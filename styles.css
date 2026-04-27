@@ -279,14 +279,14 @@ h1 span {
               transform var(--transition);
 }
 
-/* Error heatmap overlay — semi-transparent red tint scales with error count */
+/* Error heatmap overlay — red tint, opacity set directly by JS per key */
 .key::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
   background: #f87171;
-  opacity: calc(var(--err, 0) * 0.45);
+  opacity: var(--err-opacity, 0);
   pointer-events: none;
 }
 

@@ -49,19 +49,20 @@ function getBest(level) {
 // ── Error heatmap ──────────────────────────────────────────────
 
 function calcHeatIntensity(errorCount) {
-  return Math.min(errorCount / 5, 1);
+  return Math.min(errorCount / 3, 1);  // max at 3 errors
 }
 
 function showHeatmap() {
   document.querySelectorAll('.key[data-char]').forEach(el => {
-    const count = errorMap[el.dataset.char] || 0;
-    el.style.setProperty('--err', calcHeatIntensity(count));
+    const count   = errorMap[el.dataset.char] || 0;
+    const opacity = (calcHeatIntensity(count) * 0.7).toFixed(3);
+    el.style.setProperty('--err-opacity', opacity);
   });
 }
 
 function clearHeatmap() {
   document.querySelectorAll('.key[data-char]').forEach(el => {
-    el.style.removeProperty('--err');
+    el.style.removeProperty('--err-opacity');
   });
 }
 

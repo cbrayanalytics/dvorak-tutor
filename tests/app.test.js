@@ -217,10 +217,10 @@ loadSettings();
 console.log('\ncalcHeatIntensity');
 
 assert('0 errors → 0',          calcHeatIntensity(0) === 0);
-assert('1 error  → 0.2',        calcHeatIntensity(1) === 0.2);
-assert('5 errors → 1 (max)',    calcHeatIntensity(5) === 1);
+assert('1 error  → ~0.333',     Math.abs(calcHeatIntensity(1) - 1/3) < 0.001);
+assert('3 errors → 1 (max)',    calcHeatIntensity(3) === 1);
 assert('10 errors → 1 (cap)',   calcHeatIntensity(10) === 1);
-assert('2 errors → 0.4',        calcHeatIntensity(2) === 0.4);
+assert('2 errors → ~0.667',     Math.abs(calcHeatIntensity(2) - 2/3) < 0.001);
 
 // ── Personal bests ─────────────────────────────────────────────
 console.log('\nPersonal bests');
