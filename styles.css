@@ -399,6 +399,52 @@ h1 span {
 #banner.fail    { color: #f87171; }
 #banner.info    { color: var(--text-muted); font-style: italic; }
 
+/* ─── Summary Card ───────────────────────────────────────────── */
+#summary-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 1.5rem;
+  opacity: 0;
+  animation: summary-fade-in 0.3s ease forwards;
+}
+#summary-card[hidden] { display: none; }
+
+@keyframes summary-fade-in {
+  to { opacity: 1; }
+}
+
+.sum-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1.5rem;
+}
+.sum-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+.sum-value.new-best { color: var(--finger-index); }
+.sum-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 0.2rem;
+}
+.sum-divider {
+  width: 1px;
+  height: 2rem;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
 /* ─── Advance Button ─────────────────────────────────────────── */
 #advance-btn {
   display: none;

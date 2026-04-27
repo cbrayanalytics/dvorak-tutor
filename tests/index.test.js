@@ -133,6 +133,11 @@ assert('timer-toggle has aria-pressed',     html.includes('aria-pressed="false"'
 assert('settings-btn has aria-label',       html.includes('aria-label="Settings"'));
 assert('timer-toggle has aria-label',       html.includes('aria-label="Toggle time limit"'));
 
+// ── Summary card ──────────────────────────────────────────────
+console.log('\nSummary card — required IDs');
+['summary-card','sum-wpm','sum-acc','sum-time','sum-best']
+  .forEach(id => assert(`#${id} exists`, hasId(id)));
+
 // ── Summary ────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(40)}`);
 console.log(`  ${passed} passed, ${failed} failed`);

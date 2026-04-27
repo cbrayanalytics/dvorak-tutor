@@ -343,55 +343,66 @@ function startRound() {
   highlightNextKey(phrase[0]);
   updateStats();
 
-  $('banner').textContent = '';
-  $('banner').className   = '';
+  $('banner').textContent    = '';
+  $('banner').className      = '';
   $('advance-btn').classList.remove('visible');
+  $('summary-card').hidden   = true;
 
   if (settings.timerOn) startTimer();
+}
+
+function showSummaryCard(wpm, acc, elapsedMs, isNewBest) {
+  const card = $('summary-card');
+
+  $('sum-wpm').textContent  = wpm;
+  $('sum-acc').textContent  = acc + '%';
+  $('sum-time').textContent = elapsedMs > 0 ? formatTimer(Math.round(elapsedMs / 1000)) : '—';
+
+  const bestEl = $('sum-best');
+  const best   = getBest(currentLevel);
+  bestEl.textContent = best ? best.wpm + ' WPM' : '—';
+  bestEl.classList.toggle('new-best', isNewBest);
+
+  card.hidden = false;
 }
 
 function endRound() {
   clearTimer();
   clearNextKey();
 
-  // Capture WPM before resetting; update timer suggestion for next round
-  if (roundStartTime) {
-    const wpm = calcWpm(cursor, Date.now() - roundStartTime);
-    if (wpm > 0) {
-      lastWpm = wpm;
-      const suggested = suggestTimerMins(settings.wordCount, lastWpm);
-      if (suggested !== settings.timerMins) {
-        settings.timerMins = suggested;
-        $('val-timer').textContent = settings.timerMins + 'm';
-        saveSettings();
-      }
+  const elapsedMs = roundStartTime ? Date.now() - roundStartTime : 0;
+  const wpmFinal  = calcWpm(cursor, elapsedMs);
+  const acc       = calcAccuracy(correctCount, totalTyped);
+
+  if (wpmFinal > 0) {
+    lastWpm = wpmFinal;
+    const suggested = suggestTimerMins(settings.wordCount, lastWpm);
+    if (suggested !== settings.timerMins) {
+      settings.timerMins = suggested;
+      $('val-timer').textContent = settings.timerMins + 'm';
+      saveSettings();
     }
   }
 
-  const acc      = calcAccuracy(correctCount, totalTyped);
-  const wpmFinal = roundStartTime ? calcWpm(cursor, Date.now() - roundStartTime) : 0;
   const isNewBest = totalTyped > 0 && saveBest(currentLevel, wpmFinal, acc);
   updateStats();
+  showSummaryCard(wpmFinal, acc, elapsedMs, isNewBest);
 
   const banner = $('banner');
 
   if (acc >= settings.threshold) {
     if (currentLevel < 5) {
-      banner.textContent = isNewBest
-        ? `New best! ${wpmFinal} WPM · ${acc}% accuracy — great work.`
-        : `Round complete! ${acc}% accuracy — great work.`;
+      banner.textContent = isNewBest ? 'New personal best!' : 'Round complete!';
       banner.className   = 'success';
       const btn          = $('advance-btn');
       btn.textContent    = `Advance to Level ${currentLevel + 1} →`;
       btn.classList.add('visible');
     } else {
-      banner.textContent = isNewBest
-        ? `New best! ${wpmFinal} WPM · ${acc}% — you've mastered all 5 levels!`
-        : `${acc}% accuracy — you've mastered all 5 levels!`;
+      banner.textContent = isNewBest ? 'New best — all 5 levels mastered!' : 'All 5 levels mastered!';
       banner.className   = 'success';
     }
   } else {
-    banner.textContent = `${acc}% — keep going! Need ${settings.threshold}% to advance.`;
+    banner.textContent = `Need ${settings.threshold}% to advance — keep going!`;
     banner.className   = 'fail';
     setTimeout(startRound, 1800);
   }
