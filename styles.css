@@ -180,9 +180,12 @@ h1 span {
   font-size: 1.35rem;
   letter-spacing: 0.04em;
   line-height: 1.8;
-  min-height: 5rem;
+  height: 12rem;
+  overflow-y: auto;
+  scrollbar-width: none;      /* Firefox */
   word-break: break-all;
 }
+#text-display::-webkit-scrollbar { display: none; } /* Chrome/Safari */
 
 /* Each character in the text display */
 .char {
@@ -455,6 +458,7 @@ h1 span {
   transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.2s ease;
   opacity: 1;
 }
+#settings-panel[hidden] { display: none; }
 
 .setting-row {
   display: flex;

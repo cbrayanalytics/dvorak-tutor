@@ -125,6 +125,7 @@ function flashKey(char, type) {
 function renderPhrase(text) {
   const display = $('text-display');
   display.innerHTML = '';
+  display.scrollTop = 0;
   [...text].forEach((ch, i) => {
     const span = document.createElement('span');
     const info = CHAR_TO_KEY[ch] || {};
@@ -217,15 +218,17 @@ function applySettingsToDisplay() {
 function openSettingsPanel() {
   const panel = $('settings-panel');
   panel.hidden = false;
-  panel.style.maxHeight  = '0';
-  panel.style.paddingTop = '0';
+  void panel.offsetHeight;                   // layout with natural CSS before measuring
+  const naturalHeight = panel.scrollHeight;  // measure BEFORE zeroing padding
+  panel.style.maxHeight     = '0';
+  panel.style.paddingTop    = '0';
   panel.style.paddingBottom = '0';
-  panel.style.opacity    = '0';
-  void panel.offsetHeight; // force reflow before transition
-  panel.style.maxHeight  = panel.scrollHeight + 'px';
-  panel.style.paddingTop = '';
+  panel.style.opacity       = '0';
+  void panel.offsetHeight;                   // force reflow so transition sees start state
+  panel.style.maxHeight     = naturalHeight + 'px';
+  panel.style.paddingTop    = '';
   panel.style.paddingBottom = '';
-  panel.style.opacity    = '1';
+  panel.style.opacity       = '1';
   $('settings-btn').setAttribute('aria-expanded', 'true');
 }
 
@@ -398,6 +401,7 @@ function handleKeydown(e) {
 
   if (cursor < phrase.length) {
     chars[cursor].classList.add('cursor');
+    chars[cursor].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     highlightNextKey(phrase[cursor]);
   } else {
     endRound();
