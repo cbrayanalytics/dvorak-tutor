@@ -272,7 +272,6 @@ h1 span {
   color: var(--text-muted);
   flex-shrink: 0;
   position: relative;
-  isolation: isolate;
   transition: background var(--transition),
               border-color var(--transition),
               opacity var(--transition),
@@ -280,16 +279,15 @@ h1 span {
               transform var(--transition);
 }
 
-/* Error heatmap overlay — rendered behind key text via z-index: -1 */
+/* Error heatmap overlay — semi-transparent red tint scales with error count */
 .key::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
   background: #f87171;
-  opacity: calc(var(--err, 0) * 0.6);
+  opacity: calc(var(--err, 0) * 0.45);
   pointer-events: none;
-  z-index: -1;
 }
 
 .key-space {
