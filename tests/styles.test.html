@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>styles.css — Visual Test</title>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    .test-section {
+      border: 1px dashed #334155;
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .test-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #64748b;
+    }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .checklist { list-style: none; font-size: 0.8rem; color: #94a3b8; line-height: 2; }
+    .checklist li::before { content: '☐ '; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <h1>Dvorak <span>Tutor</span> — Style Test</h1>
+  </header>
+
+  <!-- ── CHECKLIST ─────────────────────────────────────────────── -->
+  <div class="test-section">
+    <div class="test-label">Visual Checklist — verify each item</div>
+    <ul class="checklist">
+      <li>Dark background (#0f172a), light text</li>
+      <li>Header: "DVORAK" + "TUTOR" with orange accent on "Tutor"</li>
+      <li>Level map: 5 pips — first two green (done), third orange (current), rest gray</li>
+      <li>Stats bar: WPM / ACC / Level labels, progress bar fills orange</li>
+      <li>Text display: pending=gray, correct chars colored by finger, error=red underline, cursor blinks</li>
+      <li>Key states: active=colored border+tint, locked=faded, home-preview=slightly faded, next=filled+pulsing</li>
+      <li>All 5 finger colors visible on keyboard: purple/blue/green/orange/gray</li>
+      <li>Responsive: shrink viewport below 620px — keys get smaller</li>
+    </ul>
+  </div>
+
+  <!-- ── LEVEL MAP ─────────────────────────────────────────────── -->
+  <div class="test-section">
+    <div class="test-label">Level Map</div>
+    <div id="level-map">
+      <div class="level-pip done">    <div class="level-pip-dot"></div> Home </div>
+      <div class="level-pip-connector"></div>
+      <div class="level-pip done">    <div class="level-pip-dot"></div> +I D </div>
+      <div class="level-pip-connector"></div>
+      <div class="level-pip current"> <div class="level-pip-dot"></div> Upper </div>
+      <div class="level-pip-connector"></div>
+      <div class="level-pip">         <div class="level-pip-dot"></div> Bottom </div>
+      <div class="level-pip-connector"></div>
+      <div class="level-pip">         <div class="level-pip-dot"></div> Full </div>
+    </div>
+  </div>
+
+  <!-- ── STATS BAR ─────────────────────────────────────────────── -->
+  <div class="test-section">
+    <div class="test-label">Stats Bar</div>
+    <div id="stats">
+      <div class="stat">
+        <div class="stat-value" id="stat-wpm">42</div>
+        <div class="stat-label">WPM</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-value" id="stat-acc">96%</div>
+        <div class="stat-label">ACC</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <div class="stat-value" id="stat-level">3</div>
+        <div class="stat-label">Level</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div id="progress-wrap">
+        <div id="progress-bar-bg">
+          <div id="progress-bar" style="width:65%"></div>
+        </div>
+        <div id="progress-label">to next level</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TEXT DISPLAY ──────────────────────────────────────────── -->
+  <div class="test-section">
+    <div class="test-label">Text Display — all char states</div>
+    <div id="text-display">
+      <!-- correct chars colored by finger -->
+      <span class="char correct" data-finger="pinky-left">a</span>
+      <span class="char correct" data-finger="ring-left">o</span>
+      <span class="char correct" data-finger="middle-left">e</span>
+      <span class="char correct" data-finger="index-left">u</span>
+      <span class="char correct" data-finger="index-left">i</span>
+      <span class="char-space correct" data-finger="thumb"> </span>
+      <!-- cursor on current char -->
+      <span class="char pending cursor" data-finger="index-right">d</span>
+      <span class="char pending" data-finger="index-right">h</span>
+      <span class="char pending" data-finger="middle-right">t</span>
+      <!-- error -->
+      <span class="char error" data-finger="ring-right">n</span>
+      <span class="char pending" data-finger="pinky-right">s</span>
+    </div>
+  </div>
+
+  <!-- ── KEY STATES ────────────────────────────────────────────── -->
+  <div class="test-section">
+    <div class="test-label">Key States (all fingers × all states)</div>
+    <div class="row">
+      <div class="key" data-finger="pinky-left"  data-state="active">a</div>
+      <div class="key" data-finger="ring-left"   data-state="active">o</div>
+      <div class="key" data-finger="middle-left" data-state="active">e</div>
+      <div class="key" data-finger="index-left"  data-state="active">u</div>
+      <div class="key" data-finger="index-right" data-state="active">h</div>
+      <div class="key" data-finger="middle-right"data-state="active">t</div>
+      <div class="key" data-finger="ring-right"  data-state="active">n</div>
+      <div class="key" data-finger="pinky-right" data-state="active">s</div>
+    </div>
+    <div class="row">
+      <div class="key" data-finger="index-left"  data-state="home-preview">i</div>
+      <div class="key" data-finger="index-right" data-state="home-preview">d</div>
+      <div class="key" data-finger="pinky-left"  data-state="locked">q</div>
+      <div class="key" data-finger="ring-left"   data-state="locked">j</div>
+      <div class="key" data-finger="middle-left" data-state="locked">k</div>
+    </div>
+    <div class="row">
+      <div class="key" data-finger="pinky-left"  data-state="next">a</div>
+      <div class="key" data-finger="ring-left"   data-state="next">o</div>
+      <div class="key" data-finger="middle-left" data-state="next">e</div>
+      <div class="key" data-finger="index-left"  data-state="next">u</div>
+      <div class="key" data-finger="index-right" data-state="next">h</div>
+      <div class="key" data-finger="middle-right"data-state="next">t</div>
+      <div class="key" data-finger="ring-right"  data-state="next">n</div>
+      <div class="key" data-finger="pinky-right" data-state="next">s</div>
+    </div>
+  </div>
+
+  <!-- ── FULL KEYBOARD (Level 1 state) ─────────────────────────── -->
+  <div class="test-section">
+    <div class="test-label">Full Keyboard — Level 1 (home row active, others locked)</div>
+    <div id="keyboard">
+      <!-- Number row -->
+      <div class="key-row row-number">
+        <div class="key" data-finger="pinky-left"  data-state="locked">1</div>
+        <div class="key" data-finger="ring-left"   data-state="locked">2</div>
+        <div class="key" data-finger="middle-left" data-state="locked">3</div>
+        <div class="key" data-finger="index-left"  data-state="locked">4</div>
+        <div class="key" data-finger="index-left"  data-state="locked">5</div>
+        <div class="key" data-finger="index-right" data-state="locked">6</div>
+        <div class="key" data-finger="index-right" data-state="locked">7</div>
+        <div class="key" data-finger="middle-right"data-state="locked">8</div>
+        <div class="key" data-finger="ring-right"  data-state="locked">9</div>
+        <div class="key" data-finger="pinky-right" data-state="locked">0</div>
+      </div>
+      <!-- Upper row -->
+      <div class="key-row row-upper">
+        <div class="key" data-finger="pinky-left"  data-state="locked">'</div>
+        <div class="key" data-finger="ring-left"   data-state="locked">,</div>
+        <div class="key" data-finger="middle-left" data-state="locked">.</div>
+        <div class="key" data-finger="index-left"  data-state="locked">p</div>
+        <div class="key" data-finger="index-left"  data-state="locked">y</div>
+        <div class="key" data-finger="index-right" data-state="locked">f</div>
+        <div class="key" data-finger="index-right" data-state="locked">g</div>
+        <div class="key" data-finger="middle-right"data-state="locked">c</div>
+        <div class="key" data-finger="ring-right"  data-state="locked">r</div>
+        <div class="key" data-finger="pinky-right" data-state="locked">l</div>
+        <div class="key" data-finger="pinky-right" data-state="locked">/</div>
+      </div>
+      <!-- Home row -->
+      <div class="key-row row-home">
+        <div class="key" data-finger="pinky-left"  data-state="active">a</div>
+        <div class="key" data-finger="ring-left"   data-state="active">o</div>
+        <div class="key" data-finger="middle-left" data-state="active">e</div>
+        <div class="key" data-finger="index-left"  data-state="active">u</div>
+        <div class="key" data-finger="index-left"  data-state="home-preview">i</div>
+        <div class="key" data-finger="index-right" data-state="home-preview">d</div>
+        <div class="key" data-finger="index-right" data-state="active">h</div>
+        <div class="key" data-finger="middle-right"data-state="active">t</div>
+        <div class="key" data-finger="ring-right"  data-state="active">n</div>
+        <div class="key" data-finger="pinky-right" data-state="active">s</div>
+        <div class="key" data-finger="pinky-right" data-state="locked">-</div>
+      </div>
+      <!-- Bottom row -->
+      <div class="key-row row-bottom">
+        <div class="key" data-finger="pinky-left"  data-state="locked">;</div>
+        <div class="key" data-finger="ring-left"   data-state="locked">q</div>
+        <div class="key" data-finger="middle-left" data-state="locked">j</div>
+        <div class="key" data-finger="index-left"  data-state="locked">k</div>
+        <div class="key" data-finger="index-left"  data-state="locked">x</div>
+        <div class="key" data-finger="index-right" data-state="locked">b</div>
+        <div class="key" data-finger="index-right" data-state="locked">m</div>
+        <div class="key" data-finger="middle-right"data-state="locked">w</div>
+        <div class="key" data-finger="ring-right"  data-state="locked">v</div>
+        <div class="key" data-finger="pinky-right" data-state="locked">z</div>
+      </div>
+      <!-- Space row -->
+      <div class="key-row row-space">
+        <div class="key key-space" data-finger="thumb" data-state="active">space</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BANNER & BUTTON ───────────────────────────────────────── -->
+  <div class="test-section">
+    <div class="test-label">Banner states + Advance button</div>
+    <div id="banner" class="success">Round complete! 96% accuracy — great work.</div>
+    <button id="advance-btn" class="visible">Advance to Level 4 →</button>
+  </div>
+  <div class="test-section">
+    <div class="test-label">Banner — fail state</div>
+    <div id="banner" class="fail">Keep practicing — aim for 90% to advance.</div>
+  </div>
+
+</div><!-- #app -->
+</body>
+</html>
