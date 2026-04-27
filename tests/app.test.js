@@ -3,11 +3,26 @@
 // words.js exports getRoundWords as a global in browser; mock it for Node
 global.getRoundWords = require('../words.js').getRoundWords;
 
+// localStorage mock for Node (not available outside browser)
+global.localStorage = (() => {
+  let store = {};
+  return {
+    getItem:    k       => store[k] ?? null,
+    setItem:    (k, v)  => { store[k] = String(v); },
+    removeItem: k       => { delete store[k]; },
+    clear:      ()      => { store = {}; },
+  };
+})();
+
 const {
   calcWpm,
   calcAccuracy,
   getKeyState,
   buildPhrase,
+  suggestTimerMins,
+  loadSettings,
+  saveSettings,
+  settings,
   ADVANCE_THRESHOLD,
   ROUND_WORD_COUNT,
 } = require('../app.js');
@@ -116,6 +131,52 @@ console.log('\nConstants');
 
 assert('ADVANCE_THRESHOLD is 90',       ADVANCE_THRESHOLD === 90);
 assert('ROUND_WORD_COUNT is at least 1', ROUND_WORD_COUNT >= 1);
+
+// ── suggestTimerMins ───────────────────────────────────────────
+console.log('\nsuggestTimerMins');
+
+assert('10 WPM, 100 words → 15 min',   suggestTimerMins(100, 10) === 15);
+assert('20 WPM, 100 words → 8 min',    suggestTimerMins(100, 20) === 8);
+assert('30 WPM, 100 words → 5 min',    suggestTimerMins(100, 30) === 5);
+assert('10 WPM,  10 words → 2 min',    suggestTimerMins(10,  10) === 2);
+assert('10 WPM, 200 words → 30 min',   suggestTimerMins(200, 10) === 30);
+assert('10 WPM, 500 words → 60 min (capped)', suggestTimerMins(500, 10) === 60);
+assert('0 WPM does not crash → 60 min (capped)', suggestTimerMins(100, 0) === 60);
+assert('1 WPM, 10 words → 15 min (ceil)', suggestTimerMins(10, 1) === 15);
+assert('always at least 1 min',         suggestTimerMins(1, 100) >= 1);
+
+// ── loadSettings / saveSettings ────────────────────────────────
+console.log('\nloadSettings / saveSettings');
+
+// Reset localStorage before each block
+localStorage.clear();
+loadSettings();
+assert('defaults: wordCount = 100',     settings.wordCount === 100);
+assert('defaults: threshold = 90',      settings.threshold === 90);
+
+// Round-trip: save non-default values then reload
+localStorage.clear();
+saveSettings({ wordCount: 50, threshold: 75, timerOn: true, timerMins: 10 });
+loadSettings();
+assert('round-trip: wordCount = 50',    settings.wordCount === 50);
+assert('round-trip: threshold = 75',    settings.threshold === 75);
+
+// Partial storage: missing keys fall back to defaults
+localStorage.clear();
+localStorage.setItem('dvorak-tutor-settings', JSON.stringify({ wordCount: 30 }));
+loadSettings();
+assert('partial: wordCount = 30',       settings.wordCount === 30);
+assert('partial: threshold defaults to 90', settings.threshold === 90);
+
+// Malformed JSON does not crash
+localStorage.clear();
+localStorage.setItem('dvorak-tutor-settings', 'not-json');
+loadSettings();
+assert('malformed JSON: falls back to defaults', settings.wordCount === 100);
+
+// Restore clean state
+localStorage.clear();
+loadSettings();
 
 // ── Summary ────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(40)}`);

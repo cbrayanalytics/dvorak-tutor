@@ -394,6 +394,7 @@ h1 span {
 
 #banner.success { color: var(--finger-middle); font-weight: 600; }
 #banner.fail    { color: #f87171; }
+#banner.info    { color: var(--text-muted); font-style: italic; }
 
 /* ─── Advance Button ─────────────────────────────────────────── */
 #advance-btn {
