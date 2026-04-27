@@ -111,6 +111,28 @@ assert('keyboard has aria-hidden="true"', html.includes('aria-hidden="true"'));
 assert('text-display has aria-label',     html.includes('aria-label="Practice text"'));
 assert('advance-btn has type="button"',   html.includes('type="button"'));
 
+// ── Settings panel ────────────────────────────────────────────
+console.log('\nSettings panel — required IDs');
+[
+  'settings-btn','settings-panel',
+  'words-dec','val-words','words-inc',
+  'threshold-dec','val-threshold','threshold-inc',
+  'timer-toggle','timer-stepper','timer-dec','val-timer','timer-inc',
+  'timer-divider','stat-timer-wrap','stat-timer',
+].forEach(id => assert(`#${id} exists`, hasId(id)));
+
+console.log('\nSettings panel — default values');
+assert('val-words default is 100',     html.includes('>100<'));
+assert('val-threshold default is 90%', html.includes('>90%<'));
+assert('val-timer default is 60s',     html.includes('>60s<'));
+
+console.log('\nSettings panel — accessibility');
+assert('settings-btn has aria-expanded',    html.includes('aria-expanded="false"'));
+assert('settings-btn has aria-controls',    html.includes('aria-controls="settings-panel"'));
+assert('timer-toggle has aria-pressed',     html.includes('aria-pressed="false"'));
+assert('settings-btn has aria-label',       html.includes('aria-label="Settings"'));
+assert('timer-toggle has aria-label',       html.includes('aria-label="Toggle time limit"'));
+
 // ── Summary ────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(40)}`);
 console.log(`  ${passed} passed, ${failed} failed`);

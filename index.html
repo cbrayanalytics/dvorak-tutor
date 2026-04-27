@@ -11,7 +11,48 @@
 
   <header>
     <h1>Dvorak <span>Tutor</span></h1>
+    <button id="settings-btn" type="button"
+            aria-label="Settings"
+            aria-expanded="false"
+            aria-controls="settings-panel">⚙</button>
   </header>
+
+  <!-- Settings panel (hidden until gear is clicked) -->
+  <div id="settings-panel" hidden>
+
+    <div class="setting-row">
+      <span class="setting-label" id="label-words">Words per round</span>
+      <div class="stepper" role="group" aria-labelledby="label-words">
+        <button class="stepper-btn" id="words-dec" type="button" aria-label="Decrease words per round">−</button>
+        <span class="stepper-value" id="val-words">100</span>
+        <button class="stepper-btn" id="words-inc" type="button" aria-label="Increase words per round">+</button>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <span class="setting-label" id="label-threshold">Advance at</span>
+      <div class="stepper" role="group" aria-labelledby="label-threshold">
+        <button class="stepper-btn" id="threshold-dec" type="button" aria-label="Decrease advance threshold">−</button>
+        <span class="stepper-value" id="val-threshold">90%</span>
+        <button class="stepper-btn" id="threshold-inc" type="button" aria-label="Increase advance threshold">+</button>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <span class="setting-label" id="label-timer">Time limit</span>
+      <div class="timer-control">
+        <button class="toggle-btn" id="timer-toggle" type="button"
+                aria-pressed="false" aria-label="Toggle time limit">OFF</button>
+        <div class="stepper" role="group" aria-labelledby="label-timer"
+             id="timer-stepper" hidden>
+          <button class="stepper-btn" id="timer-dec" type="button" aria-label="Decrease time limit">−</button>
+          <span class="stepper-value" id="val-timer">60s</span>
+          <button class="stepper-btn" id="timer-inc" type="button" aria-label="Increase time limit">+</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- #settings-panel -->
 
   <!-- Level progress map -->
   <div id="level-map">
@@ -58,6 +99,12 @@
         <div id="progress-bar"></div>
       </div>
       <div id="progress-label">to next level</div>
+    </div>
+    <!-- Timer countdown — hidden unless time limit is active -->
+    <div class="stat-divider" id="timer-divider" hidden></div>
+    <div class="stat" id="stat-timer-wrap" hidden>
+      <div class="stat-value" id="stat-timer">—</div>
+      <div class="stat-label">TIME</div>
     </div>
   </div>
 
