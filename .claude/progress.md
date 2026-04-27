@@ -107,18 +107,18 @@ Level advance condition: ≥ 90% accuracy on a completed round.
 Let the user adjust difficulty settings without touching code. Values persist via `localStorage`.
 
 ### Three settings
-| Setting | Current hardcoded value | Control type |
-|---------|------------------------|--------------|
-| Words per round | `ROUND_WORD_COUNT = 8` | Stepper / slider (range: 4–20) |
-| Advance threshold | `ADVANCE_THRESHOLD = 90` | Stepper / slider (range: 50–100%) |
-| Time limit | none | Toggle + stepper in seconds (off / 15s–120s) |
+| Setting | Default | Range | Step | Control |
+|---------|---------|-------|------|---------|
+| Words per round | **100** | 10–500 | 10 | Stepper (− / +) |
+| Advance threshold | **90%** | 50–100 | 5 | Stepper (− / +) |
+| Time limit | **OFF** | 30–300s | 15 | Toggle + stepper |
 
 ### Approach
-- Gear icon `⚙` button in the header opens/closes a settings panel
-- Panel sits above the stats bar (slides down)
-- On change, values update the live constants in `app.js` and restart the current round
+- `⚙` button in header opens/closes a slide-down settings panel
+- Each stepper change immediately restarts the current round
 - Values saved to `localStorage` under key `dvorak-tutor-settings`
-- Settings loaded at `init()` time, falling back to defaults if absent
+- Loaded at `init()`, falling back to defaults if absent
+- `ROUND_WORD_COUNT` and `ADVANCE_THRESHOLD` in `app.js` become `let` vars driven by settings
 
 ### Files to modify
 | File | Change |

@@ -88,15 +88,19 @@ Applied both to keyboard keys and to characters in the typed-text display.
 
 Planned additions to make the tutor adjustable without requiring code changes:
 
-- **Word count per round** — how many words appear per practice round (currently hardcoded to 8)
-- **Advance threshold** — minimum accuracy % required to unlock the next level (currently hardcoded to 90%)
-- **Time limit** — optional countdown per round; failing to finish in time restarts the round
+Three adjustable settings exposed via a `⚙` gear-icon panel in the header:
 
-All three values should be exposed in a settings panel in the UI. Current constants in `app.js`:
-- `ROUND_WORD_COUNT = 8`
-- `ADVANCE_THRESHOLD = 90`
+| Setting | Default | Range | Step |
+|---------|---------|-------|------|
+| Words per round | 100 | 10–500 | 10 |
+| Advance threshold | 90% | 50–100% | 5 |
+| Time limit | OFF | 30–300s | 15 |
 
-The settings panel will live in `index.html` and be toggled by a gear icon. Values should be saved to `localStorage` so they persist across sessions.
+- Controls are **steppers** (− value +), not sliders
+- Changes **restart the round immediately**
+- Values persist in `localStorage` under key `dvorak-tutor-settings`
+- `ROUND_WORD_COUNT` and `ADVANCE_THRESHOLD` in `app.js` become live `let` vars
+- New functions: `loadSettings()`, `saveSettings()`, `applySettings()` + timer countdown logic
 
 ## Repository
 
