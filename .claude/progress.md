@@ -15,9 +15,9 @@
 | 3 | Write and pass tests for `words.js` | ✅ done — 49/49 |
 | 4 | Create `styles.css` | ✅ done |
 | 5 | Create `index.html` | ✅ done |
-| 6 | Create `app.js` with game logic | 🔲 next |
-| 7 | Write and pass tests for `app.js` | 🔲 pending |
-| 8 | Final browser smoke test | 🔲 pending |
+| 6 | Create `app.js` with game logic | ✅ done |
+| 7 | Write and pass tests for `app.js` | ✅ done — 58/58 |
+| 8 | Final browser smoke test | ✅ done — 100% accuracy on first round |
 
 ---
 
@@ -113,7 +113,7 @@ Used by `renderPhrase` to set `data-finger` on each `.char` span, and by
 | `tests/words.test.js` | 49 | ✅ all pass |
 | `tests/styles.test.html` | visual | ✅ verified |
 | `tests/index.test.js` | 95 | ✅ all pass |
-| `tests/app.test.js` | TBD | 🔲 not written yet |
+| `tests/app.test.js` | 58 | ✅ all pass |
 
 ---
 
