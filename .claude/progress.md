@@ -2,12 +2,14 @@
 
 **Project:** Dvorak Typing Tutor (browser-based, vanilla JS/CSS)
 **Repo:** https://github.com/cbrayanalytics/dvorak-tutor — branch `trunk`
-**Last updated:** 2026-04-26
-**Phase 1 complete.** Now starting Phase 2 — Difficulty Tuning.
+**Last updated:** 2026-04-27
+**Phase 2 complete.** Now planning Phase 3.
 
 ---
 
 ## Task Status
+
+### Phase 1 — Core App
 
 | # | Task | Status |
 |---|------|--------|
@@ -17,8 +19,20 @@
 | 4 | Create `styles.css` | ✅ done |
 | 5 | Create `index.html` | ✅ done |
 | 6 | Create `app.js` with game logic | ✅ done |
-| 7 | Write and pass tests for `app.js` | ✅ done — 58/58 |
-| 8 | Final browser smoke test | ✅ done — 100% accuracy on first round |
+| 7 | Write and pass tests for `app.js` | ✅ done — 74/74 |
+| 8 | Final browser smoke test | ✅ done |
+
+### Phase 2 — Difficulty Tuning
+
+| # | Task | Status |
+|---|------|--------|
+| 9  | Add settings panel markup to `index.html` + tests | ✅ done — 119/119 index tests |
+| 10 | Style settings panel in `styles.css` | ✅ done |
+| 11 | Add settings logic to `app.js` + tests | ✅ done — 74/74 app tests |
+| 12 | Browser smoke test + bug fixes (panel toggle, clipping) | ✅ done |
+| 13 | Scrolling text display (fixed height, auto-scroll cursor) | ✅ done |
+
+**Total tests passing: 242/242** (49 words + 119 index + 74 app)
 
 ---
 
@@ -40,16 +54,26 @@
 - Key `data-state` variants: `active`, `locked`, `home-preview`, `next`
 - `next` state: filled background + `key-pulse` animation (scale + glow)
 - Correct chars in `#text-display` colored by `data-finger` attribute
+- `#text-display` fixed at `12rem` height with hidden scrollbar; auto-scrolls on keystroke
+- Settings panel with slide-open/close animation driven by JS `scrollHeight`
 - Responsive breakpoint at 620px (smaller keys)
-- Visual test: `tests/styles.test.html`
 
 ### `index.html`
 - Full Dvorak keyboard markup: number, upper, home, bottom, space rows
 - Every key has `data-char`, `data-finger`, `data-level` attributes
-- `data-level` encodes when each key unlocks (matches level system below)
-- IDs wired: `#text-display`, `#stat-wpm`, `#stat-acc`, `#stat-level`,
-  `#progress-bar`, `#banner`, `#advance-btn`, `#level-map`, `#keyboard`
-- Loads `words.js` then `app.js` at bottom of body
+- Settings panel: gear button, word count / threshold / timer steppers, timer toggle
+- IDs wired: `#text-display`, `#stat-wpm`, `#stat-acc`, `#stat-level`, `#stat-timer`,
+  `#progress-bar`, `#banner`, `#advance-btn`, `#level-map`, `#keyboard`,
+  `#settings-btn`, `#settings-panel`
+
+### `app.js`
+- Settings: `loadSettings()`, `saveSettings()`, `applySettingsToDisplay()`
+- Settings defaults: `wordCount: 100`, `threshold: 90`, `timerOn: false`, `timerMins: 15`
+- Timer: `startTimer()`, `clearTimer()`, `formatTimer()`, WPM-based auto-suggest
+- Timer formula: `ceil(wordCount / max(wpm, 1) * 1.5)` — 15 min at 10 WPM / 100 words
+- `lastWpm` seeded at 10 (beginner); updated after each round; drives timer suggestion
+- Threshold and timer changes apply in-place; word count change restarts the round
+- Settings persisted to `localStorage` under key `dvorak-tutor-settings`
 
 ---
 
@@ -63,7 +87,7 @@
 | 4 | + q j k x b m w v z | Bottom row letters |
 | 5 | All + punctuation + numbers | Full keyboard |
 
-Level advance condition: ≥ 90% accuracy on a completed round.
+Level advance condition: ≥ threshold% accuracy (default 90%) on a completed round.
 
 ---
 
@@ -75,17 +99,18 @@ Level advance condition: ≥ 90% accuracy on a completed round.
 | `calcAccuracy(correct, total)` | Pure — accuracy % |
 | `getKeyState(keyLevel, activeLevel, char)` | Pure — returns `active`/`locked`/`home-preview` |
 | `buildPhrase(level, wordCount)` | Pure — joins `getRoundWords()` output with spaces |
+| `suggestTimerMins(wordCount, wpm)` | Pure — WPM-based timer suggestion |
+| `loadSettings()` / `saveSettings()` | localStorage read/write |
 | `buildCharMap()` | DOM — builds `CHAR_TO_KEY` from keyboard markup at init |
 | `renderKeyboard(level)` | DOM — sets `data-state` on all `.key` elements |
 | `highlightNextKey(char)` | DOM — pulses the next key to type |
 | `flashKey(char, type)` | DOM — ok/err flash animation on a key |
-| `renderPhrase(text)` | DOM — populates `#text-display` with `.char` spans |
+| `renderPhrase(text)` | DOM — populates `#text-display` with `.char` spans, resets scroll |
 | `updateStats()` | DOM — writes WPM/ACC/progress bar |
 | `updateLevelMap(level)` | DOM — sets done/current classes on level pips |
-| `startRound()` | DOM — resets all state, renders new phrase |
-| `endRound()` | DOM — shows banner + advance button |
+| `startRound()` / `endRound()` | DOM — round lifecycle |
 | `advanceLevel()` | DOM — increments level, re-renders keyboard, starts round |
-| `handleKeydown(e)` | DOM — core input handler |
+| `handleKeydown(e)` | DOM — core input handler; scrolls cursor into view |
 | `init()` | DOM — entry point, called on DOMContentLoaded |
 
 ---
@@ -96,45 +121,8 @@ Level advance condition: ≥ 90% accuracy on a completed round.
 |------|-------|--------|
 | `tests/words.test.js` | 49 | ✅ all pass |
 | `tests/styles.test.html` | visual | ✅ verified |
-| `tests/index.test.js` | 95 | ✅ all pass |
-| `tests/app.test.js` | 58 | ✅ all pass |
-
----
-
-## Phase 2 — Difficulty Tuning (in progress)
-
-### Goal
-Let the user adjust difficulty settings without touching code. Values persist via `localStorage`.
-
-### Three settings
-| Setting | Default | Range | Step | Control |
-|---------|---------|-------|------|---------|
-| Words per round | **100** | 10–500 | 10 | Stepper (− / +) |
-| Advance threshold | **90%** | 50–100 | 5 | Stepper (− / +) |
-| Time limit | **OFF** | 30–300s | 15 | Toggle + stepper |
-
-### Approach
-- `⚙` button in header opens/closes a slide-down settings panel
-- Each stepper change immediately restarts the current round
-- Values saved to `localStorage` under key `dvorak-tutor-settings`
-- Loaded at `init()`, falling back to defaults if absent
-- `ROUND_WORD_COUNT` and `ADVANCE_THRESHOLD` in `app.js` become `let` vars driven by settings
-
-### Files to modify
-| File | Change |
-|------|--------|
-| `index.html` | Add gear button to header, add `#settings-panel` section |
-| `styles.css` | Style the settings panel, controls, and toggle animation |
-| `app.js` | Replace hardcoded constants with live vars, add `loadSettings()`, `saveSettings()`, `applySettings()`, timer countdown logic |
-| `tests/app.test.js` | Add tests for `loadSettings`, `saveSettings`, timer calc |
-
-### Tasks (Phase 2)
-| # | Task | Status |
-|---|------|--------|
-| 9  | Add settings panel markup to `index.html` + tests | 🔲 pending |
-| 10 | Style settings panel in `styles.css` | 🔲 pending |
-| 11 | Add settings logic to `app.js` (load/save/apply + timer) + tests | 🔲 pending |
-| 12 | Browser smoke test of settings panel | 🔲 pending |
+| `tests/index.test.js` | 119 | ✅ all pass |
+| `tests/app.test.js` | 74 | ✅ all pass |
 
 ---
 
@@ -147,4 +135,11 @@ Let the user adjust difficulty settings without touching code. Values persist vi
 - **`data-state` on keys** (not CSS classes) — makes JS toggling a single attribute write
 - **`color-mix()`** used for finger tints — requires Chrome 111+ / Firefox 113+ / Safari 16.2+
 - **Advance is manual** — user clicks button after passing a round; no auto-advance
-- **Round size** — 8 words per round (will be defined in `app.js` as `ROUND_WORD_COUNT = 8`)
+- **`ROUND_WORD_COUNT`** defaults to 100 (user-adjustable via settings, range 10–500)
+- **Timer auto-scales** with WPM: `ceil(wordCount / wpm * 1.5)`; seeded at 10 WPM
+- **Settings panel** uses `scrollHeight`-based JS animation (not CSS-only `max-height`)
+- **`#settings-panel[hidden]`** requires explicit `display: none` rule to override `display: flex`
+
+---
+
+## Phase 3 — TBD
