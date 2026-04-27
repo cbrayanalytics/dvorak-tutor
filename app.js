@@ -401,7 +401,7 @@ function handleKeydown(e) {
 
   if (cursor < phrase.length) {
     chars[cursor].classList.add('cursor');
-    chars[cursor].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    chars[cursor].scrollIntoView({ behavior: 'instant', block: 'nearest' });
     highlightNextKey(phrase[cursor]);
   } else {
     endRound();
