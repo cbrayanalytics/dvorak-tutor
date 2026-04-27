@@ -2,7 +2,7 @@
 
 // ── Settings ───────────────────────────────────────────────────
 const SETTINGS_KEY      = 'dvorak-tutor-settings';
-const SETTINGS_DEFAULTS = { wordCount: 100, threshold: 90, timerOn: false, timerMins: 15 };
+const SETTINGS_DEFAULTS = { wordCount: 100, threshold: 90, timerOn: false, timerMins: 15, level: 1 };
 
 let settings = { ...SETTINGS_DEFAULTS };
 
@@ -13,6 +13,7 @@ function loadSettings() {
     const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY));
     if (stored && typeof stored === 'object') Object.assign(settings, stored);
   } catch (_) { /* malformed JSON: keep defaults */ }
+  settings.level = Math.max(1, Math.min(5, settings.level));
 }
 
 function saveSettings(overrides) {
@@ -363,6 +364,7 @@ function endRound() {
 function advanceLevel() {
   if (currentLevel >= 5) return;
   currentLevel++;
+  saveSettings({ level: currentLevel });
   renderKeyboard(currentLevel);
   updateLevelMap(currentLevel);
   startRound();
@@ -414,6 +416,7 @@ function handleKeydown(e) {
 
 function init() {
   loadSettings();
+  currentLevel = settings.level;
 
   CHAR_TO_KEY = buildCharMap();
   renderKeyboard(currentLevel);

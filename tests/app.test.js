@@ -178,6 +178,37 @@ assert('malformed JSON: falls back to defaults', settings.wordCount === 100);
 localStorage.clear();
 loadSettings();
 
+// ── Level persistence ───────────────────────────────────────────
+console.log('\nLevel persistence');
+
+localStorage.clear();
+loadSettings();
+assert('defaults: level = 1',              settings.level === 1);
+
+localStorage.clear();
+saveSettings({ level: 3 });
+loadSettings();
+assert('round-trip: level 3 persists',    settings.level === 3);
+
+localStorage.clear();
+saveSettings({ level: 5 });
+loadSettings();
+assert('round-trip: level 5 persists',    settings.level === 5);
+
+localStorage.clear();
+localStorage.setItem('dvorak-tutor-settings', JSON.stringify({ level: 6 }));
+loadSettings();
+assert('level 6 clamps to 5',             settings.level === 5);
+
+localStorage.clear();
+localStorage.setItem('dvorak-tutor-settings', JSON.stringify({ level: 0 }));
+loadSettings();
+assert('level 0 clamps to 1',             settings.level === 1);
+
+// Restore clean state
+localStorage.clear();
+loadSettings();
+
 // ── Summary ────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(40)}`);
 console.log(`  ${passed} passed, ${failed} failed`);
