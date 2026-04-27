@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dvorak Tutor</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <h1>Dvorak <span>Tutor</span></h1>
+  </header>
+
+  <!-- Level progress map -->
+  <div id="level-map">
+    <div class="level-pip current" data-level="1">
+      <div class="level-pip-dot"></div>Home
+    </div>
+    <div class="level-pip-connector"></div>
+    <div class="level-pip" data-level="2">
+      <div class="level-pip-dot"></div>+I D
+    </div>
+    <div class="level-pip-connector"></div>
+    <div class="level-pip" data-level="3">
+      <div class="level-pip-dot"></div>Upper
+    </div>
+    <div class="level-pip-connector"></div>
+    <div class="level-pip" data-level="4">
+      <div class="level-pip-dot"></div>Bottom
+    </div>
+    <div class="level-pip-connector"></div>
+    <div class="level-pip" data-level="5">
+      <div class="level-pip-dot"></div>Full
+    </div>
+  </div>
+
+  <!-- Stats bar -->
+  <div id="stats">
+    <div class="stat">
+      <div class="stat-value" id="stat-wpm">0</div>
+      <div class="stat-label">WPM</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-value" id="stat-acc">—</div>
+      <div class="stat-label">ACC</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-value" id="stat-level">1</div>
+      <div class="stat-label">Level</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div id="progress-wrap">
+      <div id="progress-bar-bg">
+        <div id="progress-bar"></div>
+      </div>
+      <div id="progress-label">to next level</div>
+    </div>
+  </div>
+
+  <!-- Typed-text display -->
+  <div id="text-display" aria-label="Practice text" aria-live="polite"></div>
+
+  <!-- Round result banner -->
+  <div id="banner" role="status"></div>
+
+  <!-- Advance level button (shown after passing a round) -->
+  <button id="advance-btn" type="button">Advance to Level 2 →</button>
+
+  <!-- Keyboard diagram -->
+  <div id="keyboard" aria-hidden="true">
+
+    <!-- Number row -->
+    <div class="key-row row-number">
+      <div class="key" data-char="1" data-finger="pinky-left"   data-level="5">1</div>
+      <div class="key" data-char="2" data-finger="ring-left"    data-level="5">2</div>
+      <div class="key" data-char="3" data-finger="middle-left"  data-level="5">3</div>
+      <div class="key" data-char="4" data-finger="index-left"   data-level="5">4</div>
+      <div class="key" data-char="5" data-finger="index-left"   data-level="5">5</div>
+      <div class="key" data-char="6" data-finger="index-right"  data-level="5">6</div>
+      <div class="key" data-char="7" data-finger="index-right"  data-level="5">7</div>
+      <div class="key" data-char="8" data-finger="middle-right" data-level="5">8</div>
+      <div class="key" data-char="9" data-finger="ring-right"   data-level="5">9</div>
+      <div class="key" data-char="0" data-finger="pinky-right"  data-level="5">0</div>
+    </div>
+
+    <!-- Upper row: ' , . p y  f g c r l / -->
+    <div class="key-row row-upper">
+      <div class="key" data-char="'"  data-finger="pinky-left"   data-level="5">'</div>
+      <div class="key" data-char=","  data-finger="ring-left"    data-level="5">,</div>
+      <div class="key" data-char="."  data-finger="middle-left"  data-level="5">.</div>
+      <div class="key" data-char="p"  data-finger="index-left"   data-level="3">p</div>
+      <div class="key" data-char="y"  data-finger="index-left"   data-level="3">y</div>
+      <div class="key" data-char="f"  data-finger="index-right"  data-level="3">f</div>
+      <div class="key" data-char="g"  data-finger="index-right"  data-level="3">g</div>
+      <div class="key" data-char="c"  data-finger="middle-right" data-level="3">c</div>
+      <div class="key" data-char="r"  data-finger="ring-right"   data-level="3">r</div>
+      <div class="key" data-char="l"  data-finger="pinky-right"  data-level="3">l</div>
+      <div class="key" data-char="/"  data-finger="pinky-right"  data-level="5">/</div>
+    </div>
+
+    <!-- Home row: a o e u i  d h t n s - -->
+    <div class="key-row row-home">
+      <div class="key" data-char="a" data-finger="pinky-left"   data-level="1">a</div>
+      <div class="key" data-char="o" data-finger="ring-left"    data-level="1">o</div>
+      <div class="key" data-char="e" data-finger="middle-left"  data-level="1">e</div>
+      <div class="key" data-char="u" data-finger="index-left"   data-level="1">u</div>
+      <div class="key" data-char="i" data-finger="index-left"   data-level="2">i</div>
+      <div class="key" data-char="d" data-finger="index-right"  data-level="2">d</div>
+      <div class="key" data-char="h" data-finger="index-right"  data-level="1">h</div>
+      <div class="key" data-char="t" data-finger="middle-right" data-level="1">t</div>
+      <div class="key" data-char="n" data-finger="ring-right"   data-level="1">n</div>
+      <div class="key" data-char="s" data-finger="pinky-right"  data-level="1">s</div>
+      <div class="key" data-char="-" data-finger="pinky-right"  data-level="5">-</div>
+    </div>
+
+    <!-- Bottom row: ; q j k x  b m w v z -->
+    <div class="key-row row-bottom">
+      <div class="key" data-char=";" data-finger="pinky-left"   data-level="5">;</div>
+      <div class="key" data-char="q" data-finger="ring-left"    data-level="4">q</div>
+      <div class="key" data-char="j" data-finger="middle-left"  data-level="4">j</div>
+      <div class="key" data-char="k" data-finger="index-left"   data-level="4">k</div>
+      <div class="key" data-char="x" data-finger="index-left"   data-level="4">x</div>
+      <div class="key" data-char="b" data-finger="index-right"  data-level="4">b</div>
+      <div class="key" data-char="m" data-finger="index-right"  data-level="4">m</div>
+      <div class="key" data-char="w" data-finger="middle-right" data-level="4">w</div>
+      <div class="key" data-char="v" data-finger="ring-right"   data-level="4">v</div>
+      <div class="key" data-char="z" data-finger="pinky-right"  data-level="4">z</div>
+    </div>
+
+    <!-- Space bar -->
+    <div class="key-row row-space">
+      <div class="key key-space" data-char=" " data-finger="thumb" data-level="1">space</div>
+    </div>
+
+  </div><!-- #keyboard -->
+
+</div><!-- #app -->
+
+<script src="words.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
