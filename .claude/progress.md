@@ -3,6 +3,7 @@
 **Project:** Dvorak Typing Tutor (browser-based, vanilla JS/CSS)
 **Repo:** https://github.com/cbrayanalytics/dvorak-tutor — branch `trunk`
 **Last updated:** 2026-04-26
+**Phase 1 complete.** Now starting Phase 2 — Difficulty Tuning.
 
 ---
 
@@ -66,43 +67,26 @@ Level advance condition: ≥ 90% accuracy on a completed round.
 
 ---
 
-## app.js — Design (to implement next)
-
-Key functions to write (all pure where possible for testability):
+## app.js — Implemented functions
 
 | Function | Purpose |
 |----------|---------|
-| `renderKeyboard(level)` | Sets `data-state` on each `.key` element based on current level. Level 1 special case: I and D get `home-preview` instead of `locked`. |
-| `buildPhrase(level, wordCount)` | Calls `getRoundWords(level, wordCount)`, joins with spaces, returns string. |
-| `renderPhrase(phrase)` | Populates `#text-display` with `.char` spans. Each span gets `data-finger` from key lookup. Space chars get class `char-space`. First char gets class `cursor`. |
-| `highlightNextKey(char)` | Finds the `.key[data-char]` element and sets its `data-state` to `next`. Clears previous `next` key. |
-| `handleKeydown(e)` | Core input handler. Compares typed char to expected. Updates char class (`correct`/`error`), advances cursor, updates stats, flashes key. |
-| `calcWpm(charsTyped, elapsedMs)` | `Math.round((charsTyped / 5) / (elapsedMs / 60000))` |
-| `calcAccuracy(correct, total)` | `Math.round((correct / total) * 100)` — returns 0 if total is 0 |
-| `updateStats(wpm, accuracy)` | Writes to `#stat-wpm`, `#stat-acc`, updates `#progress-bar` width |
-| `updateLevelMap(level)` | Sets `.done` / `.current` classes on `#level-map` pips |
-| `advanceLevel()` | Increments level, calls `renderKeyboard`, resets round, hides advance button |
-| `endRound(accuracy)` | Shows `#banner` with pass/fail message. Shows `#advance-btn` if accuracy ≥ 90 and level < 5. |
-| `startRound()` | Builds and renders a new phrase, resets timer and counters, hides banner/button |
-| `init()` | Entry point — called on `DOMContentLoaded`. Renders keyboard, starts first round, attaches keydown listener. |
-
-### State variables (module-level)
-```js
-let currentLevel   = 1;
-let phrase         = '';      // full string being typed
-let cursor         = 0;       // index into phrase
-let correctCount   = 0;
-let totalTyped     = 0;
-let roundStartTime = null;    // Date.now() on first keypress
-```
-
-### Key lookup map
-`CHAR_TO_KEY` — built from querying all `.key` elements in the DOM:
-```js
-// { 'a': { finger: 'pinky-left', level: 1 }, ... }
-```
-Used by `renderPhrase` to set `data-finger` on each `.char` span, and by
-`highlightNextKey` to find the keyboard element to pulse.
+| `calcWpm(charsTyped, elapsedMs)` | Pure — WPM calculation |
+| `calcAccuracy(correct, total)` | Pure — accuracy % |
+| `getKeyState(keyLevel, activeLevel, char)` | Pure — returns `active`/`locked`/`home-preview` |
+| `buildPhrase(level, wordCount)` | Pure — joins `getRoundWords()` output with spaces |
+| `buildCharMap()` | DOM — builds `CHAR_TO_KEY` from keyboard markup at init |
+| `renderKeyboard(level)` | DOM — sets `data-state` on all `.key` elements |
+| `highlightNextKey(char)` | DOM — pulses the next key to type |
+| `flashKey(char, type)` | DOM — ok/err flash animation on a key |
+| `renderPhrase(text)` | DOM — populates `#text-display` with `.char` spans |
+| `updateStats()` | DOM — writes WPM/ACC/progress bar |
+| `updateLevelMap(level)` | DOM — sets done/current classes on level pips |
+| `startRound()` | DOM — resets all state, renders new phrase |
+| `endRound()` | DOM — shows banner + advance button |
+| `advanceLevel()` | DOM — increments level, re-renders keyboard, starts round |
+| `handleKeydown(e)` | DOM — core input handler |
+| `init()` | DOM — entry point, called on DOMContentLoaded |
 
 ---
 
@@ -114,6 +98,43 @@ Used by `renderPhrase` to set `data-finger` on each `.char` span, and by
 | `tests/styles.test.html` | visual | ✅ verified |
 | `tests/index.test.js` | 95 | ✅ all pass |
 | `tests/app.test.js` | 58 | ✅ all pass |
+
+---
+
+## Phase 2 — Difficulty Tuning (in progress)
+
+### Goal
+Let the user adjust difficulty settings without touching code. Values persist via `localStorage`.
+
+### Three settings
+| Setting | Current hardcoded value | Control type |
+|---------|------------------------|--------------|
+| Words per round | `ROUND_WORD_COUNT = 8` | Stepper / slider (range: 4–20) |
+| Advance threshold | `ADVANCE_THRESHOLD = 90` | Stepper / slider (range: 50–100%) |
+| Time limit | none | Toggle + stepper in seconds (off / 15s–120s) |
+
+### Approach
+- Gear icon `⚙` button in the header opens/closes a settings panel
+- Panel sits above the stats bar (slides down)
+- On change, values update the live constants in `app.js` and restart the current round
+- Values saved to `localStorage` under key `dvorak-tutor-settings`
+- Settings loaded at `init()` time, falling back to defaults if absent
+
+### Files to modify
+| File | Change |
+|------|--------|
+| `index.html` | Add gear button to header, add `#settings-panel` section |
+| `styles.css` | Style the settings panel, controls, and toggle animation |
+| `app.js` | Replace hardcoded constants with live vars, add `loadSettings()`, `saveSettings()`, `applySettings()`, timer countdown logic |
+| `tests/app.test.js` | Add tests for `loadSettings`, `saveSettings`, timer calc |
+
+### Tasks (Phase 2)
+| # | Task | Status |
+|---|------|--------|
+| 9  | Add settings panel markup to `index.html` + tests | 🔲 pending |
+| 10 | Style settings panel in `styles.css` | 🔲 pending |
+| 11 | Add settings logic to `app.js` (load/save/apply + timer) + tests | 🔲 pending |
+| 12 | Browser smoke test of settings panel | 🔲 pending |
 
 ---
 

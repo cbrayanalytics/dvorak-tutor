@@ -18,7 +18,7 @@ There are no lint commands and no build step. Tests live in `tests/` as plain JS
 ```bash
 node tests/words.test.js   # 49 tests — word list and level filtering
 node tests/index.test.js   # 95 tests — HTML structure and data attributes
-node tests/app.test.js     # (pending) — game logic unit tests
+node tests/app.test.js     # 58 tests  — game logic unit tests
 ```
 
 Visual CSS test: open `tests/styles.test.html` directly in a browser.
@@ -83,6 +83,20 @@ Applied both to keyboard keys and to characters in the typed-text display.
 ### Level progression
 
 `advanceLevel()` is called when the user completes a round with ≥ 90% accuracy. It increments `currentLevel`, calls `renderKeyboard(currentLevel)`, and refreshes the word pool via `getWordsForLevel(currentLevel)`.
+
+## Difficulty Tuning (next feature)
+
+Planned additions to make the tutor adjustable without requiring code changes:
+
+- **Word count per round** — how many words appear per practice round (currently hardcoded to 8)
+- **Advance threshold** — minimum accuracy % required to unlock the next level (currently hardcoded to 90%)
+- **Time limit** — optional countdown per round; failing to finish in time restarts the round
+
+All three values should be exposed in a settings panel in the UI. Current constants in `app.js`:
+- `ROUND_WORD_COUNT = 8`
+- `ADVANCE_THRESHOLD = 90`
+
+The settings panel will live in `index.html` and be toggled by a gear icon. Values should be saved to `localStorage` so they persist across sessions.
 
 ## Repository
 
