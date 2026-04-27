@@ -442,8 +442,6 @@ h1 span {
 
 /* ─── Settings Panel ─────────────────────────────────────────── */
 #settings-panel {
-  overflow: hidden;
-  max-height: 300px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -451,15 +449,10 @@ h1 span {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
-  transition: max-height 0.3s ease, padding 0.3s ease;
-}
-
-/* Override UA display:none so max-height transition works */
-#settings-panel[hidden] {
-  display: flex;
-  max-height: 0;
-  padding-top: 0;
-  padding-bottom: 0;
+  /* Slide animation driven by JS (sets max-height on element style) */
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.2s ease;
+  opacity: 1;
 }
 
 .setting-row {
