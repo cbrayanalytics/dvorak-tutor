@@ -142,4 +142,25 @@ Level advance condition: ≥ threshold% accuracy (default 90%) on a completed ro
 
 ---
 
-## Phase 3 — TBD
+## Phase 3 — Progress & Feedback
+
+### Goal
+Give users meaningful feedback on their improvement and make progress persist across sessions.
+
+### Features (in order)
+
+| # | Task | Description | Status |
+|---|------|-------------|--------|
+| 14 | Level persistence | Save/load `currentLevel` to `localStorage`; survives page refresh | 🔲 pending |
+| 15 | Personal bests | Save best WPM + accuracy per level; show in stats bar | 🔲 pending |
+| 16 | End-of-round summary | Richer result card: WPM, accuracy, errors, time used | 🔲 pending |
+| 17 | Key error heatmap | Track wrong-key counts per round; tint keys on keyboard after round | 🔲 pending |
+
+### Files to modify
+
+| File | Change |
+|------|--------|
+| `app.js` | Level persistence in `init()`/`advanceLevel()`; bests tracking; error map accumulation |
+| `index.html` | Personal best display in stats bar; summary card markup |
+| `styles.css` | Summary card styles; heatmap tint on keys |
+| `tests/app.test.js` | Tests for bests storage, error tracking helpers |

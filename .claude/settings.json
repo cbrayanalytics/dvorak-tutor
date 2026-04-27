@@ -10,6 +10,16 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"systemMessage\": \"Session ended — update .claude/progress.md if any Phase 3 tasks were completed.\"}'"
+          }
+        ]
+      }
     ]
   }
 }
