@@ -16,9 +16,12 @@ python3 -m http.server   # optional local server if needed for fetch()
 There are no lint commands and no build step. Tests live in `tests/` as plain JS files runnable with Node:
 
 ```bash
-node tests/words.test.js
-node tests/app.test.js
+node tests/words.test.js   # 49 tests — word list and level filtering
+node tests/index.test.js   # 95 tests — HTML structure and data attributes
+node tests/app.test.js     # (pending) — game logic unit tests
 ```
+
+Visual CSS test: open `tests/styles.test.html` directly in a browser.
 
 ## Architecture
 
@@ -80,3 +83,9 @@ Applied both to keyboard keys and to characters in the typed-text display.
 ### Level progression
 
 `advanceLevel()` is called when the user completes a round with ≥ 90% accuracy. It increments `currentLevel`, calls `renderKeyboard(currentLevel)`, and refreshes the word pool via `getWordsForLevel(currentLevel)`.
+
+## Repository
+
+- GitHub: https://github.com/cbrayanalytics/dvorak-tutor
+- Branch: `trunk`
+- See `.claude/progress.md` for current build status.
