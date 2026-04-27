@@ -3,7 +3,7 @@
 **Project:** Dvorak Typing Tutor (browser-based, vanilla JS/CSS)
 **Repo:** https://github.com/cbrayanalytics/dvorak-tutor — branch `trunk`
 **Last updated:** 2026-04-27
-**Phase 2 complete.** Now planning Phase 3.
+**Phase 3 complete.** All features shipped.
 
 ---
 
@@ -151,10 +151,10 @@ Give users meaningful feedback on their improvement and make progress persist ac
 
 | # | Task | Description | Status |
 |---|------|-------------|--------|
-| 14 | Level persistence | Save/load `currentLevel` to `localStorage`; survives page refresh | 🔲 pending |
-| 15 | Personal bests | Save best WPM + accuracy per level; show in stats bar | 🔲 pending |
-| 16 | End-of-round summary | Richer result card: WPM, accuracy, errors, time used | 🔲 pending |
-| 17 | Key error heatmap | Track wrong-key counts per round; tint keys on keyboard after round | 🔲 pending |
+| 14 | Level persistence | Save/load `currentLevel` to `localStorage`; survives page refresh | ✅ done |
+| 15 | Personal bests | Save best WPM + accuracy per level; show in stats bar | ✅ done |
+| 16 | End-of-round summary | Richer result card: WPM, accuracy, time, best WPM with new-best highlight | ✅ done |
+| 17 | Key error heatmap | Track wrong-key counts per round; tint keys red (23–70% opacity) after round | ✅ done |
 
 ### Files to modify
 
