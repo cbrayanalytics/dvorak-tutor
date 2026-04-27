@@ -21,6 +21,31 @@ function saveSettings(overrides) {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 }
 
+// ── Personal bests ─────────────────────────────────────────────
+const BESTS_KEY = 'dvorak-tutor-bests';
+
+function loadBests() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(BESTS_KEY));
+    if (stored && typeof stored === 'object') return stored;
+  } catch (_) {}
+  return {};
+}
+
+function saveBest(level, wpm, acc) {
+  const bests = loadBests();
+  if (!bests[level] || wpm > bests[level].wpm) {
+    bests[level] = { wpm, acc };
+    localStorage.setItem(BESTS_KEY, JSON.stringify(bests));
+    return true;
+  }
+  return false;
+}
+
+function getBest(level) {
+  return loadBests()[level] || null;
+}
+
 // Timer suggestion: 1.5× buffer over actual pace; capped 1–60 min.
 // At 10 WPM + 100 words → 15 min (matches beginner expectation).
 function suggestTimerMins(wordCount, wpm) {
@@ -188,6 +213,9 @@ function updateStats() {
   $('stat-acc').textContent   = totalTyped > 0 ? acc + '%' : '—';
   $('stat-level').textContent = currentLevel;
 
+  const best = getBest(currentLevel);
+  $('stat-best').textContent  = best ? best.wpm + ' WPM' : '—';
+
   const pct = totalTyped > 0
     ? Math.min(100, Math.round((acc / settings.threshold) * 100))
     : 0;
@@ -340,18 +368,26 @@ function endRound() {
     }
   }
 
-  const acc    = calcAccuracy(correctCount, totalTyped);
+  const acc      = calcAccuracy(correctCount, totalTyped);
+  const wpmFinal = roundStartTime ? calcWpm(cursor, Date.now() - roundStartTime) : 0;
+  const isNewBest = totalTyped > 0 && saveBest(currentLevel, wpmFinal, acc);
+  updateStats();
+
   const banner = $('banner');
 
   if (acc >= settings.threshold) {
     if (currentLevel < 5) {
-      banner.textContent = `Round complete! ${acc}% accuracy — great work.`;
+      banner.textContent = isNewBest
+        ? `New best! ${wpmFinal} WPM · ${acc}% accuracy — great work.`
+        : `Round complete! ${acc}% accuracy — great work.`;
       banner.className   = 'success';
       const btn          = $('advance-btn');
       btn.textContent    = `Advance to Level ${currentLevel + 1} →`;
       btn.classList.add('visible');
     } else {
-      banner.textContent = `${acc}% accuracy — you've mastered all 5 levels!`;
+      banner.textContent = isNewBest
+        ? `New best! ${wpmFinal} WPM · ${acc}% — you've mastered all 5 levels!`
+        : `${acc}% accuracy — you've mastered all 5 levels!`;
       banner.className   = 'success';
     }
   } else {
@@ -450,7 +486,10 @@ if (typeof module !== 'undefined') {
     suggestTimerMins,
     loadSettings,
     saveSettings,
-    settings,                                          // live object reference
+    settings,
+    loadBests,
+    saveBest,
+    getBest,
     get ADVANCE_THRESHOLD() { return settings.threshold; },
     get ROUND_WORD_COUNT()  { return settings.wordCount;  },
   };

@@ -23,6 +23,9 @@ const {
   loadSettings,
   saveSettings,
   settings,
+  loadBests,
+  saveBest,
+  getBest,
   ADVANCE_THRESHOLD,
   ROUND_WORD_COUNT,
 } = require('../app.js');
@@ -208,6 +211,44 @@ assert('level 0 clamps to 1',             settings.level === 1);
 // Restore clean state
 localStorage.clear();
 loadSettings();
+
+// ── Personal bests ─────────────────────────────────────────────
+console.log('\nPersonal bests');
+
+localStorage.clear();
+assert('loadBests: empty object when no data', JSON.stringify(loadBests()) === '{}');
+
+// saveBest: first entry always saves, returns true
+localStorage.clear();
+assert('saveBest: first entry saved',         saveBest(1, 40, 92) === true);
+assert('getBest: returns saved entry',        getBest(1)?.wpm === 40 && getBest(1)?.acc === 92);
+
+// saveBest: updates when new WPM is higher
+assert('saveBest: higher WPM updates',        saveBest(1, 55, 88) === true);
+assert('getBest: reflects new best WPM',      getBest(1)?.wpm === 55);
+
+// saveBest: does NOT update when WPM is lower or equal
+assert('saveBest: lower WPM skipped',         saveBest(1, 30, 99) === false);
+assert('getBest: WPM unchanged after skip',   getBest(1)?.wpm === 55);
+assert('saveBest: equal WPM skipped',         saveBest(1, 55, 100) === false);
+
+// getBest: null for level with no entry
+assert('getBest: null for unseen level',      getBest(3) === null);
+
+// Each level tracked independently
+localStorage.clear();
+saveBest(1, 40, 90);
+saveBest(2, 30, 95);
+assert('level 1 best independent',           getBest(1)?.wpm === 40);
+assert('level 2 best independent',           getBest(2)?.wpm === 30);
+
+// loadBests: malformed JSON returns empty object, does not crash
+localStorage.clear();
+localStorage.setItem('dvorak-tutor-bests', 'not-json');
+assert('loadBests: malformed JSON safe',      JSON.stringify(loadBests()) === '{}');
+
+// Restore
+localStorage.clear();
 
 // ── Summary ────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(40)}`);
