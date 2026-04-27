@@ -46,6 +46,25 @@ function getBest(level) {
   return loadBests()[level] || null;
 }
 
+// ── Error heatmap ──────────────────────────────────────────────
+
+function calcHeatIntensity(errorCount) {
+  return Math.min(errorCount / 5, 1);
+}
+
+function showHeatmap() {
+  document.querySelectorAll('.key[data-char]').forEach(el => {
+    const count = errorMap[el.dataset.char] || 0;
+    el.style.setProperty('--err', calcHeatIntensity(count));
+  });
+}
+
+function clearHeatmap() {
+  document.querySelectorAll('.key[data-char]').forEach(el => {
+    el.style.removeProperty('--err');
+  });
+}
+
 // Timer suggestion: 1.5× buffer over actual pace; capped 1–60 min.
 // At 10 WPM + 100 words → 15 min (matches beginner expectation).
 function suggestTimerMins(wordCount, wpm) {
@@ -63,6 +82,7 @@ let roundStartTime = null;
 let lastWpm        = 10;  // seed with 10 WPM (beginner) for first timer suggestion
 let timerInterval  = null;
 let timerRemaining = 0;
+let errorMap       = {}; // char → error count for current round
 
 // ── Pure helpers (no DOM — exported for tests) ─────────────────
 
@@ -338,10 +358,12 @@ function startRound() {
   correctCount   = 0;
   totalTyped     = 0;
   roundStartTime = null;
+  errorMap       = {};
 
   renderPhrase(phrase);
   highlightNextKey(phrase[0]);
   updateStats();
+  clearHeatmap();
 
   $('banner').textContent    = '';
   $('banner').className      = '';
@@ -387,6 +409,7 @@ function endRound() {
   const isNewBest = totalTyped > 0 && saveBest(currentLevel, wpmFinal, acc);
   updateStats();
   showSummaryCard(wpmFinal, acc, elapsedMs, isNewBest);
+  showHeatmap();
 
   const banner = $('banner');
 
@@ -443,6 +466,7 @@ function handleKeydown(e) {
   } else {
     current.classList.replace('pending', 'error');
     flashKey(expected, 'err');
+    errorMap[expected] = (errorMap[expected] || 0) + 1;
   }
 
   current.classList.remove('cursor');
@@ -494,6 +518,7 @@ if (typeof module !== 'undefined') {
     calcAccuracy,
     getKeyState,
     buildPhrase,
+    calcHeatIntensity,
     suggestTimerMins,
     loadSettings,
     saveSettings,

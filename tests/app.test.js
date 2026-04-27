@@ -19,6 +19,7 @@ const {
   calcAccuracy,
   getKeyState,
   buildPhrase,
+  calcHeatIntensity,
   suggestTimerMins,
   loadSettings,
   saveSettings,
@@ -211,6 +212,15 @@ assert('level 0 clamps to 1',             settings.level === 1);
 // Restore clean state
 localStorage.clear();
 loadSettings();
+
+// ── calcHeatIntensity ──────────────────────────────────────────
+console.log('\ncalcHeatIntensity');
+
+assert('0 errors → 0',          calcHeatIntensity(0) === 0);
+assert('1 error  → 0.2',        calcHeatIntensity(1) === 0.2);
+assert('5 errors → 1 (max)',    calcHeatIntensity(5) === 1);
+assert('10 errors → 1 (cap)',   calcHeatIntensity(10) === 1);
+assert('2 errors → 0.4',        calcHeatIntensity(2) === 0.4);
 
 // ── Personal bests ─────────────────────────────────────────────
 console.log('\nPersonal bests');
