@@ -237,8 +237,8 @@ function updateStats() {
   const best = getBest(currentLevel);
   $('stat-best').textContent  = best ? best.wpm + ' WPM' : '—';
 
-  const pct = totalTyped > 0
-    ? Math.min(100, Math.round((acc / settings.threshold) * 100))
+  const pct = cursor > 0 && phrase.length > 0
+    ? Math.min(100, Math.round((cursor / phrase.length) * (acc / settings.threshold) * 100))
     : 0;
   $('progress-bar').style.width = pct + '%';
 }
