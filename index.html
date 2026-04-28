@@ -105,6 +105,11 @@
       <div class="stat-value" id="stat-best">—</div>
       <div class="stat-label">BEST</div>
     </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-value" id="stat-streak">—</div>
+      <div class="stat-label">STREAK</div>
+    </div>
     <!-- Timer countdown — hidden unless time limit is active -->
     <div class="stat-divider" id="timer-divider" hidden></div>
     <div class="stat" id="stat-timer-wrap" hidden>
@@ -137,13 +142,20 @@
     </div>
     <div class="sum-divider"></div>
     <div class="sum-stat">
-      <div class="sum-value" id="sum-best">—</div>
-      <div class="sum-label">BEST</div>
+      <div class="sum-stars" id="sum-stars">
+        <span class="star">★</span>
+        <span class="star">★</span>
+        <span class="star">★</span>
+      </div>
+      <div class="sum-label">RATING</div>
     </div>
   </div>
 
   <!-- Advance level button (shown after passing a round) -->
   <button id="advance-btn" type="button">Advance to Level 2 →</button>
+
+  <!-- Always-visible restart button -->
+  <button id="restart-btn" type="button">Try Again</button>
 
   <!-- Keyboard diagram -->
   <div id="keyboard" aria-hidden="true">

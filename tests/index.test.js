@@ -24,7 +24,8 @@ function countAttr(a, v) { return (html.match(new RegExp(`${a}="${v}"`, 'g')) ||
 console.log('\nRequired element IDs');
 [
   'app','level-map','stats','stat-wpm','stat-acc','stat-level','stat-best',
-  'progress-bar','text-display','banner','advance-btn','keyboard',
+  'progress-bar','text-display','banner','advance-btn','restart-btn','keyboard',
+  'stat-streak',
 ].forEach(id => assert(`#${id} exists`, hasId(id)));
 
 // ── Script tags ────────────────────────────────────────────────
@@ -135,7 +136,7 @@ assert('timer-toggle has aria-label',       html.includes('aria-label="Toggle ti
 
 // ── Summary card ──────────────────────────────────────────────
 console.log('\nSummary card — required IDs');
-['summary-card','sum-wpm','sum-acc','sum-time','sum-best']
+['summary-card','sum-wpm','sum-acc','sum-time','sum-stars']
   .forEach(id => assert(`#${id} exists`, hasId(id)));
 
 // ── Summary ────────────────────────────────────────────────────

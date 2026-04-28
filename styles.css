@@ -123,7 +123,12 @@ h1 span {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1;
+  transition: color 0.3s ease;
 }
+
+.stat-good { color: var(--finger-middle); }
+.stat-warn { color: var(--finger-index);  }
+.stat-bad  { color: #f87171;              }
 
 .stat-label {
   font-size: 0.6rem;
@@ -160,8 +165,9 @@ h1 span {
   background: var(--finger-index);
   border-radius: 3px;
   width: 0%;
-  transition: width 0.4s ease;
+  transition: width 0.4s ease, background 0.4s ease;
 }
+#progress-bar.progress-complete { background: var(--finger-middle); }
 
 #progress-label {
   font-size: 0.6rem;
@@ -218,6 +224,13 @@ h1 span {
   outline: 1px solid rgba(251, 146, 60, 0.4);
   outline-offset: 1px;
 }
+
+@keyframes char-shake {
+  0%, 100% { transform: translateX(0);   }
+  25%       { transform: translateX(-4px); }
+  75%       { transform: translateX(4px);  }
+}
+.char.char-shake { animation: char-shake 250ms ease forwards; }
 
 /* Space character placeholder */
 .char-space::before { content: '·'; opacity: 0.2; }
@@ -432,6 +445,15 @@ h1 span {
   line-height: 1.2;
 }
 .sum-value.new-best { color: var(--finger-index); }
+
+.sum-stars {
+  display: flex;
+  gap: 0.15rem;
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+.star          { color: var(--border); transition: color 0.2s ease; }
+.star.star-filled { color: var(--finger-index); }
 .sum-label {
   font-size: 0.65rem;
   letter-spacing: 0.1em;
@@ -464,6 +486,24 @@ h1 span {
 #advance-btn:hover  { background: #ea6b0e; }
 #advance-btn:active { transform: scale(0.97); }
 #advance-btn.visible { display: block; }
+
+/* ─── Restart Button ─────────────────────────────────────────── */
+#restart-btn {
+  display: block;
+  margin: 0 auto;
+  padding: 0.4rem 1.2rem;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+}
+#restart-btn:hover  { color: var(--text); border-color: var(--text-muted); }
+#restart-btn:active { transform: scale(0.97); }
 
 /* ─── Settings Button ────────────────────────────────────────── */
 #settings-btn {
@@ -582,6 +622,19 @@ h1 span {
   background: var(--finger-index);
   border-color: var(--finger-index);
   color: var(--bg);
+}
+
+/* ─── Confetti ───────────────────────────────────────────────── */
+@keyframes confetti-burst {
+  0%   { transform: translate(0, 0) rotate(0deg);                    opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; }
+}
+
+.confetti-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  animation: confetti-burst var(--dur, 1s) ease-out forwards;
 }
 
 /* ─── Responsive ─────────────────────────────────────────────── */

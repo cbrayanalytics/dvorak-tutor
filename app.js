@@ -87,6 +87,8 @@ let timerInterval  = null;
 let timerRemaining = 0;
 let errorMap       = {}; // char → error count for current round
 let charEls        = []; // cached .char NodeList for current round
+let currentBest    = null; // best for currentLevel, refreshed each round
+let streak         = 0;   // consecutive rounds at or above threshold
 
 // ── Pure helpers (no DOM — exported for tests) ─────────────────
 
@@ -122,6 +124,11 @@ function buildPhrase(level, wordCount) {
 
 // ── DOM shortcuts ──────────────────────────────────────────────
 function $(id) { return document.getElementById(id); }
+
+function setStatColor(el, cls) {
+  el.classList.remove('stat-good', 'stat-warn', 'stat-bad');
+  if (cls) el.classList.add(cls);
+}
 
 // ── Keyboard ───────────────────────────────────────────────────
 
@@ -242,10 +249,25 @@ function updateStats() {
   $('stat-acc').textContent   = totalTyped > 0 ? acc + '%' : '—';
   $('stat-level').textContent = currentLevel;
 
-  const best = getBest(currentLevel);
-  $('stat-best').textContent  = best ? best.wpm + ' WPM' : '—';
+  setStatColor($('stat-wpm'), !roundStartTime ? null
+    : wpm >= 50 ? 'stat-good'
+    : wpm >= 25 ? 'stat-warn'
+    : null);
 
-  $('progress-bar').style.width = calcProgressPct(cursor, phrase.length, acc, settings.threshold) + '%';
+  setStatColor($('stat-acc'), totalTyped === 0 ? null
+    : acc >= settings.threshold       ? 'stat-good'
+    : acc >= settings.threshold - 20  ? 'stat-warn'
+    : 'stat-bad');
+
+  $('stat-best').textContent  = currentBest ? currentBest.wpm + ' WPM' : '—';
+
+  const streakEl = $('stat-streak');
+  streakEl.textContent = streak > 0 ? streak : '—';
+  setStatColor(streakEl, streak >= 5 ? 'stat-good' : streak >= 3 ? 'stat-warn' : null);
+
+  const pct = calcProgressPct(cursor, phrase.length, acc, settings.threshold);
+  $('progress-bar').style.width = pct + '%';
+  $('progress-bar').classList.toggle('progress-complete', pct >= 100);
 }
 
 function updateLevelMap(level) {
@@ -366,6 +388,8 @@ function startRound() {
   roundStartTime = null;
   errorMap       = {};
 
+  currentBest = getBest(currentLevel);
+
   renderPhrase(phrase);
   charEls = Array.from($('text-display').querySelectorAll('.char'));
   highlightNextKey(phrase[0]);
@@ -387,10 +411,10 @@ function showSummaryCard(wpm, acc, elapsedMs, isNewBest) {
   $('sum-acc').textContent  = acc + '%';
   $('sum-time').textContent = elapsedMs > 0 ? formatTimer(Math.round(elapsedMs / 1000)) : '—';
 
-  const bestEl = $('sum-best');
-  const best   = getBest(currentLevel);
-  bestEl.textContent = best ? best.wpm + ' WPM' : '—';
-  bestEl.classList.toggle('new-best', isNewBest);
+  const rating = acc >= 90 ? 3 : acc >= 80 ? 2 : acc >= 70 ? 1 : 0;
+  document.querySelectorAll('#sum-stars .star').forEach((s, i) => {
+    s.classList.toggle('star-filled', i < rating);
+  });
 
   card.hidden = false;
 }
@@ -414,6 +438,7 @@ function endRound() {
   }
 
   const isNewBest = totalTyped > 0 && saveBest(currentLevel, wpmFinal, acc);
+  if (isNewBest) currentBest = getBest(currentLevel);
   updateStats();
   showSummaryCard(wpmFinal, acc, elapsedMs, isNewBest);
   showHeatmap();
@@ -421,6 +446,7 @@ function endRound() {
   const banner = $('banner');
 
   if (acc >= settings.threshold) {
+    streak++;
     if (currentLevel < 5) {
       banner.textContent = isNewBest ? 'New personal best!' : 'Round complete!';
       banner.className   = 'success';
@@ -432,9 +458,39 @@ function endRound() {
       banner.className   = 'success';
     }
   } else {
+    streak = 0;
     banner.textContent = `Need ${settings.threshold}% to advance — keep going!`;
     banner.className   = 'fail';
-    setTimeout(startRound, 1800);
+    setTimeout(startRound, 3500);
+  }
+}
+
+function spawnConfetti() {
+  const colors = ['#a855f7', '#60a5fa', '#4ade80', '#fb923c', '#94a3b8'];
+  const cx = window.innerWidth  / 2;
+  const cy = window.innerHeight * 0.4;
+
+  for (let i = 0; i < 28; i++) {
+    const el       = document.createElement('div');
+    el.className   = 'confetti-particle';
+    const size     = 6 + Math.random() * 8;
+    const angle    = Math.random() * Math.PI * 2;
+    const speed    = 60 + Math.random() * 180;
+    const dx       = Math.cos(angle) * speed;
+    const dy       = Math.sin(angle) * speed - 100;
+    const duration = 900 + Math.random() * 500;
+    const rot      = (Math.random() * 720 - 360).toFixed(0);
+
+    el.style.cssText = `left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;` +
+      `background:${colors[i % colors.length]};` +
+      `border-radius:${Math.random() > 0.5 ? '50%' : '2px'};`;
+    el.style.setProperty('--dx',  dx.toFixed(1)  + 'px');
+    el.style.setProperty('--dy',  dy.toFixed(1)  + 'px');
+    el.style.setProperty('--rot', rot             + 'deg');
+    el.style.setProperty('--dur', duration.toFixed(0) + 'ms');
+
+    document.body.appendChild(el);
+    el.addEventListener('animationend', () => el.remove(), { once: true });
   }
 }
 
@@ -442,6 +498,7 @@ function advanceLevel() {
   if (currentLevel >= 5) return;
   currentLevel++;
   saveSettings({ level: currentLevel });
+  spawnConfetti();
   renderKeyboard(currentLevel);
   updateLevelMap(currentLevel);
   startRound();
@@ -451,6 +508,13 @@ function advanceLevel() {
 
 function handleKeydown(e) {
   if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+  if (e.key === 'Enter' && cursor >= phrase.length) {
+    e.preventDefault();
+    $('advance-btn').classList.contains('visible') ? advanceLevel() : startRound();
+    return;
+  }
+
   if (cursor >= phrase.length) return;
 
   const typed = e.key;
@@ -471,6 +535,8 @@ function handleKeydown(e) {
     flashKey(expected, 'ok');
   } else {
     current.classList.replace('pending', 'error');
+    current.classList.add('char-shake');
+    current.addEventListener('animationend', () => current.classList.remove('char-shake'), { once: true });
     flashKey(expected, 'err');
     errorMap[expected] = (errorMap[expected] || 0) + 1;
   }
@@ -503,6 +569,7 @@ function init() {
 
   document.addEventListener('keydown', handleKeydown);
   $('advance-btn').addEventListener('click', advanceLevel);
+  $('restart-btn').addEventListener('click', startRound);
   $('settings-btn').addEventListener('click', toggleSettingsPanel);
   $('words-dec').addEventListener('click',     () => changeWordCount(-10));
   $('words-inc').addEventListener('click',     () => changeWordCount(10));

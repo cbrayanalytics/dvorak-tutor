@@ -3,7 +3,7 @@
 **Project:** Dvorak Typing Tutor (browser-based, vanilla JS/CSS)
 **Repo:** https://github.com/cbrayanalytics/dvorak-tutor — branch `trunk`
 **Last updated:** 2026-04-27
-**Phase 3 complete.** All features shipped.
+**Phase 4 complete.** Polish & gamification shipped.
 
 ---
 
@@ -139,6 +139,27 @@ Level advance condition: ≥ threshold% accuracy (default 90%) on a completed ro
 - **Timer auto-scales** with WPM: `ceil(wordCount / wpm * 1.5)`; seeded at 10 WPM
 - **Settings panel** uses `scrollHeight`-based JS animation (not CSS-only `max-height`)
 - **`#settings-panel[hidden]`** requires explicit `display: none` rule to override `display: flex`
+
+---
+
+## Phase 4 — Polish & Gamification
+
+### Goal
+Improve moment-to-moment feel and motivation through visual polish, better UX affordances, and light gamification.
+
+### Features (in order)
+
+| # | Task | Description | Status |
+|---|------|-------------|--------|
+| 13 | getBest cache | Cache best per round — eliminates localStorage read on every keystroke | ✅ done |
+| 14 | Try Again button + Enter shortcut | Always-visible restart button; Enter key advances or restarts | ✅ done |
+| 15 | Slower auto-restart after fail | 3.5s delay (was 1.8s) so heatmap is readable | ✅ done |
+| 16 | Color-code WPM + ACC stats | Green/yellow/red based on threshold bands | ✅ done |
+| 17 | Progress bar turns green at threshold | Color transition when goal is met | ✅ done |
+| 18 | Streak counter | Consecutive passing rounds shown in stats bar | ✅ done |
+| 19 | Summary card star rating | 1–3 stars based on accuracy bands | ✅ done |
+| 20 | Error char shake animation | Text-display character shakes on wrong keystroke | ✅ done |
+| 21 | Level advance confetti | CSS particle burst when advancing a level | ✅ done |
 
 ---
 
