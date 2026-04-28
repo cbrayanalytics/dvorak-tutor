@@ -7,6 +7,10 @@
           {
             "type": "command",
             "command": "echo '{\"systemMessage\": \"File saved — refresh your browser to see changes (⌘R)\"}'"
+          },
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | { read -r f; case \"$f\" in *.js) cd /Users/caseybray/.local/dvorak && node tests/app.test.js 2>&1 | tail -2;; esac; } 2>/dev/null || true"
           }
         ]
       }
@@ -16,7 +20,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '{\"systemMessage\": \"Session ended — update .claude/progress.md if any Phase 3 tasks were completed.\"}'"
+            "command": "echo '{\"systemMessage\": \"Session ended — update .claude/progress.md if tasks were completed.\"}'"
           }
         ]
       }
