@@ -17,6 +17,7 @@ global.localStorage = (() => {
 const {
   calcWpm,
   calcAccuracy,
+  calcProgressPct,
   getKeyState,
   buildPhrase,
   calcHeatIntensity,
@@ -55,6 +56,17 @@ assert('50 chars in 60s → 10 wpm',calcWpm(50, 60000) === 10);
 assert('250 chars in 60s → 50 wpm',calcWpm(250, 60000) === 50);
 assert('500 chars in 60s → 100 wpm',calcWpm(500, 60000) === 100);
 assert('rounds result',           calcWpm(26, 60000) === 5); // 26/5=5.2 → 5
+
+// ── calcProgressPct ────────────────────────────────────────────
+console.log('\ncalcProgressPct');
+
+assert('0 cursor → 0',                    calcProgressPct(0, 100, 100, 90) === 0);
+assert('phraseLength 0 → 0',             calcProgressPct(10, 0, 100, 90) === 0);
+assert('half done, at threshold → 50',   calcProgressPct(50, 100, 90, 90) === 50);
+assert('complete, at threshold → 100',   calcProgressPct(100, 100, 90, 90) === 100);
+assert('complete, 100% acc → 100',       calcProgressPct(100, 100, 100, 90) === 100);
+assert('half done, below threshold → 25',calcProgressPct(50, 100, 45, 90) === 25);
+assert('1 of 500 chars → ~0',            calcProgressPct(1, 500, 100, 90) === 0);
 
 // ── calcAccuracy ───────────────────────────────────────────────
 console.log('\ncalcAccuracy');

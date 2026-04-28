@@ -48,8 +48,10 @@ function getBest(level) {
 
 // ── Error heatmap ──────────────────────────────────────────────
 
+const HEAT_ERROR_MAX = 3;
+
 function calcHeatIntensity(errorCount) {
-  return Math.min(errorCount / 3, 1);  // max at 3 errors
+  return Math.min(errorCount / HEAT_ERROR_MAX, 1);
 }
 
 function showHeatmap() {
@@ -84,8 +86,14 @@ let lastWpm        = 10;  // seed with 10 WPM (beginner) for first timer suggest
 let timerInterval  = null;
 let timerRemaining = 0;
 let errorMap       = {}; // char → error count for current round
+let charEls        = []; // cached .char NodeList for current round
 
 // ── Pure helpers (no DOM — exported for tests) ─────────────────
+
+function calcProgressPct(cursor, phraseLength, acc, threshold) {
+  if (cursor <= 0 || phraseLength <= 0) return 0;
+  return Math.min(100, Math.round((cursor / phraseLength) * (acc / threshold) * 100));
+}
 
 function calcWpm(charsTyped, elapsedMs) {
   if (elapsedMs <= 0 || charsTyped <= 0) return 0;
@@ -237,10 +245,7 @@ function updateStats() {
   const best = getBest(currentLevel);
   $('stat-best').textContent  = best ? best.wpm + ' WPM' : '—';
 
-  const pct = cursor > 0 && phrase.length > 0
-    ? Math.min(100, Math.round((cursor / phrase.length) * (acc / settings.threshold) * 100))
-    : 0;
-  $('progress-bar').style.width = pct + '%';
+  $('progress-bar').style.width = calcProgressPct(cursor, phrase.length, acc, settings.threshold) + '%';
 }
 
 function updateLevelMap(level) {
@@ -362,6 +367,7 @@ function startRound() {
   errorMap       = {};
 
   renderPhrase(phrase);
+  charEls = Array.from($('text-display').querySelectorAll('.char'));
   highlightNextKey(phrase[0]);
   updateStats();
   clearHeatmap();
@@ -455,8 +461,7 @@ function handleKeydown(e) {
   if (!roundStartTime) roundStartTime = Date.now();
 
   const expected = phrase[cursor];
-  const chars    = $('text-display').querySelectorAll('.char');
-  const current  = chars[cursor];
+  const current  = charEls[cursor];
 
   totalTyped++;
 
@@ -474,8 +479,8 @@ function handleKeydown(e) {
   cursor++;
 
   if (cursor < phrase.length) {
-    chars[cursor].classList.add('cursor');
-    chars[cursor].scrollIntoView({ behavior: 'instant', block: 'nearest' });
+    charEls[cursor].classList.add('cursor');
+    charEls[cursor].scrollIntoView({ behavior: 'instant', block: 'nearest' });
     highlightNextKey(phrase[cursor]);
   } else {
     endRound();
@@ -517,6 +522,7 @@ if (typeof module !== 'undefined') {
   module.exports = {
     calcWpm,
     calcAccuracy,
+    calcProgressPct,
     getKeyState,
     buildPhrase,
     calcHeatIntensity,
