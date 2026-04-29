@@ -46,6 +46,81 @@ function getBest(level) {
   return loadBests()[level] || null;
 }
 
+// ── Round history ─────────────────────────────────────────────
+const HISTORY_KEY    = 'dvorak-tutor-history';
+const HISTORY_LIMIT  = 20;
+
+function loadHistory(level) {
+  try {
+    const stored = JSON.parse(localStorage.getItem(HISTORY_KEY));
+    if (stored && typeof stored === 'object') return stored[level] || [];
+  } catch (_) {}
+  return [];
+}
+
+function appendHistory(level, entry) {
+  let all = {};
+  try {
+    const stored = JSON.parse(localStorage.getItem(HISTORY_KEY));
+    if (stored && typeof stored === 'object') all = stored;
+  } catch (_) {}
+  const entries = (all[level] || []).concat(entry);
+  all[level] = entries.slice(-HISTORY_LIMIT);
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(all));
+}
+
+// Returns 'up', 'down', or 'flat' based on whether the recent half of history
+// has a higher average WPM than the earlier half. Returns null with < 2 entries.
+function calcTrend(history) {
+  if (!history || history.length < 2) return null;
+  const mid   = Math.floor(history.length / 2);
+  const avg   = arr => arr.reduce((s, e) => s + e.wpm, 0) / arr.length;
+  const early = avg(history.slice(0, mid));
+  const late  = avg(history.slice(mid));
+  const delta = late - early;
+  if (delta > 2)  return 'up';
+  if (delta < -2) return 'down';
+  return 'flat';
+}
+
+// Returns an SVG element plotting wpmValues as a polyline sparkline.
+// Returns a plain object stub in non-browser environments (tests).
+function renderSparkline(wpmValues) {
+  const W = 120, H = 32, PAD = 3;
+  const ns  = 'http://www.w3.org/2000/svg';
+  if (typeof document === 'undefined') {
+    return { tagName: 'svg', getAttribute: () => '0 0 120 32' };
+  }
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width',  W);
+  svg.setAttribute('height', H);
+  svg.setAttribute('aria-hidden', 'true');
+
+  if (!wpmValues || wpmValues.length === 0) return svg;
+
+  const vals = wpmValues;
+  const min  = Math.min(...vals);
+  const max  = Math.max(...vals);
+  const range = max - min || 1;
+
+  const points = vals.map((v, i) => {
+    const x = PAD + (i / Math.max(vals.length - 1, 1)) * (W - PAD * 2);
+    const y = H - PAD - ((v - min) / range) * (H - PAD * 2);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+
+  const line = document.createElementNS(ns, 'polyline');
+  line.setAttribute('points', points);
+  line.setAttribute('fill',         'none');
+  line.setAttribute('stroke',       'currentColor');
+  line.setAttribute('stroke-width', '1.5');
+  line.setAttribute('stroke-linecap', 'round');
+  line.setAttribute('stroke-linejoin', 'round');
+  svg.appendChild(line);
+  return svg;
+}
+
 // ── Weak key history ───────────────────────────────────────────
 const WEAK_KEYS_KEY   = 'dvorak-tutor-weak-keys';
 const DECAY_FACTOR    = 0.85;
@@ -346,6 +421,11 @@ function updateStats() {
   streakEl.textContent = streak;
   setStatColor(streakEl, streak >= 5 ? 'stat-good' : streak >= 3 ? 'stat-warn' : streak === 0 ? 'stat-empty' : null);
 
+  const trendEl   = $('stat-trend');
+  const trend     = calcTrend(loadHistory(currentLevel));
+  trendEl.textContent = trend === 'up' ? '▲' : trend === 'down' ? '▼' : '—';
+  setStatColor(trendEl, trend === 'up' ? 'stat-good' : trend === 'down' ? 'stat-bad' : 'stat-empty');
+
   const pct = calcProgressPct(cursor, phrase.length, acc, settings.threshold);
   $('progress-bar').style.width = pct + '%';
   $('progress-bar').classList.toggle('progress-complete', pct >= 100);
@@ -512,8 +592,6 @@ function startRound() {
 }
 
 function showSummaryCard(wpm, acc, elapsedMs, isNewBest) {
-  const card = $('summary-card');
-
   $('sum-wpm').textContent  = wpm;
   $('sum-acc').textContent  = acc + '%';
   $('sum-time').textContent = elapsedMs > 0 ? formatTimer(Math.round(elapsedMs / 1000)) : '—';
@@ -523,7 +601,50 @@ function showSummaryCard(wpm, acc, elapsedMs, isNewBest) {
     s.classList.toggle('star-filled', i < rating);
   });
 
-  card.hidden = false;
+  const history = loadHistory(currentLevel);
+  const wrapEl  = $('sum-sparkline-wrap');
+  const sparkEl = $('sum-sparkline');
+  const trendEl = $('sum-trend');
+  sparkEl.innerHTML = '';
+  if (history.length >= 2) {
+    sparkEl.appendChild(renderSparkline(history.map(e => e.wpm)));
+    const trend = calcTrend(history);
+    trendEl.textContent = trend === 'up' ? '▲ TREND' : trend === 'down' ? '▼ TREND' : '— TREND';
+    trendEl.className   = 'sum-label trend-' + trend;
+    wrapEl.classList.add('has-data');
+  } else {
+    trendEl.textContent = 'TREND';
+    trendEl.className   = 'sum-label';
+    wrapEl.classList.remove('has-data');
+  }
+
+  $('summary-card').hidden = false;
+}
+
+function showHistoryPanel() {
+  const history = loadHistory(currentLevel);
+  $('history-title').textContent = `Round History — Level ${currentLevel}`;
+
+  const chartEl = $('history-chart');
+  chartEl.innerHTML = '';
+  if (history.length >= 2) {
+    chartEl.appendChild(renderSparkline(history.map(e => e.wpm)));
+  }
+
+  const tbody = $('history-tbody');
+  tbody.innerHTML = '';
+  history.slice().reverse().forEach((e, i) => {
+    const tr = document.createElement('tr');
+    const date = new Date(e.ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    tr.innerHTML = `<td>${history.length - i}</td><td>${e.wpm}</td><td>${e.acc}%</td><td>${date}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  $('history-panel').hidden = false;
+}
+
+function closeHistoryPanel() {
+  $('history-panel').hidden = true;
 }
 
 function endRound() {
@@ -546,6 +667,8 @@ function endRound() {
 
   const isNewBest = totalTyped > 0 && saveBest(currentLevel, wpmFinal, acc);
   if (isNewBest) currentBest = getBest(currentLevel);
+
+  if (totalTyped > 0) appendHistory(currentLevel, { wpm: wpmFinal, acc, ts: Date.now() });
 
   const updatedWeak = mergeWeakKeys(loadWeakKeys(currentLevel), errorMap);
   saveWeakKeys(currentLevel, updatedWeak);
@@ -705,9 +828,11 @@ function init() {
   });
 
   document.addEventListener('keydown', handleKeydown);
-  $('advance-btn').addEventListener('click', advanceLevel);
-  $('restart-btn').addEventListener('click', startRound);
-  $('drill-btn').addEventListener('click',   startDrillRound);
+  $('advance-btn').addEventListener('click',       advanceLevel);
+  $('restart-btn').addEventListener('click',       startRound);
+  $('drill-btn').addEventListener('click',         startDrillRound);
+  $('sum-sparkline-wrap').addEventListener('click', showHistoryPanel);
+  $('history-close').addEventListener('click',     closeHistoryPanel);
   $('settings-btn').addEventListener('click', toggleSettingsPanel);
   $('words-dec').addEventListener('click',     () => changeWordCount(-10));
   $('words-inc').addEventListener('click',     () => changeWordCount(10));
@@ -745,6 +870,10 @@ if (typeof module !== 'undefined') {
     loadWeakKeys,
     saveWeakKeys,
     mergeWeakKeys,
+    loadHistory,
+    appendHistory,
+    renderSparkline,
+    calcTrend,
     get ADVANCE_THRESHOLD() { return settings.threshold; },
     get ROUND_WORD_COUNT()  { return settings.wordCount;  },
   };

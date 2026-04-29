@@ -25,7 +25,7 @@ console.log('\nRequired element IDs');
 [
   'app','level-map','stats','stat-wpm','stat-acc','stat-level','stat-best',
   'progress-bar','text-display','banner','advance-btn','restart-btn','drill-btn',
-  'round-actions','keyboard','stat-streak',
+  'round-actions','keyboard','stat-streak','stat-trend',
 ].forEach(id => assert(`#${id} exists`, hasId(id)));
 
 // ── Script tags ────────────────────────────────────────────────
@@ -145,8 +145,14 @@ assert('timer-toggle has aria-label',       html.includes('aria-label="Toggle ti
 
 // ── Summary card ──────────────────────────────────────────────
 console.log('\nSummary card — required IDs');
-['summary-card','sum-wpm','sum-acc','sum-time','sum-stars']
+['summary-card','sum-wpm','sum-acc','sum-time','sum-stars','sum-sparkline','sum-sparkline-wrap','sum-trend']
   .forEach(id => assert(`#${id} exists`, hasId(id)));
+
+// ── History panel ─────────────────────────────────────────────
+console.log('\nHistory panel — required IDs');
+['history-panel','history-header','history-title','history-close','history-chart','history-table','history-tbody']
+  .forEach(id => assert(`#${id} exists`, hasId(id)));
+assert('history-close has aria-label', html.includes('aria-label="Close history"'));
 
 // ── Summary ────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(40)}`);

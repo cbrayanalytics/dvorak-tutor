@@ -34,6 +34,10 @@ const {
   loadWeakKeys,
   saveWeakKeys,
   mergeWeakKeys,
+  loadHistory,
+  appendHistory,
+  renderSparkline,
+  calcTrend,
   ADVANCE_THRESHOLD,
   ROUND_WORD_COUNT,
 } = require('../app.js');
@@ -330,6 +334,85 @@ try { mergeWeakKeys(null, null); mergeWeakKeys(undefined, {}); } catch (e) { mer
 assert('mergeWeakKeys tolerates null inputs',        mergeSafe);
 
 localStorage.clear();
+
+// ── history storage ────────────────────────────────────────────
+console.log('\nhistory storage');
+
+localStorage.clear();
+assert('loadHistory: empty array when no data',      Array.isArray(loadHistory(1)) && loadHistory(1).length === 0);
+assert('loadHistory: missing level returns []',      loadHistory(3).length === 0);
+
+// appendHistory stores an entry
+localStorage.clear();
+appendHistory(1, { wpm: 45, acc: 92, ts: 1000 });
+const h1 = loadHistory(1);
+assert('appendHistory: entry stored',                h1.length === 1);
+assert('appendHistory: wpm correct',                 h1[0].wpm === 45);
+assert('appendHistory: acc correct',                 h1[0].acc === 92);
+assert('appendHistory: ts correct',                  h1[0].ts === 1000);
+
+// Multiple entries accumulate in order (oldest first)
+appendHistory(1, { wpm: 50, acc: 95, ts: 2000 });
+appendHistory(1, { wpm: 55, acc: 88, ts: 3000 });
+const h2 = loadHistory(1);
+assert('multiple entries in order',                  h2[0].wpm === 45 && h2[2].wpm === 55);
+
+// Levels stored independently
+appendHistory(2, { wpm: 30, acc: 80, ts: 4000 });
+assert('level 1 unaffected by level 2 append',      loadHistory(1).length === 3);
+assert('level 2 stored independently',              loadHistory(2).length === 1);
+
+// Trims to 20 entries (oldest dropped first)
+localStorage.clear();
+for (let i = 0; i < 25; i++) appendHistory(1, { wpm: i, acc: 90, ts: i });
+const hTrim = loadHistory(1);
+assert('trims to 20 entries',                        hTrim.length === 20);
+assert('oldest entries dropped',                     hTrim[0].wpm === 5);  // 0–4 dropped
+assert('newest entry retained',                      hTrim[19].wpm === 24);
+
+// Malformed JSON returns empty array
+localStorage.clear();
+localStorage.setItem('dvorak-tutor-history', 'bad-json');
+assert('malformed JSON: loadHistory safe',           loadHistory(1).length === 0);
+
+localStorage.clear();
+
+// ── renderSparkline ────────────────────────────────────────────
+console.log('\nrenderSparkline');
+
+const svg1 = renderSparkline([40, 45, 50, 48, 55]);
+assert('renderSparkline returns an object',          typeof svg1 === 'object' && svg1 !== null);
+assert('renderSparkline: tagName is svg (case-insensitive)',
+  svg1.tagName && svg1.tagName.toLowerCase() === 'svg');
+assert('renderSparkline: has viewBox attribute',     svg1.getAttribute('viewBox') !== null);
+
+// Edge cases
+const svgEmpty = renderSparkline([]);
+assert('renderSparkline: empty array does not crash', typeof svgEmpty === 'object');
+
+const svgOne = renderSparkline([42]);
+assert('renderSparkline: single point does not crash', typeof svgOne === 'object');
+
+// ── calcTrend ──────────────────────────────────────────────────
+console.log('\ncalcTrend');
+
+assert('no history → null',                         calcTrend([]) === null);
+assert('fewer than 2 entries → null',               calcTrend([{ wpm: 40 }]) === null);
+assert('improving trend → "up"',                    calcTrend([
+  { wpm: 30 }, { wpm: 32 }, { wpm: 35 }, { wpm: 38 }, { wpm: 40 },
+  { wpm: 42 }, { wpm: 44 }, { wpm: 46 }, { wpm: 48 }, { wpm: 50 },
+]) === 'up');
+assert('declining trend → "down"',                  calcTrend([
+  { wpm: 50 }, { wpm: 48 }, { wpm: 46 }, { wpm: 44 }, { wpm: 42 },
+  { wpm: 40 }, { wpm: 38 }, { wpm: 36 }, { wpm: 34 }, { wpm: 32 },
+]) === 'down');
+assert('flat trend → "flat"',                       calcTrend([
+  { wpm: 40 }, { wpm: 40 }, { wpm: 41 }, { wpm: 40 }, { wpm: 40 },
+  { wpm: 40 }, { wpm: 41 }, { wpm: 40 }, { wpm: 40 }, { wpm: 40 },
+]) === 'flat');
+assert('with < 10 entries, uses all available',     calcTrend([
+  { wpm: 30 }, { wpm: 35 }, { wpm: 40 }, { wpm: 45 },
+]) === 'up');
 
 // ── audioOn setting ────────────────────────────────────────────
 console.log('\naudioOn setting');

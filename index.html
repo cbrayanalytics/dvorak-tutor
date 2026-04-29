@@ -126,6 +126,11 @@
       <div class="stat-value" id="stat-streak">—</div>
       <div class="stat-label">STREAK</div>
     </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-value stat-empty" id="stat-trend">—</div>
+      <div class="stat-label">TREND</div>
+    </div>
     <!-- Timer countdown — hidden unless time limit is active -->
     <div class="stat-divider" id="timer-divider" hidden></div>
     <div class="stat" id="stat-timer-wrap" hidden>
@@ -139,6 +144,21 @@
 
   <!-- Round result banner -->
   <div id="banner" role="status"></div>
+
+  <!-- History panel — overlay shown when sparkline is clicked -->
+  <div id="history-panel" hidden aria-label="Round history">
+    <div id="history-header">
+      <span id="history-title">Round History — Level 1</span>
+      <button id="history-close" type="button" aria-label="Close history">✕</button>
+    </div>
+    <div id="history-chart"></div>
+    <table id="history-table">
+      <thead>
+        <tr><th>#</th><th>WPM</th><th>ACC</th><th>Date</th></tr>
+      </thead>
+      <tbody id="history-tbody"></tbody>
+    </table>
+  </div>
 
   <!-- End-of-round summary card (shown after each round) -->
   <div id="summary-card" hidden>
@@ -164,6 +184,11 @@
         <span class="star">★</span>
       </div>
       <div class="sum-label">RATING</div>
+    </div>
+    <div class="sum-divider"></div>
+    <div class="sum-stat sum-stat-sparkline" id="sum-sparkline-wrap" title="Click to view history">
+      <div id="sum-sparkline"></div>
+      <div class="sum-label" id="sum-trend">TREND</div>
     </div>
   </div>
 
