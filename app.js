@@ -260,11 +260,13 @@ function updateStats() {
     : acc >= settings.threshold - 20  ? 'stat-warn'
     : 'stat-bad');
 
-  $('stat-best').textContent  = currentBest ? currentBest.wpm + ' WPM' : '—';
+  const bestEl = $('stat-best');
+  bestEl.textContent = currentBest ? currentBest.wpm + ' WPM' : '—';
+  setStatColor(bestEl, currentBest ? null : 'stat-empty');
 
   const streakEl = $('stat-streak');
-  streakEl.textContent = streak > 0 ? streak : '—';
-  setStatColor(streakEl, streak >= 5 ? 'stat-good' : streak >= 3 ? 'stat-warn' : null);
+  streakEl.textContent = streak;
+  setStatColor(streakEl, streak >= 5 ? 'stat-good' : streak >= 3 ? 'stat-warn' : streak === 0 ? 'stat-empty' : null);
 
   const pct = calcProgressPct(cursor, phrase.length, acc, settings.threshold);
   $('progress-bar').style.width = pct + '%';
@@ -403,6 +405,7 @@ function startRound() {
   $('banner').textContent    = '';
   $('banner').className      = '';
   $('advance-btn').classList.remove('visible');
+  $('restart-btn').classList.remove('visible');
   $('summary-card').hidden   = true;
 
   if (settings.timerOn) startTimer();
@@ -446,6 +449,7 @@ function endRound() {
   updateStats();
   showSummaryCard(wpmFinal, acc, elapsedMs, isNewBest);
   showHeatmap();
+  $('restart-btn').classList.add('visible');
 
   const banner = $('banner');
 

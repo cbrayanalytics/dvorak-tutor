@@ -15,10 +15,9 @@
             aria-label="Settings"
             aria-expanded="false"
             aria-controls="settings-panel">⚙</button>
-  </header>
 
-  <!-- Settings panel (hidden until gear is clicked) -->
-  <div id="settings-panel" hidden>
+    <!-- Settings panel — floats below gear icon, does not reflow page -->
+    <div id="settings-panel" hidden>
 
     <div class="setting-row">
       <span class="setting-label" id="label-words">Words per round</span>
@@ -52,7 +51,8 @@
       </div>
     </div>
 
-  </div><!-- #settings-panel -->
+    </div><!-- #settings-panel -->
+  </header>
 
   <!-- Level progress map -->
   <div id="level-map">
@@ -164,9 +164,6 @@
   <!-- Advance level button (shown after passing a round) -->
   <button id="advance-btn" type="button">Advance to Level 2 →</button>
 
-  <!-- Always-visible restart button -->
-  <button id="restart-btn" type="button">Try Again</button>
-
   <!-- Keyboard diagram -->
   <div id="keyboard" aria-hidden="true">
 
@@ -234,6 +231,9 @@
     </div>
 
   </div><!-- #keyboard -->
+
+  <!-- Restart button — shown only after a round ends -->
+  <button id="restart-btn" type="button">Try Again</button>
 
 </div><!-- #app -->
 
