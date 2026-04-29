@@ -3,7 +3,7 @@
 **Project:** Dvorak Typing Tutor (browser-based, vanilla JS/CSS)
 **Repo:** https://github.com/cbrayanalytics/dvorak-tutor — branch `trunk`
 **Last updated:** 2026-04-28
-**Phase 5 complete.** UX layout polish, level navigation, and timer fix shipped.
+**Phase 6 complete.** Audio feedback and adaptive drill mode shipped.
 
 ---
 
@@ -32,7 +32,31 @@
 | 12 | Browser smoke test + bug fixes (panel toggle, clipping) | ✅ done |
 | 13 | Scrolling text display (fixed height, auto-scroll cursor) | ✅ done |
 
-**Total tests passing: 281/281** (49 words + 129 index + 103 app)
+**Total tests passing: 320/320** (61 words + 134 index + 125 app)
+
+---
+
+## Phase 6 — Audio Feedback & Adaptive Drill Mode
+
+### Goal
+Improve learning effectiveness with targeted practice on weak keys, and add audio feedback for a more polished feel.
+
+### Features
+
+| # | Task | Description | Status |
+|---|------|-------------|--------|
+| 1 | Audio functions | `playClick`, `playError`, `playLevelUp` via lazy `AudioContext` in `app.js` | ✅ done |
+| 2 | Audio setting | `audioOn: true` default, persisted to `localStorage` | ✅ done |
+| 3 | Mute toggle markup | `#audio-toggle` in settings panel | ✅ done |
+| 4 | Mute toggle style | Reuses `.toggle-btn`; wired to `toggleAudio()` | ✅ done |
+| 5 | Wire audio calls | `playClick/playError` in `handleKeydown`, `playLevelUp` in `advanceLevel` | ✅ done |
+| 6 | `getWeightedWords` | Biased word pool in `words.js`; tests in `words.test.js` | ✅ done |
+| 7 | Weak key storage | `loadWeakKeys/saveWeakKeys/mergeWeakKeys` (0.85 decay); tests in `app.test.js` | ✅ done |
+| 8 | Accumulate errors | `endRound()` merges `errorMap` into persistent weak key history per level | ✅ done |
+| 9 | Drill button markup | `#drill-btn` inside `#round-actions` wrapper alongside `#restart-btn` | ✅ done |
+| 10 | Drill mode logic | `startDrillRound()`, `updateDrillBtn()`, `drillMode` flag, Enter key aware | ✅ done |
+| 11 | Drill button style | Blue border/text; `#round-actions` flex container | ✅ done |
+| 12 | Docs update | CLAUDE.md + progress.md updated | ✅ done |
 
 ---
 
@@ -44,6 +68,7 @@
 - `getLevelChars(level)` — returns the Set; falls back to level 5 for out-of-range
 - `getWordsForLevel(level)` — filters WORD_LIST to words using only allowed chars
 - `getRoundWords(level, count)` — shuffled subset of the level's word pool
+- `getWeightedWords(level, weakKeys, count)` — biased pool; error chars get up to 5× word copies
 - Exports via `module.exports` guard (works in browser + Node)
 
 ### `styles.css`

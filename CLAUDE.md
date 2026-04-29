@@ -15,9 +15,9 @@ open index.html          # macOS — opens in default browser
 Tests are plain Node.js files — no test framework:
 
 ```bash
-node tests/words.test.js   # 49 tests  — word list and level filtering
-node tests/index.test.js   # 129 tests — HTML structure and data attributes
-node tests/app.test.js     # 103 tests — game logic unit tests
+node tests/words.test.js   # 61 tests  — word list and level filtering
+node tests/index.test.js   # 134 tests — HTML structure and data attributes
+node tests/app.test.js     # 125 tests — game logic unit tests
 ```
 
 Visual CSS test: open `tests/styles.test.html` directly in a browser.
@@ -73,6 +73,7 @@ Level pips in `#level-map` are **clickable** — clicking any completed or curre
 | `timerOn` | false | — | — |
 | `timerMins` | 15 | 1–60 | 1 |
 | `level` | 1 | 1–5 | — |
+| `audioOn` | true | — | — |
 
 Timer auto-suggests based on WPM: `ceil(wordCount / max(wpm,1) * 1.5)`.  
 Timer **waits for first keystroke** before counting down — `armTimer()` shows the time, `startTimer()` starts the interval.
@@ -81,9 +82,21 @@ Timer **waits for first keystroke** before counting down — `armTimer()` shows 
 
 Stored as `{ 1: {wpm, acc}, 2: {wpm, acc}, ... }` — one entry per level, updated only when WPM improves. Cached in `currentBest` per round to avoid repeated localStorage reads on every keystroke.
 
+### Audio feedback (`localStorage` key: `dvorak-tutor-settings` → `audioOn`)
+
+Web Audio API via lazy `AudioContext`. Three sounds — `playClick()` (correct key), `playError()` (wrong key), `playLevelUp()` (ascending 3-note chime on level advance). Graceful no-op when AudioContext is unavailable (Node/old browsers). Mute toggle in settings panel (`#audio-toggle`).
+
 ### Error heatmap
 
 `errorMap[char]` tracks wrong-key counts during a round. On round end, `showHeatmap()` sets `--err-opacity` on each `.key` element via a CSS `::after` overlay. `HEAT_ERROR_MAX = 3` — full intensity at 3+ errors.
+
+### Adaptive drill mode (`localStorage` key: `dvorak-tutor-weak-keys`)
+
+Stored as `{ 1: { char: count }, 2: ... }` — per-level error history. After each round, `mergeWeakKeys(stored, errorMap)` decays existing counts by `DECAY_FACTOR = 0.85` and adds new errors, then calls `saveWeakKeys()`. Chars that decay to 0 are pruned.
+
+`getWeightedWords(level, weakKeys, count)` in `words.js` biases the word pool by giving extra copies to words containing high-error chars (1 + min(floor(score/2), 4) copies). After dedup, returns a shuffled subset.
+
+`#drill-btn` appears post-round whenever `loadWeakKeys(currentLevel)` is non-empty. `startDrillRound()` generates the weighted phrase and sets `drillMode = true`. Enter key is drill-aware: prefers drill over restart when "Drill Weak Keys" is visible.
 
 ### Gamification
 
@@ -114,6 +127,10 @@ Stored as `{ 1: {wpm, acc}, 2: {wpm, acc}, ... }` — one entry per level, updat
 | `calcHeatIntensity(errorCount)` | 0–1 heatmap intensity (max at `HEAT_ERROR_MAX`) |
 | `loadSettings()` / `saveSettings()` | localStorage read/write |
 | `loadBests()` / `saveBest()` / `getBest()` | Per-level best WPM/accuracy |
+| `playClick()` / `playError()` / `playLevelUp()` | Web Audio feedback (no-op without AudioContext) |
+| `loadWeakKeys(level)` / `saveWeakKeys(level, keys)` | Per-level error history persistence |
+| `mergeWeakKeys(stored, round)` | Decay + merge error maps; prunes chars at 0 |
+| `getWeightedWords(level, weakKeys, count)` | Biased word pool for drill mode (in `words.js`) |
 
 ## Key DOM functions
 
@@ -126,6 +143,8 @@ Stored as `{ 1: {wpm, acc}, 2: {wpm, acc}, ... }` — one entry per level, updat
 | `setStatColor(el, cls)` | Swaps `stat-good/warn/bad/empty` class on a stat element |
 | `spawnConfetti()` | Creates 28 fixed-position particles, self-removes on animationend |
 | `startRound()` / `endRound()` | Round lifecycle |
+| `startDrillRound()` | Drill round using weighted word pool from weak key history |
+| `updateDrillBtn()` | Shows/hides `#drill-btn` based on weak key history for current level |
 | `handleKeydown(e)` | Core input handler; starts timer + roundStartTime on first key |
 | `init()` | Entry point — called on DOMContentLoaded |
 
