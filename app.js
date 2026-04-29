@@ -2,7 +2,7 @@
 
 // ── Settings ───────────────────────────────────────────────────
 const SETTINGS_KEY      = 'dvorak-tutor-settings';
-const SETTINGS_DEFAULTS = { wordCount: 100, threshold: 90, timerOn: false, timerMins: 15, level: 1 };
+const SETTINGS_DEFAULTS = { wordCount: 100, threshold: 90, timerOn: false, timerMins: 15, level: 1, audioOn: true };
 
 let settings = { ...SETTINGS_DEFAULTS };
 
@@ -66,6 +66,43 @@ function showHeatmap() {
 function clearHeatmap() {
   document.querySelectorAll('.key[data-char]').forEach(el => {
     el.style.removeProperty('--err-opacity');
+  });
+}
+
+// ── Audio ──────────────────────────────────────────────────────
+
+let _audioCtx = null;
+
+function getAudioCtx() {
+  const Ctor = typeof AudioContext !== 'undefined' ? AudioContext
+             : typeof webkitAudioContext !== 'undefined' ? webkitAudioContext
+             : null;
+  if (!Ctor) return null;
+  if (!_audioCtx) _audioCtx = new Ctor();
+  return _audioCtx;
+}
+
+function playTone(freq, type, duration, peak) {
+  if (!settings.audioOn) return;
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const osc  = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.frequency.value = freq;
+  osc.type            = type;
+  gain.gain.setValueAtTime(peak, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + duration);
+}
+
+function playClick()   { playTone(700, 'sine',   0.04, 0.08); }
+function playError()   { playTone(180, 'square', 0.12, 0.15); }
+function playLevelUp() {
+  [523, 659, 784].forEach((freq, i) => {
+    setTimeout(() => playTone(freq, 'sine', 0.25, 0.15), i * 130);
   });
 }
 
@@ -295,11 +332,14 @@ function applySettingsToDisplay() {
   $('val-words').textContent     = settings.wordCount;
   $('val-threshold').textContent = settings.threshold + '%';
   $('val-timer').textContent     = settings.timerMins + 'm';
-  const toggle = $('timer-toggle');
-  toggle.textContent = settings.timerOn ? 'ON' : 'OFF';
-  toggle.setAttribute('aria-pressed', String(settings.timerOn));
+  const timerToggle = $('timer-toggle');
+  timerToggle.textContent = settings.timerOn ? 'ON' : 'OFF';
+  timerToggle.setAttribute('aria-pressed', String(settings.timerOn));
   $('timer-stepper').hidden = !settings.timerOn;
   updateTimerVisibility();
+  const audioToggle = $('audio-toggle');
+  audioToggle.textContent = settings.audioOn ? 'ON' : 'OFF';
+  audioToggle.setAttribute('aria-pressed', String(settings.audioOn));
 }
 
 function openSettingsPanel() {
@@ -370,6 +410,14 @@ function changeTimerMins(delta) {
   $('val-timer').textContent = settings.timerMins + 'm';
   saveSettings();
   if (settings.timerOn) { armTimer(); if (roundStartTime) startTimer(); }
+}
+
+function toggleAudio() {
+  settings.audioOn = !settings.audioOn;
+  const toggle = $('audio-toggle');
+  toggle.textContent = settings.audioOn ? 'ON' : 'OFF';
+  toggle.setAttribute('aria-pressed', String(settings.audioOn));
+  saveSettings();
 }
 
 function toggleTimer() {
@@ -518,6 +566,7 @@ function applyLevel(n) {
 function advanceLevel() {
   if (currentLevel >= 5) return;
   spawnConfetti();
+  playLevelUp();
   applyLevel(currentLevel + 1);
 }
 
@@ -553,9 +602,11 @@ function handleKeydown(e) {
     current.classList.replace('pending', 'correct');
     correctCount++;
     flashKey(expected, 'ok');
+    playClick();
   } else {
     current.classList.replace('pending', 'error');
     current.classList.add('char-shake');
+    playError();
     current.addEventListener('animationend', () => current.classList.remove('char-shake'), { once: true });
     flashKey(expected, 'err');
     errorMap[expected] = (errorMap[expected] || 0) + 1;
@@ -606,6 +657,7 @@ function init() {
   $('timer-dec').addEventListener('click',     () => changeTimerMins(-1));
   $('timer-inc').addEventListener('click',     () => changeTimerMins(1));
   $('timer-toggle').addEventListener('click',  toggleTimer);
+  $('audio-toggle').addEventListener('click',  toggleAudio);
 }
 
 if (typeof document !== 'undefined') {
@@ -628,6 +680,9 @@ if (typeof module !== 'undefined') {
     loadBests,
     saveBest,
     getBest,
+    playClick,
+    playError,
+    playLevelUp,
     get ADVANCE_THRESHOLD() { return settings.threshold; },
     get ROUND_WORD_COUNT()  { return settings.wordCount;  },
   };

@@ -28,6 +28,9 @@ const {
   loadBests,
   saveBest,
   getBest,
+  playClick,
+  playError,
+  playLevelUp,
   ADVANCE_THRESHOLD,
   ROUND_WORD_COUNT,
 } = require('../app.js');
@@ -271,6 +274,54 @@ assert('loadBests: malformed JSON safe',      JSON.stringify(loadBests()) === '{
 
 // Restore
 localStorage.clear();
+
+// ── audioOn setting ────────────────────────────────────────────
+console.log('\naudioOn setting');
+
+localStorage.clear();
+loadSettings();
+assert('defaults: audioOn = true',              settings.audioOn === true);
+
+localStorage.clear();
+saveSettings({ audioOn: false });
+loadSettings();
+assert('round-trip: audioOn false persists',    settings.audioOn === false);
+
+localStorage.clear();
+saveSettings({ audioOn: true });
+loadSettings();
+assert('round-trip: audioOn true persists',     settings.audioOn === true);
+
+// Malformed / missing audioOn falls back to default
+localStorage.clear();
+localStorage.setItem('dvorak-tutor-settings', JSON.stringify({ wordCount: 50 }));
+loadSettings();
+assert('missing audioOn defaults to true',      settings.audioOn === true);
+
+// Restore
+localStorage.clear();
+loadSettings();
+
+// ── audio functions ────────────────────────────────────────────
+console.log('\naudio functions');
+
+assert('playClick is a function',               typeof playClick   === 'function');
+assert('playError is a function',               typeof playError   === 'function');
+assert('playLevelUp is a function',             typeof playLevelUp === 'function');
+
+// Must not throw in Node where AudioContext is unavailable
+let audioNoCrash = true;
+try { playClick(); playError(); playLevelUp(); } catch (e) { audioNoCrash = false; }
+assert('audio functions do not crash without AudioContext', audioNoCrash);
+
+// Calling with audioOn: false must also not crash
+saveSettings({ audioOn: false });
+let audioOffNoCrash = true;
+try { playClick(); playError(); playLevelUp(); } catch (e) { audioOffNoCrash = false; }
+assert('audio functions silent when audioOn = false', audioOffNoCrash);
+
+localStorage.clear();
+loadSettings();
 
 // ── Summary ────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(40)}`);
