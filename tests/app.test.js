@@ -414,6 +414,31 @@ assert('with < 10 entries, uses all available',     calcTrend([
   { wpm: 30 }, { wpm: 35 }, { wpm: 40 }, { wpm: 45 },
 ]) === 'up');
 
+// ── mode setting ───────────────────────────────────────────────
+console.log('\nmode setting');
+
+localStorage.clear();
+loadSettings();
+assert('defaults: mode = words',              settings.mode === 'words');
+
+localStorage.clear();
+saveSettings({ mode: 'quotes' });
+loadSettings();
+assert('round-trip: mode quotes persists',    settings.mode === 'quotes');
+
+localStorage.clear();
+saveSettings({ mode: 'words' });
+loadSettings();
+assert('round-trip: mode words persists',     settings.mode === 'words');
+
+localStorage.clear();
+localStorage.setItem('dvorak-tutor-settings', JSON.stringify({ wordCount: 50 }));
+loadSettings();
+assert('missing mode defaults to words',      settings.mode === 'words');
+
+localStorage.clear();
+loadSettings();
+
 // ── audioOn setting ────────────────────────────────────────────
 console.log('\naudioOn setting');
 

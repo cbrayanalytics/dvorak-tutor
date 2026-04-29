@@ -1,6 +1,6 @@
 'use strict';
 
-const { WORD_LIST, LEVEL_CHARS, getLevelChars, getWordsForLevel, getRoundWords, getWeightedWords } = require('../words.js');
+const { WORD_LIST, LEVEL_CHARS, getLevelChars, getWordsForLevel, getRoundWords, getWeightedWords, getQuotesForLevel, getRoundQuote } = require('../words.js');
 
 let passed = 0;
 let failed = 0;
@@ -168,6 +168,43 @@ const fullPool = getWordsForLevel(1);
 const wwMax = getWeightedWords(1, { h: 5 }, 9999);
 assert('caps at pool size when count exceeds pool',
   wwMax.length <= fullPool.length);
+
+// ── getQuotesForLevel ─────────────────────────────────────────────────────
+console.log('\ngetQuotesForLevel');
+
+for (let level = 1; level <= 5; level++) {
+  const quotes = getQuotesForLevel(level);
+  const allowed = getLevelChars(level);
+  assert(`level ${level}: returns an array`, Array.isArray(quotes));
+  // Every char in every quote (excluding spaces) must be in the allowed set
+  const bad = quotes.find(q => [...q].some(c => c !== ' ' && !allowed.has(c)));
+  assert(`level ${level}: all chars are allowed`, !bad, bad ? `offending quote: "${bad}"` : '');
+}
+
+// Higher levels have at least as many quotes as lower levels
+assert('level 5 has more quotes than level 1',
+  getQuotesForLevel(5).length >= getQuotesForLevel(1).length);
+
+// Returns at least some quotes at level 3+
+assert('level 3 has at least 3 quotes', getQuotesForLevel(3).length >= 3);
+assert('level 5 has at least 10 quotes', getQuotesForLevel(5).length >= 10);
+
+// ── getRoundQuote ─────────────────────────────────────────────────────────
+console.log('\ngetRoundQuote');
+
+for (let level = 3; level <= 5; level++) {
+  const quote = getRoundQuote(level);
+  assert(`level ${level}: getRoundQuote returns a string`, typeof quote === 'string');
+  assert(`level ${level}: quote is non-empty`, quote.length > 0);
+  const allowed = getLevelChars(level);
+  const badChar = [...quote].find(c => c !== ' ' && !allowed.has(c));
+  assert(`level ${level}: quote uses only allowed chars`, !badChar,
+    badChar ? `offending: "${badChar}"` : '');
+}
+
+// Falls back gracefully at level 1 (may return empty string if no quotes exist)
+const q1 = getRoundQuote(1);
+assert('getRoundQuote level 1 does not crash', typeof q1 === 'string');
 
 // ── SUMMARY ───────────────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(40)}`);

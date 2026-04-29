@@ -124,12 +124,13 @@ console.log('\nSettings panel — required IDs');
   'threshold-dec','val-threshold','threshold-inc',
   'timer-toggle','timer-stepper','timer-dec','val-timer','timer-inc',
   'timer-divider','stat-timer-wrap','stat-timer',
-  'audio-toggle',
+  'audio-toggle','mode-toggle',
 ].forEach(id => assert(`#${id} exists`, hasId(id)));
 
-console.log('\nSettings panel — audio toggle accessibility');
+console.log('\nSettings panel — audio/mode toggle accessibility');
 assert('audio-toggle has aria-pressed',  html.includes('id="audio-toggle"') && html.includes('aria-pressed="true"'));
 assert('audio-toggle has aria-label',    html.includes('aria-label="Toggle sound"'));
+assert('mode-toggle has aria-label',     html.includes('aria-label="Toggle practice mode"'));
 
 console.log('\nSettings panel — default values');
 assert('val-words default is 100',     html.includes('>100<'));

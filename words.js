@@ -341,6 +341,72 @@ function getWeightedWords(level, weakKeys, count) {
   return result;
 }
 
+// Short quotes/phrases. Each must use only chars in the level's allowed set.
+// Level 1: aoeuhtns + space  |  Level 2: +id  |  Level 3: +pyfgcrl
+// Level 4: +qjkxbmwvz        |  Level 5: all letters + punctuation/numbers
+const QUOTE_LIST = [
+  // Level 1 — only a o e u h t n s
+  'use the sun to heat the house',
+  'one honest tone',
+  'the sun sets east',
+  'she sent a note to us',
+  'stone the nut',
+  // Level 2 — + i d
+  'the tide is out at sunrise',
+  'an idea is not enough on its own',
+  'the nods and the hints',
+  'a thin sound in the distance',
+  'shine and do not hide',
+  'this is not the end',
+  // Level 3 — + p y f g c r l
+  'the only courage that counts',
+  'life is short try again',
+  'the future belongs to those who try',
+  'practice the things you fear',
+  'go further than you thought possible',
+  'still the quiet places of the earth',
+  'clarity is the path to progress',
+  'you only fail if you stop trying',
+  'let your actions reflect your goals',
+  // Level 4 — + q j k x b m w v z
+  'a journey of a thousand miles begins with a single step',
+  'the best way to get started is to quit talking and begin doing',
+  'do what you can with what you have where you are',
+  'well begun is half done',
+  'know yourself before you judge others',
+  'work hard in silence let success make the noise',
+  'be the change you wish to see in the world',
+  'every exit is an entry somewhere else',
+  'make each day your masterwork',
+  'the expert in anything was once a beginner',
+  // Level 5 — full alphabet + punctuation
+  'it always seems impossible until it\'s done.',
+  'in the middle of difficulty lies opportunity.',
+  'you miss 100% of the shots you don\'t take.',
+  'simplicity is the ultimate sophistication.',
+  'the only way to do great work is to love what you do.',
+  'success is not final, failure is not fatal.',
+  'whether you think you can or you can\'t, you\'re right.',
+  'a smooth sea never made a skilled sailor.',
+  'do one thing every day that scares you.',
+  'the harder I work, the luckier I get.',
+  'type fast, type well, type dvorak.',
+];
+
+function getQuotesForLevel(level) {
+  const allowed = getLevelChars(level);
+  return QUOTE_LIST.filter(q =>
+    [...q].every(c => c === ' ' || allowed.has(c))
+  );
+}
+
+// Returns a random quote for the level, or '' if none exist.
+function getRoundQuote(level) {
+  const pool = getQuotesForLevel(level);
+  if (pool.length === 0) return '';
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
 if (typeof module !== 'undefined') {
-  module.exports = { WORD_LIST, LEVEL_CHARS, getLevelChars, getWordsForLevel, getRoundWords, getWeightedWords };
+  module.exports = { WORD_LIST, LEVEL_CHARS, getLevelChars, getWordsForLevel, getRoundWords, getWeightedWords, getQuotesForLevel, getRoundQuote };
 }

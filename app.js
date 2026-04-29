@@ -2,7 +2,7 @@
 
 // ── Settings ───────────────────────────────────────────────────
 const SETTINGS_KEY      = 'dvorak-tutor-settings';
-const SETTINGS_DEFAULTS = { wordCount: 100, threshold: 90, timerOn: false, timerMins: 15, level: 1, audioOn: true };
+const SETTINGS_DEFAULTS = { wordCount: 100, threshold: 90, timerOn: false, timerMins: 15, level: 1, audioOn: true, mode: 'words' };
 
 let settings = { ...SETTINGS_DEFAULTS };
 
@@ -457,6 +457,9 @@ function applySettingsToDisplay() {
   const audioToggle = $('audio-toggle');
   audioToggle.textContent = settings.audioOn ? 'ON' : 'OFF';
   audioToggle.setAttribute('aria-pressed', String(settings.audioOn));
+  const modeToggle = $('mode-toggle');
+  modeToggle.textContent = settings.mode === 'quotes' ? 'Quotes' : 'Words';
+  modeToggle.setAttribute('aria-pressed', String(settings.mode === 'quotes'));
 }
 
 function openSettingsPanel() {
@@ -529,6 +532,15 @@ function changeTimerMins(delta) {
   if (settings.timerOn) { armTimer(); if (roundStartTime) startTimer(); }
 }
 
+function toggleMode() {
+  settings.mode = settings.mode === 'quotes' ? 'words' : 'quotes';
+  const toggle = $('mode-toggle');
+  toggle.textContent = settings.mode === 'quotes' ? 'Quotes' : 'Words';
+  toggle.setAttribute('aria-pressed', String(settings.mode === 'quotes'));
+  saveSettings();
+  startRound();
+}
+
 function toggleAudio() {
   settings.audioOn = !settings.audioOn;
   const toggle = $('audio-toggle');
@@ -587,7 +599,12 @@ function startDrillRound() {
 
 function startRound() {
   drillMode = false;
-  phrase    = buildPhrase(currentLevel, settings.wordCount);
+  if (settings.mode === 'quotes') {
+    const q = getRoundQuote(currentLevel);
+    phrase = q || buildPhrase(currentLevel, settings.wordCount);
+  } else {
+    phrase = buildPhrase(currentLevel, settings.wordCount);
+  }
   _initRound();
 }
 
@@ -842,6 +859,7 @@ function init() {
   $('timer-inc').addEventListener('click',     () => changeTimerMins(1));
   $('timer-toggle').addEventListener('click',  toggleTimer);
   $('audio-toggle').addEventListener('click',  toggleAudio);
+  $('mode-toggle').addEventListener('click',   toggleMode);
 }
 
 if (typeof document !== 'undefined') {
