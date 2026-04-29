@@ -475,12 +475,7 @@ function toggleTimer() {
 
 // ── Round lifecycle ────────────────────────────────────────────
 
-function startDrillRound() {
-  drillMode = true;
-  const weak = loadWeakKeys(currentLevel);
-  const words = getWeightedWords(currentLevel, weak, settings.wordCount);
-  phrase = words.join(' ');
-  // re-use startRound internals without rebuilding the phrase
+function _initRound() {
   clearTimer();
   cursor         = 0;
   correctCount   = 0;
@@ -493,8 +488,8 @@ function startDrillRound() {
   highlightNextKey(phrase[0]);
   updateStats();
   clearHeatmap();
-  $('banner').textContent    = '🎯 Drilling weak keys';
-  $('banner').className      = 'info';
+  $('banner').textContent    = '';
+  $('banner').className      = '';
   $('advance-btn').classList.remove('visible');
   $('restart-btn').classList.remove('visible');
   $('drill-btn').classList.remove('visible');
@@ -502,32 +497,18 @@ function startDrillRound() {
   if (settings.timerOn) armTimer();
 }
 
+function startDrillRound() {
+  drillMode = true;
+  phrase    = getWeightedWords(currentLevel, loadWeakKeys(currentLevel), settings.wordCount).join(' ');
+  _initRound();
+  $('banner').textContent = '🎯 Drilling weak keys';
+  $('banner').className   = 'info';
+}
+
 function startRound() {
-  drillMode      = false;
-  clearTimer();
-  phrase         = buildPhrase(currentLevel, settings.wordCount);
-  cursor         = 0;
-  correctCount   = 0;
-  totalTyped     = 0;
-  roundStartTime = null;
-  errorMap       = {};
-
-  currentBest = getBest(currentLevel);
-
-  renderPhrase(phrase);
-  charEls = Array.from($('text-display').querySelectorAll('.char'));
-  highlightNextKey(phrase[0]);
-  updateStats();
-  clearHeatmap();
-
-  $('banner').textContent    = '';
-  $('banner').className      = '';
-  $('advance-btn').classList.remove('visible');
-  $('restart-btn').classList.remove('visible');
-  $('drill-btn').classList.remove('visible');
-  $('summary-card').hidden   = true;
-
-  if (settings.timerOn) armTimer();
+  drillMode = false;
+  phrase    = buildPhrase(currentLevel, settings.wordCount);
+  _initRound();
 }
 
 function showSummaryCard(wpm, acc, elapsedMs, isNewBest) {
@@ -566,7 +547,6 @@ function endRound() {
   const isNewBest = totalTyped > 0 && saveBest(currentLevel, wpmFinal, acc);
   if (isNewBest) currentBest = getBest(currentLevel);
 
-  // Merge this round's errors into the persistent weak key history
   const updatedWeak = mergeWeakKeys(loadWeakKeys(currentLevel), errorMap);
   saveWeakKeys(currentLevel, updatedWeak);
 
@@ -574,7 +554,7 @@ function endRound() {
   showSummaryCard(wpmFinal, acc, elapsedMs, isNewBest);
   showHeatmap();
   $('restart-btn').classList.add('visible');
-  updateDrillBtn();
+  updateDrillBtn(updatedWeak);
 
   const banner = $('banner');
 
@@ -627,15 +607,12 @@ function spawnConfetti() {
   }
 }
 
-function updateDrillBtn() {
-  const weak = loadWeakKeys(currentLevel);
-  const hasWeak = Object.keys(weak).length > 0;
-  $('drill-btn').classList.toggle('visible', hasWeak);
+function updateDrillBtn(weak) {
+  $('drill-btn').classList.toggle('visible', Object.keys(weak).length > 0);
 }
 
 function applyLevel(n) {
   currentLevel = n;
-  drillMode = false;
   saveSettings({ level: currentLevel });
   renderKeyboard(currentLevel);
   updateLevelMap(currentLevel);

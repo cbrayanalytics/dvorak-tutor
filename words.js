@@ -299,34 +299,39 @@ function getWordsForLevel(level) {
   );
 }
 
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 // Returns a shuffled array of `count` words for the given level
 function getRoundWords(level, count) {
   const pool = getWordsForLevel(level);
-  const shuffled = pool.slice().sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, Math.min(count, shuffled.length));
+  return shuffle(pool).slice(0, Math.min(count, pool.length));
 }
 
 // Returns a shuffled array of `count` words biased toward words that contain
 // the most-errored characters from `weakKeys` ({ char: errorCount }).
-// Words with higher error-char coverage appear more often in the candidate pool.
+// Each word gets 1 + min(floor(score/2), 4) copies in the candidate pool,
+// where score = sum of error counts for distinct chars in the word.
 function getWeightedWords(level, weakKeys, count) {
   const pool = getWordsForLevel(level);
   const keys = weakKeys && typeof weakKeys === 'object' ? weakKeys : {};
 
-  // Build weighted pool: each word appears 1 + up to 4 extra times
-  // based on summed error counts of the distinct chars it contains.
   const weighted = [];
   for (const word of pool) {
-    const score = [...new Set(word)].reduce((sum, ch) => sum + (keys[ch] || 0), 0);
+    const score  = [...new Set(word)].reduce((sum, ch) => sum + (keys[ch] || 0), 0);
     const copies = 1 + Math.min(Math.floor(score / 2), 4);
     for (let i = 0; i < copies; i++) weighted.push(word);
   }
 
-  // Shuffle, then collect unique words up to count
-  weighted.sort(() => Math.random() - 0.5);
   const seen   = new Set();
   const result = [];
-  for (const word of weighted) {
+  for (const word of shuffle(weighted)) {
     if (!seen.has(word)) {
       seen.add(word);
       result.push(word);
