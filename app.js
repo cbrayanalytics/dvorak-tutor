@@ -218,10 +218,13 @@ function clearTimer() {
   timerInterval = null;
 }
 
-function startTimer() {
+function armTimer() {
   clearTimer();
   timerRemaining = settings.timerMins * 60;
   $('stat-timer').textContent = formatTimer(timerRemaining);
+}
+
+function startTimer() {
   timerInterval = setInterval(() => {
     timerRemaining--;
     $('stat-timer').textContent = formatTimer(timerRemaining);
@@ -366,7 +369,7 @@ function changeTimerMins(delta) {
   settings.timerMins = Math.max(1, Math.min(60, settings.timerMins + delta));
   $('val-timer').textContent = settings.timerMins + 'm';
   saveSettings();
-  if (settings.timerOn) startTimer();
+  if (settings.timerOn) { armTimer(); if (roundStartTime) startTimer(); }
 }
 
 function toggleTimer() {
@@ -378,7 +381,8 @@ function toggleTimer() {
   updateTimerVisibility();
   saveSettings();
   if (settings.timerOn) {
-    startTimer();
+    armTimer();
+    if (roundStartTime) startTimer();
   } else {
     clearTimer();
   }
@@ -409,7 +413,7 @@ function startRound() {
   $('restart-btn').classList.remove('visible');
   $('summary-card').hidden   = true;
 
-  if (settings.timerOn) startTimer();
+  if (settings.timerOn) armTimer();
 }
 
 function showSummaryCard(wpm, acc, elapsedMs, isNewBest) {
@@ -535,7 +539,10 @@ function handleKeydown(e) {
 
   e.preventDefault();
 
-  if (!roundStartTime) roundStartTime = Date.now();
+  if (!roundStartTime) {
+    roundStartTime = Date.now();
+    if (settings.timerOn) startTimer();
+  }
 
   const expected = phrase[cursor];
   const current  = charEls[cursor];
