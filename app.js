@@ -272,10 +272,13 @@ function updateStats() {
 
 function updateLevelMap(level) {
   document.querySelectorAll('#level-map .level-pip[data-level]').forEach(pip => {
-    const l = Number(pip.dataset.level);
-    pip.classList.remove('done', 'current');
+    const l      = Number(pip.dataset.level);
+    const label  = pip.querySelector('.pip-label');
+    pip.classList.remove('done', 'current', 'locked');
     if (l < level)  pip.classList.add('done');
     if (l === level) pip.classList.add('current');
+    if (l > level)  pip.classList.add('locked');
+    if (label) label.textContent = l > level ? '···' : pip.dataset.label;
   });
 }
 
@@ -566,6 +569,19 @@ function init() {
   updateLevelMap(currentLevel);
   applySettingsToDisplay();
   startRound();
+
+  document.querySelectorAll('#level-map .level-pip[data-level]').forEach(pip => {
+    pip.addEventListener('click', () => {
+      const target = Number(pip.dataset.level);
+      if (target > currentLevel) return;
+      currentLevel = target;
+      saveSettings({ level: currentLevel });
+      renderKeyboard(currentLevel);
+      updateLevelMap(currentLevel);
+      currentBest = getBest(currentLevel);
+      startRound();
+    });
+  });
 
   document.addEventListener('keydown', handleKeydown);
   $('advance-btn').addEventListener('click', advanceLevel);

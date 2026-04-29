@@ -105,6 +105,10 @@ assert('5 level pip data-level attrs', countAttr('data-level', '1') >= 1 &&
   [1,2,3,4,5].every(l => html.includes(`data-level="${l}"`)));
 assert('level-pip-connector elements present',
   (html.match(/level-pip-connector/g) || []).length >= 4);
+assert('level pip data-label attrs present',
+  ['Novice','Learner','Builder','Adept','Master'].every(n => html.includes(`data-label="${n}"`)));
+assert('pip-label and pip-icon spans present',
+  html.includes('pip-label') && html.includes('pip-icon'));
 
 // ── Accessibility ──────────────────────────────────────────────
 console.log('\nAccessibility');

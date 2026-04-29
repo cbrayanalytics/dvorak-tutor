@@ -71,11 +71,15 @@ h1 span {
 .level-pip {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.3rem;
   font-size: 0.7rem;
   color: var(--text-muted);
   cursor: default;
+  transition: opacity var(--transition);
 }
+
+.pip-icon  { font-size: 0.72rem; line-height: 1; }
+.pip-label { letter-spacing: 0.02em; }
 
 .level-pip-dot {
   width: 10px;
@@ -83,13 +87,46 @@ h1 span {
   border-radius: 50%;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  transition: background var(--transition), border-color var(--transition);
+  transition: background var(--transition), border-color var(--transition),
+              width var(--transition), height var(--transition);
   flex-shrink: 0;
 }
 
-.level-pip.done    .level-pip-dot { background: var(--finger-middle); border-color: var(--finger-middle); }
-.level-pip.current .level-pip-dot { background: var(--finger-index);  border-color: var(--finger-index);  }
-.level-pip.current                { color: var(--text); font-weight: 600; }
+/* Done — green, clickable */
+.level-pip.done {
+  cursor: pointer;
+  color: var(--finger-middle);
+}
+.level-pip.done .level-pip-dot {
+  background: var(--finger-middle);
+  border-color: var(--finger-middle);
+}
+.level-pip.done:hover .pip-label {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Current — orange, larger dot, clickable */
+.level-pip.current {
+  cursor: pointer;
+  color: var(--finger-index);
+  font-weight: 600;
+}
+.level-pip.current .level-pip-dot {
+  width: 12px;
+  height: 12px;
+  background: var(--finger-index);
+  border-color: var(--finger-index);
+}
+.level-pip.current:hover .pip-label {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Locked — dim, not interactive */
+.level-pip.locked {
+  opacity: 0.35;
+}
 
 .level-pip-connector {
   width: 24px;
