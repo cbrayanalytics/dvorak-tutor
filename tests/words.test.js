@@ -1,6 +1,6 @@
 'use strict';
 
-const { WORD_LIST, LEVEL_CHARS, getLevelChars, getWordsForLevel, getRoundWords } = require('../words.js');
+const { WORD_LIST, LEVEL_CHARS, getLevelChars, getWordsForLevel, getRoundWords, getWeightedWords } = require('../words.js');
 
 let passed = 0;
 let failed = 0;
@@ -122,6 +122,52 @@ const smallPool = getWordsForLevel(1);
 const cap = getRoundWords(1, 9999);
 assert('caps at pool size when count exceeds pool',
   cap.length === smallPool.length, `got ${cap.length}, pool is ${smallPool.length}`);
+
+// ── getWeightedWords ──────────────────────────────────────────────────────
+console.log('\ngetWeightedWords');
+
+// Returns an array of strings
+const ww1 = getWeightedWords(1, { h: 5, t: 3 }, 20);
+assert('returns an array',                  Array.isArray(ww1));
+assert('all items are strings',             ww1.every(w => typeof w === 'string'));
+assert('respects count cap',                ww1.length <= 20);
+assert('no duplicates',                     ww1.length === new Set(ww1).size);
+
+// All words use only level-allowed chars
+const level1Chars = getLevelChars(1);
+assert('all words use only level-1 chars',
+  ww1.every(w => [...w].every(c => level1Chars.has(c))));
+
+// Empty weakKeys behaves like getRoundWords (returns valid words)
+const wwEmpty = getWeightedWords(2, {}, 30);
+assert('empty weakKeys: returns array',     Array.isArray(wwEmpty));
+assert('empty weakKeys: no duplicates',     wwEmpty.length === new Set(wwEmpty).size);
+const level2Chars = getLevelChars(2);
+assert('empty weakKeys: only level-2 chars',
+  wwEmpty.every(w => [...w].every(c => level2Chars.has(c))));
+
+// null / undefined weakKeys does not crash
+let nullSafe = true;
+try { getWeightedWords(1, null, 10); getWeightedWords(1, undefined, 10); }
+catch (e) { nullSafe = false; }
+assert('null/undefined weakKeys does not crash', nullSafe);
+
+// Words containing error chars appear in the result
+// With 'h' heavily errored, words containing 'h' should appear
+const wwBiased = getWeightedWords(1, { h: 10 }, 50);
+const hasHWord = wwBiased.some(w => w.includes('h'));
+assert('biased result includes words with the error char', hasHWord);
+
+// Result is a subset of the level word pool
+const pool1 = new Set(getWordsForLevel(1));
+assert('all returned words are from the level pool',
+  ww1.every(w => pool1.has(w)));
+
+// Count exceeding pool still returns at most pool size
+const fullPool = getWordsForLevel(1);
+const wwMax = getWeightedWords(1, { h: 5 }, 9999);
+assert('caps at pool size when count exceeds pool',
+  wwMax.length <= fullPool.length);
 
 // ── SUMMARY ───────────────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(40)}`);

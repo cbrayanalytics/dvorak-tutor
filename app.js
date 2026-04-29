@@ -46,6 +46,42 @@ function getBest(level) {
   return loadBests()[level] || null;
 }
 
+// ── Weak key history ───────────────────────────────────────────
+const WEAK_KEYS_KEY   = 'dvorak-tutor-weak-keys';
+const DECAY_FACTOR    = 0.85;
+
+function loadWeakKeys(level) {
+  try {
+    const stored = JSON.parse(localStorage.getItem(WEAK_KEYS_KEY));
+    if (stored && typeof stored === 'object') return stored[level] || {};
+  } catch (_) {}
+  return {};
+}
+
+function saveWeakKeys(level, keys) {
+  let all = {};
+  try {
+    const stored = JSON.parse(localStorage.getItem(WEAK_KEYS_KEY));
+    if (stored && typeof stored === 'object') all = stored;
+  } catch (_) {}
+  all[level] = keys;
+  localStorage.setItem(WEAK_KEYS_KEY, JSON.stringify(all));
+}
+
+// Decays stored counts by DECAY_FACTOR then merges in this round's errors.
+// Chars that decay to 0 are pruned so the object stays lean.
+function mergeWeakKeys(stored, round) {
+  const s = (stored && typeof stored === 'object') ? stored : {};
+  const r = (round  && typeof round  === 'object') ? round  : {};
+  const result = {};
+  const chars = new Set([...Object.keys(s), ...Object.keys(r)]);
+  for (const ch of chars) {
+    const val = Math.floor((s[ch] || 0) * DECAY_FACTOR) + (r[ch] || 0);
+    if (val > 0) result[ch] = val;
+  }
+  return result;
+}
+
 // ── Error heatmap ──────────────────────────────────────────────
 
 const HEAT_ERROR_MAX   = 3;
@@ -127,6 +163,7 @@ let errorMap       = {}; // char → error count for current round
 let charEls        = []; // cached .char NodeList for current round
 let currentBest    = null; // best for currentLevel, refreshed each round
 let streak         = 0;   // consecutive rounds at or above threshold
+let drillMode      = false;
 
 // ── Pure helpers (no DOM — exported for tests) ─────────────────
 
@@ -438,7 +475,35 @@ function toggleTimer() {
 
 // ── Round lifecycle ────────────────────────────────────────────
 
+function startDrillRound() {
+  drillMode = true;
+  const weak = loadWeakKeys(currentLevel);
+  const words = getWeightedWords(currentLevel, weak, settings.wordCount);
+  phrase = words.join(' ');
+  // re-use startRound internals without rebuilding the phrase
+  clearTimer();
+  cursor         = 0;
+  correctCount   = 0;
+  totalTyped     = 0;
+  roundStartTime = null;
+  errorMap       = {};
+  currentBest    = getBest(currentLevel);
+  renderPhrase(phrase);
+  charEls = Array.from($('text-display').querySelectorAll('.char'));
+  highlightNextKey(phrase[0]);
+  updateStats();
+  clearHeatmap();
+  $('banner').textContent    = '🎯 Drilling weak keys';
+  $('banner').className      = 'info';
+  $('advance-btn').classList.remove('visible');
+  $('restart-btn').classList.remove('visible');
+  $('drill-btn').classList.remove('visible');
+  $('summary-card').hidden   = true;
+  if (settings.timerOn) armTimer();
+}
+
 function startRound() {
+  drillMode      = false;
   clearTimer();
   phrase         = buildPhrase(currentLevel, settings.wordCount);
   cursor         = 0;
@@ -459,6 +524,7 @@ function startRound() {
   $('banner').className      = '';
   $('advance-btn').classList.remove('visible');
   $('restart-btn').classList.remove('visible');
+  $('drill-btn').classList.remove('visible');
   $('summary-card').hidden   = true;
 
   if (settings.timerOn) armTimer();
@@ -499,10 +565,16 @@ function endRound() {
 
   const isNewBest = totalTyped > 0 && saveBest(currentLevel, wpmFinal, acc);
   if (isNewBest) currentBest = getBest(currentLevel);
+
+  // Merge this round's errors into the persistent weak key history
+  const updatedWeak = mergeWeakKeys(loadWeakKeys(currentLevel), errorMap);
+  saveWeakKeys(currentLevel, updatedWeak);
+
   updateStats();
   showSummaryCard(wpmFinal, acc, elapsedMs, isNewBest);
   showHeatmap();
   $('restart-btn').classList.add('visible');
+  updateDrillBtn();
 
   const banner = $('banner');
 
@@ -555,8 +627,15 @@ function spawnConfetti() {
   }
 }
 
+function updateDrillBtn() {
+  const weak = loadWeakKeys(currentLevel);
+  const hasWeak = Object.keys(weak).length > 0;
+  $('drill-btn').classList.toggle('visible', hasWeak);
+}
+
 function applyLevel(n) {
   currentLevel = n;
+  drillMode = false;
   saveSettings({ level: currentLevel });
   renderKeyboard(currentLevel);
   updateLevelMap(currentLevel);
@@ -577,7 +656,9 @@ function handleKeydown(e) {
 
   if (e.key === 'Enter' && cursor >= phrase.length) {
     e.preventDefault();
-    $('advance-btn').classList.contains('visible') ? advanceLevel() : startRound();
+    if ($('advance-btn').classList.contains('visible')) advanceLevel();
+    else if ($('drill-btn').classList.contains('visible')) startDrillRound();
+    else startRound();
     return;
   }
 
@@ -649,6 +730,7 @@ function init() {
   document.addEventListener('keydown', handleKeydown);
   $('advance-btn').addEventListener('click', advanceLevel);
   $('restart-btn').addEventListener('click', startRound);
+  $('drill-btn').addEventListener('click',   startDrillRound);
   $('settings-btn').addEventListener('click', toggleSettingsPanel);
   $('words-dec').addEventListener('click',     () => changeWordCount(-10));
   $('words-inc').addEventListener('click',     () => changeWordCount(10));
@@ -683,6 +765,9 @@ if (typeof module !== 'undefined') {
     playClick,
     playError,
     playLevelUp,
+    loadWeakKeys,
+    saveWeakKeys,
+    mergeWeakKeys,
     get ADVANCE_THRESHOLD() { return settings.threshold; },
     get ROUND_WORD_COUNT()  { return settings.wordCount;  },
   };

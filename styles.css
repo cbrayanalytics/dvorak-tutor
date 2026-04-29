@@ -526,10 +526,17 @@ h1 span {
 #advance-btn:active { transform: scale(0.97); }
 #advance-btn.visible { display: block; }
 
-/* ─── Restart Button ─────────────────────────────────────────── */
-#restart-btn {
+/* ─── Round-action buttons (Try Again + Drill) ───────────────── */
+#round-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+#restart-btn,
+#drill-btn {
   display: none;
-  margin: 0 auto;
   padding: 0.4rem 1.2rem;
   background: transparent;
   color: var(--text-muted);
@@ -539,11 +546,15 @@ h1 span {
   font-weight: 600;
   letter-spacing: 0.04em;
   cursor: pointer;
-  transition: color var(--transition), border-color var(--transition);
+  transition: color var(--transition), border-color var(--transition), transform var(--transition);
 }
-#restart-btn:hover   { color: var(--text); border-color: var(--text-muted); }
-#restart-btn:active  { transform: scale(0.97); }
+#restart-btn:hover,
+#drill-btn:hover   { color: var(--text); border-color: var(--text-muted); }
+#restart-btn:active,
+#drill-btn:active  { transform: scale(0.97); }
 #restart-btn.visible { display: block; }
+#drill-btn.visible   { display: block; border-color: var(--finger-ring); color: var(--finger-ring); }
+#drill-btn.visible:hover { border-color: var(--text); color: var(--text); }
 
 /* ─── Settings Button ────────────────────────────────────────── */
 #settings-btn {

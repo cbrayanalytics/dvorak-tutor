@@ -31,6 +31,9 @@ const {
   playClick,
   playError,
   playLevelUp,
+  loadWeakKeys,
+  saveWeakKeys,
+  mergeWeakKeys,
   ADVANCE_THRESHOLD,
   ROUND_WORD_COUNT,
 } = require('../app.js');
@@ -273,6 +276,59 @@ localStorage.setItem('dvorak-tutor-bests', 'not-json');
 assert('loadBests: malformed JSON safe',      JSON.stringify(loadBests()) === '{}');
 
 // Restore
+localStorage.clear();
+
+// ── weak keys storage ──────────────────────────────────────────
+console.log('\nweak keys storage');
+
+localStorage.clear();
+assert('loadWeakKeys: empty when no data',           JSON.stringify(loadWeakKeys(1)) === '{}');
+assert('loadWeakKeys: missing level returns {}',     JSON.stringify(loadWeakKeys(3)) === '{}');
+
+// saveWeakKeys + loadWeakKeys round-trip
+localStorage.clear();
+saveWeakKeys(1, { h: 4, t: 2 });
+assert('round-trip: saved keys present',             loadWeakKeys(1).h === 4 && loadWeakKeys(1).t === 2);
+assert('other levels unaffected',                    JSON.stringify(loadWeakKeys(2)) === '{}');
+
+// Levels stored independently
+saveWeakKeys(2, { i: 6 });
+assert('level 1 unchanged after level 2 save',      loadWeakKeys(1).h === 4);
+assert('level 2 stored correctly',                   loadWeakKeys(2).i === 6);
+
+// Malformed JSON does not crash
+localStorage.clear();
+localStorage.setItem('dvorak-tutor-weak-keys', 'bad-json');
+assert('malformed JSON: loadWeakKeys does not crash', JSON.stringify(loadWeakKeys(1)) === '{}');
+
+localStorage.clear();
+
+// ── mergeWeakKeys ──────────────────────────────────────────────
+console.log('\nmergeWeakKeys');
+
+// Fresh merge: stored is empty
+assert('merge into empty: returns round errors',
+  mergeWeakKeys({}, { h: 3, t: 1 }).h === 3);
+
+// Existing counts decay before adding new round counts
+// Decay factor is 0.85; 10 * 0.85 = 8.5 + 2 = 10.5 → floor = 10
+const merged = mergeWeakKeys({ h: 10 }, { h: 2 });
+assert('decay applied before merging',               merged.h === 10); // floor(10*0.85+2)=floor(10.5)=10
+
+// New char in round added fresh
+const m2 = mergeWeakKeys({ h: 4 }, { t: 3 });
+assert('new error char added',                       m2.t === 3);
+assert('existing char decays when not in new round', m2.h === 3); // floor(4*0.85)=floor(3.4)=3
+
+// Chars that decay to 0 are removed
+const m3 = mergeWeakKeys({ h: 1 }, {});
+assert('chars decaying to 0 are pruned',             m3.h === undefined);
+
+// null/undefined inputs do not crash
+let mergeSafe = true;
+try { mergeWeakKeys(null, null); mergeWeakKeys(undefined, {}); } catch (e) { mergeSafe = false; }
+assert('mergeWeakKeys tolerates null inputs',        mergeSafe);
+
 localStorage.clear();
 
 // ── audioOn setting ────────────────────────────────────────────

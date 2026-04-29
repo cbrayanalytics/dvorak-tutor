@@ -24,8 +24,8 @@ function countAttr(a, v) { return (html.match(new RegExp(`${a}="${v}"`, 'g')) ||
 console.log('\nRequired element IDs');
 [
   'app','level-map','stats','stat-wpm','stat-acc','stat-level','stat-best',
-  'progress-bar','text-display','banner','advance-btn','restart-btn','keyboard',
-  'stat-streak',
+  'progress-bar','text-display','banner','advance-btn','restart-btn','drill-btn',
+  'round-actions','keyboard','stat-streak',
 ].forEach(id => assert(`#${id} exists`, hasId(id)));
 
 // ── Script tags ────────────────────────────────────────────────

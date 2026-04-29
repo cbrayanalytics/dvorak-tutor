@@ -306,6 +306,36 @@ function getRoundWords(level, count) {
   return shuffled.slice(0, Math.min(count, shuffled.length));
 }
 
+// Returns a shuffled array of `count` words biased toward words that contain
+// the most-errored characters from `weakKeys` ({ char: errorCount }).
+// Words with higher error-char coverage appear more often in the candidate pool.
+function getWeightedWords(level, weakKeys, count) {
+  const pool = getWordsForLevel(level);
+  const keys = weakKeys && typeof weakKeys === 'object' ? weakKeys : {};
+
+  // Build weighted pool: each word appears 1 + up to 4 extra times
+  // based on summed error counts of the distinct chars it contains.
+  const weighted = [];
+  for (const word of pool) {
+    const score = [...new Set(word)].reduce((sum, ch) => sum + (keys[ch] || 0), 0);
+    const copies = 1 + Math.min(Math.floor(score / 2), 4);
+    for (let i = 0; i < copies; i++) weighted.push(word);
+  }
+
+  // Shuffle, then collect unique words up to count
+  weighted.sort(() => Math.random() - 0.5);
+  const seen   = new Set();
+  const result = [];
+  for (const word of weighted) {
+    if (!seen.has(word)) {
+      seen.add(word);
+      result.push(word);
+      if (result.length === count) break;
+    }
+  }
+  return result;
+}
+
 if (typeof module !== 'undefined') {
-  module.exports = { WORD_LIST, LEVEL_CHARS, getLevelChars, getWordsForLevel, getRoundWords };
+  module.exports = { WORD_LIST, LEVEL_CHARS, getLevelChars, getWordsForLevel, getRoundWords, getWeightedWords };
 }
