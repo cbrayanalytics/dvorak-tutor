@@ -246,16 +246,17 @@ function updateStats() {
   const wpm     = calcWpm(cursor, elapsed);
   const acc     = calcAccuracy(correctCount, totalTyped);
 
-  $('stat-wpm').textContent   = roundStartTime ? wpm : 0;
+  const hasWpm = roundStartTime && cursor >= 5;
+  $('stat-wpm').textContent   = hasWpm ? wpm : (roundStartTime ? '—' : 0);
   $('stat-acc').textContent   = totalTyped > 0 ? acc + '%' : '—';
   $('stat-level').textContent = currentLevel;
 
-  setStatColor($('stat-wpm'), !roundStartTime ? null
+  setStatColor($('stat-wpm'), !hasWpm ? null
     : wpm >= 50 ? 'stat-good'
     : wpm >= 25 ? 'stat-warn'
     : null);
 
-  setStatColor($('stat-acc'), totalTyped === 0 ? null
+  setStatColor($('stat-acc'), totalTyped < 5 ? null
     : acc >= settings.threshold       ? 'stat-good'
     : acc >= settings.threshold - 20  ? 'stat-warn'
     : 'stat-bad');

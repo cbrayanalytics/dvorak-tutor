@@ -574,7 +574,7 @@ h1 span {
 /* ─── Settings Panel ─────────────────────────────────────────── */
 #settings-panel {
   position: absolute;
-  top: calc(100% + 0.5rem);
+  top: calc(100% + 0.75rem);
   right: 0;
   width: min(300px, 90vw);
   z-index: 100;
