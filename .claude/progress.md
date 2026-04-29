@@ -3,7 +3,7 @@
 **Project:** Dvorak Typing Tutor (browser-based, vanilla JS/CSS)
 **Repo:** https://github.com/cbrayanalytics/dvorak-tutor — branch `trunk`
 **Last updated:** 2026-04-28
-**Phase 6 complete.** Audio feedback and adaptive drill mode shipped.
+**Phase 7 complete.** Progress history, quotes mode, and finger indicator shipped.
 
 ---
 
@@ -32,7 +32,32 @@
 | 12 | Browser smoke test + bug fixes (panel toggle, clipping) | ✅ done |
 | 13 | Scrolling text display (fixed height, auto-scroll cursor) | ✅ done |
 
-**Total tests passing: 320/320** (61 words + 134 index + 125 app)
+**Total tests passing: 388/388** (84 words + 151 index + 153 app)
+
+---
+
+## Phase 7 — Progress History, Quotes Mode & Finger Indicator
+
+### Features
+
+| # | Task | Description | Status |
+|---|------|-------------|--------|
+| 1 | History storage | `loadHistory`/`appendHistory` — last 20 rounds per level in localStorage | ✅ done |
+| 2 | History accumulation | `appendHistory` called in `endRound` (only when `totalTyped > 0`) | ✅ done |
+| 3 | `renderSparkline` | SVG polyline from WPM array; stub in Node | ✅ done |
+| 4 | Sparkline on summary card | Clickable sparkline + trend label; click opens history panel | ✅ done |
+| 5 | History panel markup | Overlay with chart + table of last 20 rounds | ✅ done |
+| 6 | History panel styles | Panel, table, sparkline, trend color classes | ✅ done |
+| 7 | TREND stat in stats bar | `calcTrend` compares first/second half averages; ▲/▼/— with color | ✅ done |
+| 8 | Quote list + filter | 41 quotes in `words.js`, `getQuotesForLevel`/`getRoundQuote` | ✅ done |
+| 9 | Mode setting + toggle | `mode:'words'` default; Words/Quotes toggle in settings panel | ✅ done |
+| 10 | Wire quotes into startRound | Falls back to word mode if no quotes at current level | ✅ done |
+| 11 | Mode toggle style | Reuses `.toggle-btn` | ✅ done |
+| 12 | Finger indicator markup | `#finger-indicator` strip between text display and keyboard | ✅ done |
+| 13 | `updateFingerIndicator` | Looks up `CHAR_TO_KEY`, updates dot color + label text | ✅ done |
+| 14 | Wire indicator | Called in `highlightNextKey`; cleared in `clearNextKey` | ✅ done |
+| 15 | Finger indicator styles | Dot uses finger-color CSS vars; fades in/out with `.active` | ✅ done |
+| 16 | Docs update | CLAUDE.md + progress.md | ✅ done |
 
 ---
 

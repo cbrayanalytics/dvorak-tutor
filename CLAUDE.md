@@ -15,9 +15,9 @@ open index.html          # macOS — opens in default browser
 Tests are plain Node.js files — no test framework:
 
 ```bash
-node tests/words.test.js   # 61 tests  — word list and level filtering
-node tests/index.test.js   # 134 tests — HTML structure and data attributes
-node tests/app.test.js     # 125 tests — game logic unit tests
+node tests/words.test.js   # 84 tests  — word list, level filtering, quotes
+node tests/index.test.js   # 151 tests — HTML structure and data attributes
+node tests/app.test.js     # 153 tests — game logic unit tests
 ```
 
 Visual CSS test: open `tests/styles.test.html` directly in a browser.
@@ -74,6 +74,7 @@ Level pips in `#level-map` are **clickable** — clicking any completed or curre
 | `timerMins` | 15 | 1–60 | 1 |
 | `level` | 1 | 1–5 | — |
 | `audioOn` | true | — | — |
+| `mode` | `'words'` | `'words'`/`'quotes'` | — |
 
 Timer auto-suggests based on WPM: `ceil(wordCount / max(wpm,1) * 1.5)`.  
 Timer **waits for first keystroke** before counting down — `armTimer()` shows the time, `startTimer()` starts the interval.
@@ -131,6 +132,10 @@ Stored as `{ 1: { char: count }, 2: ... }` — per-level error history. After ea
 | `loadWeakKeys(level)` / `saveWeakKeys(level, keys)` | Per-level error history persistence |
 | `mergeWeakKeys(stored, round)` | Decay + merge error maps; prunes chars at 0 |
 | `getWeightedWords(level, weakKeys, count)` | Biased word pool for drill mode (in `words.js`) |
+| `getQuotesForLevel(level)` / `getRoundQuote(level)` | Level-filtered quote pool (in `words.js`) |
+| `loadHistory(level)` / `appendHistory(level, entry)` | Per-level round history (last 20 entries) |
+| `calcTrend(history)` | Returns `'up'`/`'down'`/`'flat'` from history array |
+| `renderSparkline(wpmValues)` | SVG polyline element for WPM trend |
 
 ## Key DOM functions
 
@@ -144,7 +149,9 @@ Stored as `{ 1: { char: count }, 2: ... }` — per-level error history. After ea
 | `spawnConfetti()` | Creates 28 fixed-position particles, self-removes on animationend |
 | `startRound()` / `endRound()` | Round lifecycle |
 | `startDrillRound()` | Drill round using weighted word pool from weak key history |
-| `updateDrillBtn()` | Shows/hides `#drill-btn` based on weak key history for current level |
+| `updateDrillBtn(weak)` | Shows/hides `#drill-btn` based on weak key object |
+| `showHistoryPanel()` / `closeHistoryPanel()` | Open/close round history overlay |
+| `updateFingerIndicator(char)` | Updates `#finger-indicator` strip for next key; pass `null` to clear |
 | `handleKeydown(e)` | Core input handler; starts timer + roundStartTime on first key |
 | `init()` | Entry point — called on DOMContentLoaded |
 
