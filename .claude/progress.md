@@ -2,8 +2,8 @@
 
 **Project:** Dvorak Typing Tutor (browser-based, vanilla JS/CSS)
 **Repo:** https://github.com/cbrayanalytics/dvorak-tutor — branch `trunk`
-**Last updated:** 2026-04-27
-**Phase 4 complete.** Polish & gamification shipped.
+**Last updated:** 2026-04-28
+**Phase 5 complete.** UX layout polish, level navigation, and timer fix shipped.
 
 ---
 
@@ -32,7 +32,7 @@
 | 12 | Browser smoke test + bug fixes (panel toggle, clipping) | ✅ done |
 | 13 | Scrolling text display (fixed height, auto-scroll cursor) | ✅ done |
 
-**Total tests passing: 242/242** (49 words + 119 index + 74 app)
+**Total tests passing: 281/281** (49 words + 129 index + 103 app)
 
 ---
 
@@ -93,25 +93,17 @@ Level advance condition: ≥ threshold% accuracy (default 90%) on a completed ro
 
 ## app.js — Implemented functions
 
-| Function | Purpose |
-|----------|---------|
-| `calcWpm(charsTyped, elapsedMs)` | Pure — WPM calculation |
-| `calcAccuracy(correct, total)` | Pure — accuracy % |
-| `getKeyState(keyLevel, activeLevel, char)` | Pure — returns `active`/`locked`/`home-preview` |
-| `buildPhrase(level, wordCount)` | Pure — joins `getRoundWords()` output with spaces |
-| `suggestTimerMins(wordCount, wpm)` | Pure — WPM-based timer suggestion |
-| `loadSettings()` / `saveSettings()` | localStorage read/write |
-| `buildCharMap()` | DOM — builds `CHAR_TO_KEY` from keyboard markup at init |
-| `renderKeyboard(level)` | DOM — sets `data-state` on all `.key` elements |
-| `highlightNextKey(char)` | DOM — pulses the next key to type |
-| `flashKey(char, type)` | DOM — ok/err flash animation on a key |
-| `renderPhrase(text)` | DOM — populates `#text-display` with `.char` spans, resets scroll |
-| `updateStats()` | DOM — writes WPM/ACC/progress bar |
-| `updateLevelMap(level)` | DOM — sets done/current classes on level pips |
-| `startRound()` / `endRound()` | DOM — round lifecycle |
-| `advanceLevel()` | DOM — increments level, re-renders keyboard, starts round |
-| `handleKeydown(e)` | DOM — core input handler; scrolls cursor into view |
-| `init()` | DOM — entry point, called on DOMContentLoaded |
+See CLAUDE.md for the current authoritative function list. Summary of key additions since Phase 2:
+
+- `calcProgressPct`, `calcHeatIntensity` — pure helpers for progress bar and heatmap
+- `loadBests`, `saveBest`, `getBest` — per-level personal best storage
+- `showHeatmap`, `clearHeatmap` — error overlay on keys post-round
+- `showSummaryCard` — end-of-round WPM/ACC/time/stars card
+- `applyLevel(n)` — shared level-switch helper (used by advanceLevel + pip click)
+- `spawnConfetti` — 28-particle CSS burst on level advance
+- `setStatColor` — swaps stat color class on a stat element
+- `armTimer` / `startTimer` — split so timer waits for first keystroke
+- `streak` state — consecutive passing rounds, shown in stats bar
 
 ---
 
@@ -121,8 +113,8 @@ Level advance condition: ≥ threshold% accuracy (default 90%) on a completed ro
 |------|-------|--------|
 | `tests/words.test.js` | 49 | ✅ all pass |
 | `tests/styles.test.html` | visual | ✅ verified |
-| `tests/index.test.js` | 119 | ✅ all pass |
-| `tests/app.test.js` | 74 | ✅ all pass |
+| `tests/index.test.js` | 129 | ✅ all pass |
+| `tests/app.test.js` | 103 | ✅ all pass |
 
 ---
 
@@ -139,6 +131,37 @@ Level advance condition: ≥ threshold% accuracy (default 90%) on a completed ro
 - **Timer auto-scales** with WPM: `ceil(wordCount / wpm * 1.5)`; seeded at 10 WPM
 - **Settings panel** uses `scrollHeight`-based JS animation (not CSS-only `max-height`)
 - **`#settings-panel[hidden]`** requires explicit `display: none` rule to override `display: flex`
+- **Settings panel is `position: absolute`** overlay inside `<header>` — does not reflow page on open
+- **Timer waits for first keystroke** — `armTimer()` shows time, `startTimer()` starts interval on first key
+- **`applyLevel(n)`** is the shared level-switch helper; `advanceLevel()` wraps it with confetti
+- **WPM/ACC color coding** suppressed until 5 chars typed to prevent misleading early values
+- **Level names**: Novice / Learner / Builder / Adept / Master with icons ⌂ → ↑ ◆ ✦
+- **Level pips are clickable** — any done/current pip navigates to that level via `applyLevel`
+
+---
+
+## Phase 5 — UX Layout & Navigation
+
+### Goal
+Fix layout issues identified from live screenshots, add level navigation, and patch bugs found during review.
+
+### Features
+
+| # | Task | Description | Status |
+|---|------|-------------|--------|
+| 22 | Level pip markup | New names (Novice/Learner/Builder/Adept/Master), icons (⌂→↑◆✦), data-label attrs | ✅ done |
+| 23 | Level pip styling | Done=green, current=orange+larger dot, locked=···, hover underline | ✅ done |
+| 24 | Clickable pip navigation | Click any done/current pip → `applyLevel(n)` | ✅ done |
+| 25 | Try Again repositioned | Hidden during round; shown below keyboard post-round only | ✅ done |
+| 26 | Level map enlarged | Font 0.7→0.82rem, dots larger, connectors 24→32px, padding for hit area | ✅ done |
+| 27 | Settings panel overlay | `position: absolute` — no layout reflow when opened | ✅ done |
+| 28 | Stats empty state | STREAK shows 0 (dimmed), BEST styled muted when no data | ✅ done |
+| 29 | Tighten whitespace | Body padding and #app gap reduced | ✅ done |
+| —  | WPM/ACC warmup | Suppress color coding and WPM until 5 chars typed | ✅ done |
+| —  | Settings panel nudge | Increased top offset to clear stats bar | ✅ done |
+| —  | Timer on first keystroke | `armTimer()` shows time; `startTimer()` starts interval on first key | ✅ done |
+| —  | `applyLevel(n)` helper | Extracted shared level-switch logic from advanceLevel + pip handler | ✅ done |
+| —  | `CONFETTI_COLORS` constant | Named constant replaces inline hex array in spawnConfetti | ✅ done |
 
 ---
 

@@ -16,7 +16,7 @@ Tests are plain Node.js files — no test framework:
 
 ```bash
 node tests/words.test.js   # 49 tests  — word list and level filtering
-node tests/index.test.js   # 125 tests — HTML structure and data attributes
+node tests/index.test.js   # 129 tests — HTML structure and data attributes
 node tests/app.test.js     # 103 tests — game logic unit tests
 ```
 
@@ -50,7 +50,19 @@ Four files; each has a single responsibility:
 --finger-thumb:  gray (space)
 ```
 
-Applied to both keyboard keys and characters in the typed-text display.
+Applied to both keyboard keys and characters in the typed-text display. Also used as `CONFETTI_COLORS` array for level-advance particle burst.
+
+### Level system
+
+| Level | Name | Letters unlocked |
+|-------|------|-----------------|
+| 1 | Novice | a o e u h t n s |
+| 2 | Learner | + i d |
+| 3 | Builder | + p y f g c r l |
+| 4 | Adept | + q j k x b m w v z |
+| 5 | Master | All + punctuation + numbers |
+
+Level pips in `#level-map` are **clickable** — clicking any completed or current pip calls `applyLevel(n)` to jump to that level. Each pip has `data-label` (name), `.pip-icon` span (⌂ → ↑ ◆ ✦), and `.pip-label` span (shows `···` for locked levels).
 
 ### Settings (`localStorage` key: `dvorak-tutor-settings`)
 
@@ -62,15 +74,32 @@ Applied to both keyboard keys and characters in the typed-text display.
 | `timerMins` | 15 | 1–60 | 1 |
 | `level` | 1 | 1–5 | — |
 
-Timer auto-suggests based on WPM: `ceil(wordCount / max(wpm,1) * 1.5)`.
+Timer auto-suggests based on WPM: `ceil(wordCount / max(wpm,1) * 1.5)`.  
+Timer **waits for first keystroke** before counting down — `armTimer()` shows the time, `startTimer()` starts the interval.
 
 ### Personal bests (`localStorage` key: `dvorak-tutor-bests`)
 
-Stored as `{ 1: {wpm, acc}, 2: {wpm, acc}, ... }` — one entry per level, updated only when WPM improves.
+Stored as `{ 1: {wpm, acc}, 2: {wpm, acc}, ... }` — one entry per level, updated only when WPM improves. Cached in `currentBest` per round to avoid repeated localStorage reads on every keystroke.
 
 ### Error heatmap
 
-`errorMap[char]` tracks wrong-key counts during a round. On round end, `showHeatmap()` sets `--err-opacity` on each `.key` element. `HEAT_ERROR_MAX = 3` — full intensity at 3+ errors.
+`errorMap[char]` tracks wrong-key counts during a round. On round end, `showHeatmap()` sets `--err-opacity` on each `.key` element via a CSS `::after` overlay. `HEAT_ERROR_MAX = 3` — full intensity at 3+ errors.
+
+### Gamification
+
+- **Streak**: `streak` counter increments on each passing round, resets on fail. Color-coded in stats bar (orange at 3+, green at 5+).
+- **Stars**: Summary card shows 1–3 stars based on accuracy (70%/80%/90% thresholds).
+- **Confetti**: 28 CSS particles burst from viewport center on level advance. Colors from `CONFETTI_COLORS`. CSS custom properties (`--dx`, `--dy`, `--rot`, `--dur`) drive per-particle animation.
+
+### Stats bar behavior
+
+- WPM and ACC color coding (`stat-good` / `stat-warn` / `stat-bad`) only activates after **5 characters typed** — prevents misleading values at round start.
+- WPM shows `—` until 5 chars typed, then updates live.
+- STREAK shows `0` (dimmed) when no streak; BEST shows `—` (dimmed) when no data yet.
+
+### Settings panel
+
+`position: absolute` overlay anchored to `<header>` — opens below the gear icon without reflowing the page. Slide animation uses `scrollHeight`-based JS (`openSettingsPanel` / `closeSettingsPanel`). `#settings-panel[hidden]` requires explicit `display: none` to override `display: flex`.
 
 ## Pure functions (exported for tests)
 
@@ -85,6 +114,20 @@ Stored as `{ 1: {wpm, acc}, 2: {wpm, acc}, ... }` — one entry per level, updat
 | `calcHeatIntensity(errorCount)` | 0–1 heatmap intensity (max at `HEAT_ERROR_MAX`) |
 | `loadSettings()` / `saveSettings()` | localStorage read/write |
 | `loadBests()` / `saveBest()` / `getBest()` | Per-level best WPM/accuracy |
+
+## Key DOM functions
+
+| Function | Purpose |
+|----------|---------|
+| `applyLevel(n)` | Sets `currentLevel`, saves, re-renders keyboard/map, starts round |
+| `advanceLevel()` | Fires confetti, then calls `applyLevel(currentLevel + 1)` |
+| `armTimer()` | Sets `timerRemaining` + display — no interval started |
+| `startTimer()` | Starts countdown interval (call after `armTimer`) |
+| `setStatColor(el, cls)` | Swaps `stat-good/warn/bad/empty` class on a stat element |
+| `spawnConfetti()` | Creates 28 fixed-position particles, self-removes on animationend |
+| `startRound()` / `endRound()` | Round lifecycle |
+| `handleKeydown(e)` | Core input handler; starts timer + roundStartTime on first key |
+| `init()` | Entry point — called on DOMContentLoaded |
 
 ## Workflow Rules
 
