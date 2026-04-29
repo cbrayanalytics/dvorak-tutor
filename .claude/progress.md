@@ -92,38 +92,57 @@ Improve learning effectiveness with targeted practice on weak keys, and add audi
 - `LEVEL_CHARS` — object mapping level 1–5 to a `Set` of allowed characters
 - `getLevelChars(level)` — returns the Set; falls back to level 5 for out-of-range
 - `getWordsForLevel(level)` — filters WORD_LIST to words using only allowed chars
+- `shuffle(arr)` — Fisher-Yates in-place shuffle; used by `getRoundWords` and `getWeightedWords`
 - `getRoundWords(level, count)` — shuffled subset of the level's word pool
 - `getWeightedWords(level, weakKeys, count)` — biased pool; error chars get up to 5× word copies
+- `QUOTE_LIST` — 41 curated short quotes/phrases
+- `getQuotesForLevel(level)` — filters QUOTE_LIST to quotes using only level-allowed chars
+- `getRoundQuote(level)` — returns one random quote for the level, or `''` if none exist
 - Exports via `module.exports` guard (works in browser + Node)
 
 ### `styles.css`
-- Dark theme (`--bg: #0f172a`)
-- CSS custom properties for all 5 finger colors:
-  - `--finger-pinky: #a855f7`, `--finger-ring: #60a5fa`, `--finger-middle: #4ade80`
-  - `--finger-index: #fb923c`, `--finger-thumb: #94a3b8`
+- Dark theme (`--bg: #0f172a`); CSS custom properties for all 5 finger colors
 - Key `data-state` variants: `active`, `locked`, `home-preview`, `next`
-- `next` state: filled background + `key-pulse` animation (scale + glow)
-- Correct chars in `#text-display` colored by `data-finger` attribute
+- `next` state: filled background + `key-pulse` animation; `--err-opacity` CSS var for heatmap
+- Correct chars in `#text-display` colored by `data-finger`; `char-shake` on error
 - `#text-display` fixed at `12rem` height with hidden scrollbar; auto-scrolls on keystroke
-- Settings panel with slide-open/close animation driven by JS `scrollHeight`
+- Settings panel slide animation driven by `scrollHeight`-based JS; `position: absolute` overlay
+- Summary card (`#summary-card`) with fade-in animation; `.star`/`.star-filled` rating
+- `#round-actions` flex container for `#restart-btn` + `#drill-btn` (blue accent when visible)
+- `#finger-indicator` strip: colored dot (`#finger-dot[data-finger=...]`) + `#finger-label`
+- `#history-panel` overlay: chart area + responsive table with newest-row highlight
+- Sparkline SVG styled via `currentColor` (inherits finger-ring blue)
+- `.stat-good` / `.stat-warn` / `.stat-bad` / `.stat-empty` color classes on stat values
+- `@keyframes confetti-burst` — CSS custom property driven particle animation
 - Responsive breakpoint at 620px (smaller keys)
 
 ### `index.html`
 - Full Dvorak keyboard markup: number, upper, home, bottom, space rows
 - Every key has `data-char`, `data-finger`, `data-level` attributes
-- Settings panel: gear button, word count / threshold / timer steppers, timer toggle
-- IDs wired: `#text-display`, `#stat-wpm`, `#stat-acc`, `#stat-level`, `#stat-timer`,
-  `#progress-bar`, `#banner`, `#advance-btn`, `#level-map`, `#keyboard`,
-  `#settings-btn`, `#settings-panel`
+- Settings panel: word count / threshold / timer / sound / mode toggles
+- Stats bar IDs: `stat-wpm`, `stat-acc`, `stat-level`, `stat-best`, `stat-streak`, `stat-trend`,
+  `stat-timer-wrap`, `stat-timer`, `progress-bar`, `progress-wrap`
+- Level map: 5 `.level-pip` divs with `data-level`, `data-label`, `.pip-icon`, `.pip-label`
+- Summary card: `sum-wpm`, `sum-acc`, `sum-time`, `sum-stars`, `sum-sparkline-wrap`, `sum-trend`
+- History panel: `history-panel`, `history-title`, `history-close`, `history-chart`, `history-tbody`
+- Finger indicator: `finger-indicator`, `finger-dot`, `finger-label`
+- Post-round buttons: `#round-actions` wraps `#restart-btn` + `#drill-btn`
 
 ### `app.js`
-- Settings: `loadSettings()`, `saveSettings()`, `applySettingsToDisplay()`
-- Settings defaults: `wordCount: 100`, `threshold: 90`, `timerOn: false`, `timerMins: 15`
-- Timer: `startTimer()`, `clearTimer()`, `formatTimer()`, WPM-based auto-suggest
-- Timer formula: `ceil(wordCount / max(wpm, 1) * 1.5)` — 15 min at 10 WPM / 100 words
-- `lastWpm` seeded at 10 (beginner); updated after each round; drives timer suggestion
-- Threshold and timer changes apply in-place; word count change restarts the round
-- Settings persisted to `localStorage` under key `dvorak-tutor-settings`
+- **Settings**: `loadSettings`, `saveSettings`, `applySettingsToDisplay`; defaults include `audioOn`, `mode`
+- **Round history**: `loadHistory`, `appendHistory` (last 20 per level); `calcTrend`; `renderSparkline`
+- **Personal bests**: `loadBests`, `saveBest`, `getBest`; cached in `currentBest` per round
+- **Weak keys**: `loadWeakKeys`, `saveWeakKeys`, `mergeWeakKeys` (0.85 decay); drives drill mode
+- **Audio**: lazy `AudioContext`; `playClick`, `playError`, `playLevelUp`; no-op without AudioContext
+- **Round lifecycle**: `_initRound` (shared reset), `startRound`, `startDrillRound`, `endRound`
+- **Keyboard**: `renderKeyboard`, `highlightNextKey`, `clearNextKey`, `flashKey`, `buildCharMap`
+- **Finger indicator**: `FINGER_LABELS` map; `updateFingerIndicator(char)` called by `highlightNextKey`
+- **History UI**: `showHistoryPanel`, `closeHistoryPanel`; sparkline + table populated from `loadHistory`
+- **Level map**: `updateLevelMap`; pip click handlers call `applyLevel(n)`
+- **Timer**: `armTimer` (display only), `startTimer` (interval on first key), `clearTimer`
+- **Gamification**: `streak`, `spawnConfetti`, star rating in `showSummaryCard`
+- **Stats**: `updateStats` updates WPM/ACC/BEST/STREAK/TREND with color coding; suppressed until 5 chars
+- **Heatmap**: `showHeatmap` / `clearHeatmap` using `--err-opacity` CSS var; `HEAT_ERROR_MAX = 3`
 
 ---
 
@@ -143,17 +162,7 @@ Level advance condition: ≥ threshold% accuracy (default 90%) on a completed ro
 
 ## app.js — Implemented functions
 
-See CLAUDE.md for the current authoritative function list. Summary of key additions since Phase 2:
-
-- `calcProgressPct`, `calcHeatIntensity` — pure helpers for progress bar and heatmap
-- `loadBests`, `saveBest`, `getBest` — per-level personal best storage
-- `showHeatmap`, `clearHeatmap` — error overlay on keys post-round
-- `showSummaryCard` — end-of-round WPM/ACC/time/stars card
-- `applyLevel(n)` — shared level-switch helper (used by advanceLevel + pip click)
-- `spawnConfetti` — 28-particle CSS burst on level advance
-- `setStatColor` — swaps stat color class on a stat element
-- `armTimer` / `startTimer` — split so timer waits for first keystroke
-- `streak` state — consecutive passing rounds, shown in stats bar
+See **CLAUDE.md** for the authoritative function list (Pure functions + Key DOM functions tables).
 
 ---
 
@@ -161,10 +170,10 @@ See CLAUDE.md for the current authoritative function list. Summary of key additi
 
 | File | Tests | Status |
 |------|-------|--------|
-| `tests/words.test.js` | 49 | ✅ all pass |
+| `tests/words.test.js` | 84 | ✅ all pass |
 | `tests/styles.test.html` | visual | ✅ verified |
-| `tests/index.test.js` | 129 | ✅ all pass |
-| `tests/app.test.js` | 103 | ✅ all pass |
+| `tests/index.test.js` | 151 | ✅ all pass |
+| `tests/app.test.js` | 153 | ✅ all pass |
 
 ---
 
@@ -187,6 +196,16 @@ See CLAUDE.md for the current authoritative function list. Summary of key additi
 - **WPM/ACC color coding** suppressed until 5 chars typed to prevent misleading early values
 - **Level names**: Novice / Learner / Builder / Adept / Master with icons ⌂ → ↑ ◆ ✦
 - **Level pips are clickable** — any done/current pip navigates to that level via `applyLevel`
+- **`_initRound()`** is the shared reset body extracted from `startRound`/`startDrillRound` (Phase 6 simplify)
+- **Fisher-Yates shuffle** replaces `Math.random()-0.5` sort in `getRoundWords` + `getWeightedWords`
+- **`updateDrillBtn(weak)`** accepts the already-merged value to avoid a redundant localStorage read
+- **Audio on by default** — `audioOn: true`; Web Audio API with lazy `AudioContext` init
+- **Drill mode** — `drillMode` flag; `startDrillRound` uses `getWeightedWords`; Enter key is drill-aware
+- **Weak key decay** — `DECAY_FACTOR = 0.85`; chars that reach 0 are pruned from the stored object
+- **Progress history** — last 20 rounds per level; `calcTrend` uses midpoint-split average comparison
+- **Sparkline** — pure SVG polyline via `renderSparkline(wpmValues)`; Node stub returns plain object
+- **Quotes mode** — `mode:'words'|'quotes'` setting; `getRoundQuote` falls back to word mode if no quotes exist at level
+- **Finger indicator** — `#finger-indicator` fades in/out with `.active`; dot color driven by `data-finger` attribute CSS selectors
 
 ---
 

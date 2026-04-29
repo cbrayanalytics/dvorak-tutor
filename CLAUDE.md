@@ -28,10 +28,10 @@ Four files; each has a single responsibility:
 
 | File | Role |
 |------|------|
-| `index.html` | Shell markup — keyboard grid, stats bar, settings panel, summary card |
+| `index.html` | Shell markup — keyboard grid, stats bar, settings panel, summary card, history panel |
 | `styles.css` | Dark theme, finger-color palette (CSS vars), key state variants, animations |
-| `words.js` | Embedded word list + `getWordsForLevel(level)` filter |
-| `app.js` | All runtime logic: settings, game loop, input handling, level progression, bests, heatmap |
+| `words.js` | Embedded word list, quote set, level filtering, weighted/shuffled selection |
+| `app.js` | All runtime logic: settings, game loop, input handling, level progression, bests, heatmap, history, audio, drill |
 
 ### Key visual states (`data-state` attribute on `.key` elements)
 
@@ -79,6 +79,10 @@ Level pips in `#level-map` are **clickable** — clicking any completed or curre
 Timer auto-suggests based on WPM: `ceil(wordCount / max(wpm,1) * 1.5)`.  
 Timer **waits for first keystroke** before counting down — `armTimer()` shows the time, `startTimer()` starts the interval.
 
+### Round history (`localStorage` key: `dvorak-tutor-history`)
+
+Stored as `{ 1: [{wpm, acc, ts}, ...], 2: ... }` — last 20 entries per level (oldest trimmed). `appendHistory` called in `endRound` only when `totalTyped > 0`. `calcTrend` splits the array at its midpoint and compares average WPM of each half; threshold ±2 WPM to avoid noise. Summary card shows a clickable SVG sparkline — click opens `#history-panel` overlay. Stats bar **TREND** stat shows ▲ (green) / ▼ (red) / — (muted) and updates at round end.
+
 ### Personal bests (`localStorage` key: `dvorak-tutor-bests`)
 
 Stored as `{ 1: {wpm, acc}, 2: {wpm, acc}, ... }` — one entry per level, updated only when WPM improves. Cached in `currentBest` per round to avoid repeated localStorage reads on every keystroke.
@@ -110,6 +114,7 @@ Stored as `{ 1: { char: count }, 2: ... }` — per-level error history. After ea
 - WPM and ACC color coding (`stat-good` / `stat-warn` / `stat-bad`) only activates after **5 characters typed** — prevents misleading values at round start.
 - WPM shows `—` until 5 chars typed, then updates live.
 - STREAK shows `0` (dimmed) when no streak; BEST shows `—` (dimmed) when no data yet.
+- TREND shows `—` (dimmed) until enough history exists; updates live after each round end.
 
 ### Settings panel
 
@@ -147,6 +152,7 @@ Stored as `{ 1: { char: count }, 2: ... }` — per-level error history. After ea
 | `startTimer()` | Starts countdown interval (call after `armTimer`) |
 | `setStatColor(el, cls)` | Swaps `stat-good/warn/bad/empty` class on a stat element |
 | `spawnConfetti()` | Creates 28 fixed-position particles, self-removes on animationend |
+| `_initRound()` | Shared reset body called by both `startRound` and `startDrillRound` |
 | `startRound()` / `endRound()` | Round lifecycle |
 | `startDrillRound()` | Drill round using weighted word pool from weak key history |
 | `updateDrillBtn(weak)` | Shows/hides `#drill-btn` based on weak key object |
