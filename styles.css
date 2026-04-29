@@ -588,6 +588,44 @@ h1 span {
 #history-table tr:last-child td { border-bottom: none; }
 #history-tbody tr:first-child td { color: var(--finger-ring); font-weight: 600; }
 
+/* ─── Finger Indicator ───────────────────────────────────────── */
+#finger-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 1.6rem;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+#finger-indicator.active { opacity: 1; }
+
+#finger-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  flex-shrink: 0;
+  transition: background var(--transition);
+}
+#finger-dot[data-finger="pinky-left"],
+#finger-dot[data-finger="pinky-right"]  { background: var(--finger-pinky); }
+#finger-dot[data-finger="ring-left"],
+#finger-dot[data-finger="ring-right"]   { background: var(--finger-ring); }
+#finger-dot[data-finger="middle-left"],
+#finger-dot[data-finger="middle-right"] { background: var(--finger-middle); }
+#finger-dot[data-finger="index-left"],
+#finger-dot[data-finger="index-right"]  { background: var(--finger-index); }
+#finger-dot[data-finger="thumb"]        { background: var(--finger-thumb); }
+
+#finger-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
 /* ─── Advance Button ─────────────────────────────────────────── */
 #advance-btn {
   display: none;
