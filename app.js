@@ -48,7 +48,8 @@ function getBest(level) {
 
 // ── Error heatmap ──────────────────────────────────────────────
 
-const HEAT_ERROR_MAX = 3;
+const HEAT_ERROR_MAX   = 3;
+const CONFETTI_COLORS  = ['#a855f7', '#60a5fa', '#4ade80', '#fb923c', '#94a3b8'];
 
 function calcHeatIntensity(errorCount) {
   return Math.min(errorCount / HEAT_ERROR_MAX, 1);
@@ -469,7 +470,7 @@ function endRound() {
 }
 
 function spawnConfetti() {
-  const colors = ['#a855f7', '#60a5fa', '#4ade80', '#fb923c', '#94a3b8'];
+  const colors = CONFETTI_COLORS;
   const cx = window.innerWidth  / 2;
   const cy = window.innerHeight * 0.4;
 
@@ -497,14 +498,18 @@ function spawnConfetti() {
   }
 }
 
-function advanceLevel() {
-  if (currentLevel >= 5) return;
-  currentLevel++;
+function applyLevel(n) {
+  currentLevel = n;
   saveSettings({ level: currentLevel });
-  spawnConfetti();
   renderKeyboard(currentLevel);
   updateLevelMap(currentLevel);
   startRound();
+}
+
+function advanceLevel() {
+  if (currentLevel >= 5) return;
+  spawnConfetti();
+  applyLevel(currentLevel + 1);
 }
 
 // ── Input handler ──────────────────────────────────────────────
@@ -574,12 +579,7 @@ function init() {
     pip.addEventListener('click', () => {
       const target = Number(pip.dataset.level);
       if (target > currentLevel) return;
-      currentLevel = target;
-      saveSettings({ level: currentLevel });
-      renderKeyboard(currentLevel);
-      updateLevelMap(currentLevel);
-      currentBest = getBest(currentLevel);
-      startRound();
+      applyLevel(target);
     });
   });
 
