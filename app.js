@@ -316,18 +316,22 @@ const FINGER_LABELS = {
 };
 
 function updateFingerIndicator(char) {
-  const info = char ? CHAR_TO_KEY[char] : null;
-  const dot  = $('finger-dot');
-  const lbl  = $('finger-label');
-  if (info && info.finger) {
-    dot.dataset.finger  = info.finger;
-    lbl.textContent     = FINGER_LABELS[info.finger] || info.finger;
+  const info   = char ? CHAR_TO_KEY[char] : null;
+  const finger = info && info.finger ? info.finger : null;
+  const dot    = $('finger-dot');
+  const lbl    = $('finger-label');
+  if (finger) {
+    dot.dataset.finger = finger;
+    lbl.textContent    = FINGER_LABELS[finger] || finger;
     $('finger-indicator').classList.add('active');
   } else {
-    dot.dataset.finger  = '';
-    lbl.textContent     = '—';
+    dot.dataset.finger = '';
+    lbl.textContent    = '—';
     $('finger-indicator').classList.remove('active');
   }
+  document.querySelectorAll('#hand-diagram rect[data-finger]').forEach(rect => {
+    rect.classList.toggle('finger-active', rect.dataset.finger === finger);
+  });
 }
 
 function highlightNextKey(char) {

@@ -633,6 +633,36 @@ h1 span {
   text-transform: uppercase;
 }
 
+/* ─── Hand Diagram ───────────────────────────────────────────── */
+#hand-diagram {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 0.2rem 0;
+}
+
+.hand-svg rect {
+  fill: var(--surface-2);
+  stroke: var(--border);
+  stroke-width: 1.5;
+  transition: fill 0.12s ease, opacity 0.12s ease;
+  opacity: 0.35;
+}
+
+.hand-svg rect.finger-active {
+  opacity: 1;
+}
+
+.hand-svg rect[data-finger="pinky-left"].finger-active,
+.hand-svg rect[data-finger="pinky-right"].finger-active  { fill: var(--finger-pinky);  }
+.hand-svg rect[data-finger="ring-left"].finger-active,
+.hand-svg rect[data-finger="ring-right"].finger-active   { fill: var(--finger-ring);   }
+.hand-svg rect[data-finger="middle-left"].finger-active,
+.hand-svg rect[data-finger="middle-right"].finger-active { fill: var(--finger-middle); }
+.hand-svg rect[data-finger="index-left"].finger-active,
+.hand-svg rect[data-finger="index-right"].finger-active  { fill: var(--finger-index);  }
+.hand-svg rect[data-finger="thumb"].finger-active        { fill: var(--finger-thumb);  }
+
 /* ─── Advance Button ─────────────────────────────────────────── */
 #advance-btn {
   display: none;

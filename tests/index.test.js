@@ -27,6 +27,7 @@ console.log('\nRequired element IDs');
   'progress-bar','text-display','banner','advance-btn','restart-btn','drill-btn',
   'round-actions','keyboard','stat-streak','stat-trend',
   'finger-indicator','finger-dot','finger-label',
+  'hand-diagram','hand-left','hand-right',
 ].forEach(id => assert(`#${id} exists`, hasId(id)));
 
 // ── Script tags ────────────────────────────────────────────────
