@@ -643,7 +643,7 @@ h1 span {
   margin-top: -0.5rem;
 }
 
-.hand-svg rect {
+.hand-svg g rect {
   fill: var(--surface-2);
   stroke: var(--border);
   stroke-width: 1.5;
@@ -651,19 +651,36 @@ h1 span {
   opacity: 0.35;
 }
 
-.hand-svg rect.finger-active {
-  opacity: 1;
+.hand-svg .palm {
+  fill: var(--surface-2);
+  stroke: var(--border);
+  stroke-width: 1.5;
+  opacity: 0.5;
 }
 
-.hand-svg rect[data-finger="pinky-left"].finger-active,
-.hand-svg rect[data-finger="pinky-right"].finger-active  { fill: var(--finger-pinky);  }
-.hand-svg rect[data-finger="ring-left"].finger-active,
-.hand-svg rect[data-finger="ring-right"].finger-active   { fill: var(--finger-ring);   }
-.hand-svg rect[data-finger="middle-left"].finger-active,
-.hand-svg rect[data-finger="middle-right"].finger-active { fill: var(--finger-middle); }
-.hand-svg rect[data-finger="index-left"].finger-active,
-.hand-svg rect[data-finger="index-right"].finger-active  { fill: var(--finger-index);  }
-.hand-svg rect[data-finger="thumb"].finger-active        { fill: var(--finger-thumb);  }
+.hand-svg text {
+  font-size: 8px;
+  font-weight: 700;
+  fill: var(--text-muted);
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+  transition: fill 0.12s ease, opacity 0.12s ease;
+  opacity: 0.45;
+}
+
+.hand-svg g.finger-active rect { opacity: 1; }
+.hand-svg g.finger-active text { fill: #fff; opacity: 1; }
+
+.hand-svg g[data-finger="pinky-left"].finger-active  rect,
+.hand-svg g[data-finger="pinky-right"].finger-active rect  { fill: var(--finger-pinky);  }
+.hand-svg g[data-finger="ring-left"].finger-active   rect,
+.hand-svg g[data-finger="ring-right"].finger-active  rect  { fill: var(--finger-ring);   }
+.hand-svg g[data-finger="middle-left"].finger-active rect,
+.hand-svg g[data-finger="middle-right"].finger-active rect { fill: var(--finger-middle); }
+.hand-svg g[data-finger="index-left"].finger-active  rect,
+.hand-svg g[data-finger="index-right"].finger-active rect  { fill: var(--finger-index);  }
+.hand-svg g[data-finger="thumb"].finger-active       rect  { fill: var(--finger-thumb);  }
 
 /* ─── Advance Button ─────────────────────────────────────────── */
 #advance-btn {

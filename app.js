@@ -329,8 +329,8 @@ function updateFingerIndicator(char) {
     lbl.textContent    = '—';
     $('finger-indicator').classList.remove('active');
   }
-  document.querySelectorAll('#hand-diagram rect[data-finger]').forEach(rect => {
-    rect.classList.toggle('finger-active', rect.dataset.finger === finger);
+  document.querySelectorAll('#hand-diagram g[data-finger]').forEach(g => {
+    g.classList.toggle('finger-active', g.dataset.finger === finger);
   });
 }
 
