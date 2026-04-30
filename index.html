@@ -158,50 +158,54 @@
 
   <!-- Hand diagram — highlights the finger to use for the next key -->
   <div id="hand-diagram" aria-hidden="true">
-    <svg id="hand-left" class="hand-svg" viewBox="0 0 74 82" width="74" height="82">
+    <!-- Left hand: pinky(left) → index(right), thumb extends right -->
+    <svg id="hand-left" class="hand-svg" viewBox="0 0 72 94" width="95" height="124">
       <g data-finger="pinky-left">
-        <rect x="2"  y="16" width="12" height="42" rx="3"/>
-        <text x="8"  y="37">P</text>
+        <rect x="2"  y="18" width="12" height="42" rx="7"/>
+        <text x="8"  y="39">P</text>
       </g>
       <g data-finger="ring-left">
-        <rect x="16" y="6"  width="12" height="52" rx="3"/>
-        <text x="22" y="32">R</text>
+        <rect x="16" y="7"  width="13" height="53" rx="7"/>
+        <text x="22" y="33">R</text>
       </g>
       <g data-finger="middle-left">
-        <rect x="30" y="0"  width="12" height="58" rx="3"/>
-        <text x="36" y="29">M</text>
+        <rect x="31" y="0"  width="15" height="60" rx="8"/>
+        <text x="38" y="30">M</text>
       </g>
       <g data-finger="index-left">
-        <rect x="44" y="8"  width="12" height="50" rx="3"/>
-        <text x="50" y="33">I</text>
+        <rect x="48" y="9"  width="13" height="51" rx="7"/>
+        <text x="54" y="34">I</text>
       </g>
-      <rect class="palm" x="2"  y="56" width="54" height="18" rx="5"/>
+      <rect class="palm" x="2"  y="58" width="58" height="20" rx="5"/>
+      <rect class="wrist"x="8"  y="76" width="44" height="16" rx="8"/>
       <g data-finger="thumb">
-        <rect x="50" y="68" width="22" height="12" rx="5"/>
-        <text x="61" y="74">T</text>
+        <rect x="50" y="68" width="20" height="13" rx="6"/>
+        <text x="60" y="74">T</text>
       </g>
     </svg>
-    <svg id="hand-right" class="hand-svg" viewBox="0 0 74 82" width="74" height="82">
+    <!-- Right hand: index(left) → pinky(right), thumb extends left -->
+    <svg id="hand-right" class="hand-svg" viewBox="0 0 72 94" width="95" height="124">
       <g data-finger="index-right">
-        <rect x="18" y="8"  width="12" height="50" rx="3"/>
-        <text x="24" y="33">I</text>
+        <rect x="4"  y="9"  width="13" height="51" rx="7"/>
+        <text x="10" y="34">I</text>
       </g>
       <g data-finger="middle-right">
-        <rect x="32" y="0"  width="12" height="58" rx="3"/>
-        <text x="38" y="29">M</text>
+        <rect x="19" y="0"  width="15" height="60" rx="8"/>
+        <text x="26" y="30">M</text>
       </g>
       <g data-finger="ring-right">
-        <rect x="46" y="6"  width="12" height="52" rx="3"/>
-        <text x="52" y="32">R</text>
+        <rect x="36" y="7"  width="13" height="53" rx="7"/>
+        <text x="42" y="33">R</text>
       </g>
       <g data-finger="pinky-right">
-        <rect x="60" y="16" width="12" height="42" rx="3"/>
-        <text x="66" y="37">P</text>
+        <rect x="51" y="18" width="12" height="42" rx="7"/>
+        <text x="57" y="39">P</text>
       </g>
-      <rect class="palm" x="18" y="56" width="54" height="18" rx="5"/>
+      <rect class="palm" x="4"  y="58" width="58" height="20" rx="5"/>
+      <rect class="wrist"x="10" y="76" width="44" height="16" rx="8"/>
       <g data-finger="thumb">
-        <rect x="2"  y="68" width="22" height="12" rx="5"/>
-        <text x="13" y="74">T</text>
+        <rect x="2"  y="68" width="20" height="13" rx="6"/>
+        <text x="12" y="74">T</text>
       </g>
     </svg>
   </div>

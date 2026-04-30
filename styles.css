@@ -638,9 +638,9 @@ h1 span {
 #hand-diagram {
   display: flex;
   justify-content: center;
-  gap: 2.5rem;
+  gap: 2rem;
   padding: 0.2rem 0;
-  margin-top: -0.5rem;
+  margin-top: -0.4rem;
 }
 
 .hand-svg g rect {
@@ -651,7 +651,8 @@ h1 span {
   opacity: 0.35;
 }
 
-.hand-svg .palm {
+.hand-svg .palm,
+.hand-svg .wrist {
   fill: var(--surface-2);
   stroke: var(--border);
   stroke-width: 1.5;
@@ -659,7 +660,7 @@ h1 span {
 }
 
 .hand-svg text {
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 700;
   fill: var(--text-muted);
   text-anchor: middle;
@@ -874,6 +875,6 @@ h1 span {
   #text-display { font-size: 1.15rem; }
   .stat-value   { font-size: 1.2rem; }
   #progress-bar-bg { width: 70px; }
-  #hand-diagram { gap: 1.5rem; }
-  .hand-svg { width: 56px; height: 54px; }
+  #hand-diagram { gap: 1rem; }
+  .hand-svg { width: 68px; height: 89px; }
 }
