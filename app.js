@@ -364,9 +364,9 @@ function flashKey(char, type) {
 // ── Text display ───────────────────────────────────────────────
 
 function renderPhrase(text) {
-  const display = $('text-display');
-  display.innerHTML = '';
-  display.scrollTop = 0;
+  const inner = $('text-inner');
+  inner.innerHTML = '';
+  inner.style.transform = '';
   [...text].forEach((ch, i) => {
     const span = document.createElement('span');
     const info = CHAR_TO_KEY[ch] || {};
@@ -379,8 +379,14 @@ function renderPhrase(text) {
     }
     if (info.finger) span.dataset.finger = info.finger;
     if (i === 0) span.classList.add('cursor');
-    display.appendChild(span);
+    inner.appendChild(span);
   });
+}
+
+function updateTextScroll() {
+  if (cursor >= charEls.length) return;
+  const offset = charEls[cursor].offsetLeft - 40;
+  $('text-inner').style.transform = `translateX(${-Math.max(0, offset)}px)`;
 }
 
 // ── Timer ──────────────────────────────────────────────────────
@@ -605,7 +611,7 @@ function _initRound() {
   errorMap       = {};
   currentBest    = getBest(currentLevel);
   renderPhrase(phrase);
-  charEls = Array.from($('text-display').querySelectorAll('.char'));
+  charEls = Array.from($('text-inner').querySelectorAll('.char'));
   highlightNextKey(phrase[0]);
   updateStats();
   clearHeatmap();
@@ -844,7 +850,7 @@ function handleKeydown(e) {
 
   if (cursor < phrase.length) {
     charEls[cursor].classList.add('cursor');
-    charEls[cursor].scrollIntoView({ behavior: 'instant', block: 'nearest' });
+    updateTextScroll();
     highlightNextKey(phrase[cursor]);
   } else {
     endRound();
