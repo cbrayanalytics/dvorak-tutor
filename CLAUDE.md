@@ -16,7 +16,7 @@ Tests are plain Node.js files — no test framework:
 
 ```bash
 node tests/words.test.js   # 84 tests  — word list, level filtering, quotes
-node tests/index.test.js   # 151 tests — HTML structure and data attributes
+node tests/index.test.js   # 148 tests — HTML structure and data attributes
 node tests/app.test.js     # 153 tests — game logic unit tests
 ```
 
@@ -38,7 +38,7 @@ Four files; each has a single responsibility:
 | State | Meaning |
 |-------|---------|
 | `active` | Unlocked at current level, finger-colored |
-| `locked` | Not yet unlocked — opacity 0.13, desaturated |
+| `locked` | Not yet unlocked — opacity 0.18, desaturated |
 | `home-preview` | I and D at Level 1 only — opacity 0.38, desaturated |
 | `next` | Character user must type next — pulsing animation |
 
@@ -61,6 +61,8 @@ Applied to both keyboard keys and characters in the typed-text display. Also use
 | 3 | Builder | + p y f g c r l |
 | 4 | Adept | + q j k x b m w v z |
 | 5 | Master | All + punctuation + numbers |
+
+Each keyboard row contains a `<div class="hand-gap"></div>` (20px spacer, `flex-shrink: 0`) between the last `index-left` and first `index-right` key — visually splits the left and right hand groups.
 
 Level pips in `#level-map` are **clickable** — clicking any completed or current pip calls `applyLevel(n)` to jump to that level. Each pip has `data-label` (name), `.pip-icon` span (⌂ → ↑ ◆ ✦), and `.pip-label` span (shows `···` for locked levels).
 
@@ -111,6 +113,8 @@ Stored as `{ 1: { char: count }, 2: ... }` — per-level error history. After ea
 
 ### Stats bar behavior
 
+Stats bar order: **WPM | ACC | progress bar | BEST | STREAK | TREND | TIME** (TIME hidden unless timer is on). There is no LEVEL stat — current level is shown in the level map pips above.
+
 - WPM and ACC color coding (`stat-good` / `stat-warn` / `stat-bad`) only activates after **5 characters typed** — prevents misleading values at round start.
 - WPM shows `—` until 5 chars typed, then updates live.
 - STREAK shows `0` (dimmed) when no streak; BEST shows `—` (dimmed) when no data yet.
@@ -157,9 +161,16 @@ Stored as `{ 1: { char: count }, 2: ... }` — per-level error history. After ea
 | `startDrillRound()` | Drill round using weighted word pool from weak key history |
 | `updateDrillBtn(weak)` | Shows/hides `#drill-btn` based on weak key object |
 | `showHistoryPanel()` / `closeHistoryPanel()` | Open/close round history overlay |
-| `updateFingerIndicator(char)` | Updates `#finger-indicator` strip for next key; pass `null` to clear |
 | `handleKeydown(e)` | Core input handler; starts timer + roundStartTime on first key |
 | `init()` | Entry point — called on DOMContentLoaded |
+
+## CSS Gotchas
+
+**Animation vs. JS transform conflict**: CSS animation values override inline `style.transform`. If a keyframe animation runs on `#text-inner`, it blocks `updateTextScroll()`'s `translateX` — the text cannot scroll. Keep animation targets and JS transform targets on **separate elements**. The phrase-fade animation belongs on `#text-display`; `#text-inner` is transform-only.
+
+**`#app` max-width is 620px** — sized to match the keyboard's intrinsic width so all sections (stats bar, text display, keyboard) share the same column.
+
+**.char.cursor** is a terminal underline (`border-bottom: 2px solid var(--finger-index)`) with a `cursor-blink` keyframe animation (1.2s, `step-start`, `infinite`) — not a box highlight.
 
 ## Workflow Rules
 
