@@ -476,6 +476,12 @@ h1 span {
 .key.flash-ok  { animation: flash-ok  220ms ease forwards; }
 .key.flash-err { animation: flash-err 280ms ease forwards; }
 
+@keyframes wpm-flash {
+  0%   { color: var(--finger-index); }
+  100% { color: inherit; }
+}
+.stat-wpm-flash { animation: wpm-flash 250ms ease forwards; }
+
 /* ─── Banner (round result) ──────────────────────────────────── */
 #banner {
   text-align: center;

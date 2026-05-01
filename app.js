@@ -409,8 +409,16 @@ function updateStats() {
   const wpm     = calcWpm(cursor, elapsed);
   const acc     = calcAccuracy(correctCount, totalTyped);
 
-  const hasWpm = roundStartTime && cursor >= 5;
-  $('stat-wpm').textContent   = hasWpm ? wpm : (roundStartTime ? '—' : 0);
+  const hasWpm    = roundStartTime && cursor >= 5;
+  const wpmEl     = $('stat-wpm');
+  const prevWpm   = wpmEl.textContent;
+  const nextWpm   = String(hasWpm ? wpm : (roundStartTime ? '—' : 0));
+  wpmEl.textContent = nextWpm;
+  if (hasWpm && nextWpm !== prevWpm) {
+    wpmEl.classList.remove('stat-wpm-flash');
+    void wpmEl.offsetWidth;
+    wpmEl.classList.add('stat-wpm-flash');
+  }
   $('stat-acc').textContent   = totalTyped > 0 ? acc + '%' : '—';
   $('stat-level').textContent = currentLevel;
 
