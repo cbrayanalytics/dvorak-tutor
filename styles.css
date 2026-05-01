@@ -376,7 +376,9 @@ h1 span {
 .key[data-finger="pinky-left"][data-state="active"],
 .key[data-finger="pinky-right"][data-state="active"] {
   border-color: var(--finger-pinky);
-  background: color-mix(in srgb, var(--finger-pinky) 18%, var(--surface-2));
+  background: linear-gradient(to bottom,
+    color-mix(in srgb, var(--finger-pinky) 30%, var(--surface-2)) 0%,
+    color-mix(in srgb, var(--finger-pinky) 14%, var(--surface-2)) 100%);
 }
 .key[data-finger="pinky-left"][data-state="next"],
 .key[data-finger="pinky-right"][data-state="next"] {
@@ -387,7 +389,9 @@ h1 span {
 .key[data-finger="ring-left"][data-state="active"],
 .key[data-finger="ring-right"][data-state="active"] {
   border-color: var(--finger-ring);
-  background: color-mix(in srgb, var(--finger-ring) 18%, var(--surface-2));
+  background: linear-gradient(to bottom,
+    color-mix(in srgb, var(--finger-ring) 30%, var(--surface-2)) 0%,
+    color-mix(in srgb, var(--finger-ring) 14%, var(--surface-2)) 100%);
 }
 .key[data-finger="ring-left"][data-state="next"],
 .key[data-finger="ring-right"][data-state="next"] {
@@ -398,7 +402,9 @@ h1 span {
 .key[data-finger="middle-left"][data-state="active"],
 .key[data-finger="middle-right"][data-state="active"] {
   border-color: var(--finger-middle);
-  background: color-mix(in srgb, var(--finger-middle) 18%, var(--surface-2));
+  background: linear-gradient(to bottom,
+    color-mix(in srgb, var(--finger-middle) 30%, var(--surface-2)) 0%,
+    color-mix(in srgb, var(--finger-middle) 14%, var(--surface-2)) 100%);
 }
 .key[data-finger="middle-left"][data-state="next"],
 .key[data-finger="middle-right"][data-state="next"] {
@@ -409,7 +415,9 @@ h1 span {
 .key[data-finger="index-left"][data-state="active"],
 .key[data-finger="index-right"][data-state="active"] {
   border-color: var(--finger-index);
-  background: color-mix(in srgb, var(--finger-index) 18%, var(--surface-2));
+  background: linear-gradient(to bottom,
+    color-mix(in srgb, var(--finger-index) 30%, var(--surface-2)) 0%,
+    color-mix(in srgb, var(--finger-index) 14%, var(--surface-2)) 100%);
 }
 .key[data-finger="index-left"][data-state="next"],
 .key[data-finger="index-right"][data-state="next"] {
@@ -419,7 +427,9 @@ h1 span {
 
 .key[data-finger="thumb"][data-state="active"] {
   border-color: var(--finger-thumb);
-  background: color-mix(in srgb, var(--finger-thumb) 18%, var(--surface-2));
+  background: linear-gradient(to bottom,
+    color-mix(in srgb, var(--finger-thumb) 30%, var(--surface-2)) 0%,
+    color-mix(in srgb, var(--finger-thumb) 14%, var(--surface-2)) 100%);
 }
 .key[data-finger="thumb"][data-state="next"] {
   background: var(--finger-thumb);
