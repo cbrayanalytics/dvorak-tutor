@@ -3,11 +3,37 @@
 **Project:** Dvorak Typing Tutor (browser-based, vanilla JS/CSS)
 **Repo:** https://github.com/cbrayanalytics/dvorak-tutor — branch `trunk`
 **Last updated:** 2026-04-30
-**Phase 9 complete.** All 15 design overhaul tasks shipped — typography, color depth, visual hierarchy, animation polish.
+**Phase 10 in progress.** Design review follow-up — layout consistency, keyboard hand-split, component polish.
 
 ---
 
 ## Task Status
+
+### Phase 10 — Design Review Follow-Up
+
+From second frontend-design plugin analysis + user discussion. Fixes remaining inconsistencies and adds hand-split keyboard feature.
+
+#### Layout & Consistency
+| # | Task | Description | Status |
+|---|------|-------------|--------|
+| P1 | **Unify stats bar background** | Remove border/surface bg from `#stats`; use `rgba(0,0,0,0.15)` + inset shadow to match text display | ⬜ todo |
+| P2 | **Constrain layout to keyboard width** | Set `#app` max-width ~620px so stats bar, text display, and keyboard all share the same width | ⬜ todo |
+| P3 | **Remove redundant LEVEL stat** | Level map shows current level already; remove `#stat-level` + divider from stats bar | ⬜ todo |
+
+#### Keyboard
+| # | Task | Description | Status |
+|---|------|-------------|--------|
+| P4 | **Hand-split keyboard** | Add `<div class="hand-gap">` spacer between index-left and index-right keys in each row; ~20px gap reinforces left/right hand mental model | ⬜ todo |
+
+#### Typography & Interaction
+| # | Task | Description | Status |
+|---|------|-------------|--------|
+| P5 | **Terminal-style cursor** | Replace box highlight + outline on `.char.cursor` with `border-bottom: 2px solid` + slow blink animation | ⬜ todo |
+| P6 | **Section spacing grouping** | Header+level-map tight (0.25rem gap), then larger gap before practice area (text display + keyboard) | ⬜ todo |
+| P7 | **Settings button upgrade** | Increase to 36×38px; borderless; subtle bg pill on hover only | ⬜ todo |
+| P8 | **First-char cursor padding fix** | Increase `#text-display` left padding to 1.75rem so cursor outline never clips at edge | ⬜ todo |
+
+---
 
 ### Phase 9 — Frontend Design Overhaul
 
