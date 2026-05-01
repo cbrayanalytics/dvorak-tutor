@@ -351,7 +351,7 @@ h1 span {
 /* ── Key States ──────────────────────────────────────────────── */
 
 .key[data-state="locked"] {
-  opacity: 0.13;
+  opacity: 0.18;
   filter: saturate(0);
 }
 
@@ -438,8 +438,8 @@ h1 span {
 
 /* ── Next-key pulse animation ────────────────────────────────── */
 @keyframes key-pulse {
-  0%, 100% { transform: scale(1);    box-shadow: none; }
-  50%       { transform: scale(1.1); box-shadow: 0 0 14px 3px currentColor; }
+  0%, 100% { transform: scale(1);    filter: drop-shadow(0 0 0px currentColor); }
+  50%       { transform: scale(1.1); filter: drop-shadow(0 0 8px currentColor); }
 }
 
 .key[data-state="next"] { animation: key-pulse 0.75s ease-in-out infinite; }
