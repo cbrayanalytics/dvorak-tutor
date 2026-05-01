@@ -3,7 +3,7 @@
 **Project:** Dvorak Typing Tutor (browser-based, vanilla JS/CSS)
 **Repo:** https://github.com/cbrayanalytics/dvorak-tutor — branch `trunk`
 **Last updated:** 2026-04-30
-**Phase 9 in progress.** Frontend design overhaul — typography, color depth, visual hierarchy, animation polish.
+**Phase 9 complete.** All 15 design overhaul tasks shipped — typography, color depth, visual hierarchy, animation polish.
 
 ---
 
@@ -16,45 +16,45 @@ Based on frontend-design plugin analysis. Goal: distinctive, production-grade ae
 #### Typography
 | # | Task | Description | Status |
 |---|------|-------------|--------|
-| T1 | **JetBrains Mono** | Load from Google Fonts; replace Segoe UI (UI) + Courier New (text display) throughout | ⬜ todo |
-| T2 | **Wordmark sizing** | h1 from 1rem → 1.6rem; "Dvorak" plain, "Tutor" orange | ⬜ todo |
+| T1 | **JetBrains Mono** | Load from Google Fonts; replace Segoe UI (UI) + Courier New (text display) throughout | ✅ done |
+| T2 | **Wordmark sizing** | h1 from 1rem → 1.6rem; "Dvorak" plain, "Tutor" orange | ✅ done |
 
 #### Background & Color
 | # | Task | Description | Status |
 |---|------|-------------|--------|
-| T3 | **Background depth** | Base bg → `#0d1520` (warmer navy); add radial gradient to body | ⬜ todo |
+| T3 | **Background depth** | Base bg → `#0d1520` (warmer navy); add radial gradient to body | ✅ done |
 
 #### Text Display
 | # | Task | Description | Status |
 |---|------|-------------|--------|
-| T4 | **Text display as stage** | Remove border, transparent/darker bg, inset shadow, font 1.5 → 1.75rem | ⬜ todo |
+| T4 | **Text display as stage** | Remove border, transparent/darker bg, inset shadow, font 1.5 → 1.75rem | ✅ done |
 
 #### Keyboard
 | # | Task | Description | Status |
 |---|------|-------------|--------|
-| T5 | **Keyboard elevation** | Add `box-shadow: 0 8px 32px rgba(0,0,0,0.4)` below keyboard | ⬜ todo |
-| T6 | **Key depth gradient** | Active keys: subtle top-highlight gradient for tactile feel | ⬜ todo |
-| T7 | **Locked key + pulse** | Opacity 0.13 → 0.18; pulse uses `drop-shadow` filter instead of `box-shadow` | ⬜ todo |
+| T5 | **Keyboard elevation** | Add `box-shadow: 0 8px 32px rgba(0,0,0,0.4)` below keyboard | ✅ done |
+| T6 | **Key depth gradient** | Active keys: subtle top-highlight gradient for tactile feel | ✅ done |
+| T7 | **Locked key + pulse** | Opacity 0.13 → 0.18; pulse uses `drop-shadow` filter instead of `box-shadow` | ✅ done |
 
 #### Stats Bar
 | # | Task | Description | Status |
 |---|------|-------------|--------|
-| T8 | **Stats hierarchy** | BEST, TREND, LEVEL demoted to secondary size; WPM, ACC, STREAK stay primary | ⬜ todo |
+| T8 | **Stats hierarchy** | BEST, TREND, LEVEL demoted to secondary size; WPM, ACC, STREAK stay primary | ✅ done |
 
 #### Animations & Motion
 | # | Task | Description | Status |
 |---|------|-------------|--------|
-| T9  | **Phrase fade-in** | Round start: text display content fades in over 150ms | ⬜ todo |
-| T10 | **Level advance delay** | 200ms pause after confetti fires before keyboard re-renders | ⬜ todo |
-| T11 | **WPM flash** | Brief color flash on WPM stat on each live update | ⬜ todo |
+| T9  | **Phrase fade-in** | Round start: text display content fades in over 150ms | ✅ done |
+| T10 | **Level advance delay** | 200ms pause after confetti fires before keyboard re-renders | ✅ done |
+| T11 | **WPM flash** | Brief color flash on WPM stat on each live update | ✅ done |
 
 #### Component Polish
 | # | Task | Description | Status |
 |---|------|-------------|--------|
-| T12 | **Pip connectors** | Increase to 3px; fill green for completed levels | ⬜ todo |
-| T13 | **Stars** | Empty star → `☆` outline; filled → `★`; not opacity/color tricks | ⬜ todo |
-| T14 | **Banner height** | Remove dead `min-height` space; animate height properly | ⬜ todo |
-| T15 | **Button radius** | Advance btn `border-radius` 8px → 10px (match everything else) | ⬜ todo |
+| T12 | **Pip connectors** | Increase to 3px; fill green for completed levels | ✅ done |
+| T13 | **Stars** | Empty star → `☆` outline; filled → `★`; not opacity/color tricks | ✅ done |
+| T14 | **Banner height** | Remove dead `min-height` space; animate height properly | ✅ done |
+| T15 | **Button radius** | Advance btn `border-radius` 8px → 10px (match everything else) | ✅ done |
 
 ---
 
