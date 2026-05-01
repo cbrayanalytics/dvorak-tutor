@@ -119,7 +119,7 @@ assert('advance-btn has type="button"',   html.includes('type="button"'));
 // ── Settings panel ────────────────────────────────────────────
 console.log('\nSettings panel — required IDs');
 [
-  'settings-btn','settings-panel',
+  'settings-btn','settings-panel','settings-close',
   'words-dec','val-words','words-inc',
   'threshold-dec','val-threshold','threshold-inc',
   'timer-toggle','timer-stepper','timer-dec','val-timer','timer-inc',

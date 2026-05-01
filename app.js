@@ -858,6 +858,7 @@ function init() {
   $('sum-sparkline-wrap').addEventListener('click', showHistoryPanel);
   $('history-close').addEventListener('click',     closeHistoryPanel);
   $('settings-btn').addEventListener('click', toggleSettingsPanel);
+  $('settings-close').addEventListener('click', closeSettingsPanel);
   $('words-dec').addEventListener('click',     () => changeWordCount(-10));
   $('words-inc').addEventListener('click',     () => changeWordCount(10));
   $('threshold-dec').addEventListener('click', () => changeThreshold(-5));

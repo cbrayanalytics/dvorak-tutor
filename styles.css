@@ -688,10 +688,51 @@ h1 span {
 }
 #settings-panel[hidden] { display: none; }
 
+#settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.1rem;
+}
+
+#settings-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+#settings-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  transition: color var(--transition), background var(--transition);
+}
+#settings-close:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
 .setting-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.setting-sub-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.1rem;
 }
 
 .setting-label {
@@ -736,16 +777,9 @@ h1 span {
   color: var(--text);
 }
 
-/* ─── Timer control row ──────────────────────────────────────── */
-.timer-control {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
 /* ─── Toggle Button (OFF / ON pill) ──────────────────────────── */
 .toggle-btn {
-  min-width: 52px;
+  width: 76px;
   height: 28px;
   border-radius: 14px;
   border: 1px solid var(--border);
@@ -755,7 +789,7 @@ h1 span {
   font-weight: 700;
   letter-spacing: 0.1em;
   cursor: pointer;
-  padding: 0 0.75rem;
+  padding: 0;
   transition: background var(--transition), color var(--transition),
               border-color var(--transition);
 }

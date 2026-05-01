@@ -19,6 +19,11 @@
     <!-- Settings panel — floats below gear icon, does not reflow page -->
     <div id="settings-panel" hidden>
 
+    <div id="settings-header">
+      <span id="settings-title">Settings</span>
+      <button id="settings-close" type="button" aria-label="Close settings">✕</button>
+    </div>
+
     <div class="setting-row">
       <span class="setting-label" id="label-words">Words per round</span>
       <div class="stepper" role="group" aria-labelledby="label-words">
@@ -39,16 +44,14 @@
 
     <div class="setting-row">
       <span class="setting-label" id="label-timer">Time limit</span>
-      <div class="timer-control">
-        <button class="toggle-btn" id="timer-toggle" type="button"
-                aria-pressed="false" aria-label="Toggle time limit">OFF</button>
-        <div class="stepper" role="group" aria-labelledby="label-timer"
-             id="timer-stepper" hidden>
-          <button class="stepper-btn" id="timer-dec" type="button" aria-label="Decrease time limit">−</button>
-          <span class="stepper-value" id="val-timer">60s</span>
-          <button class="stepper-btn" id="timer-inc" type="button" aria-label="Increase time limit">+</button>
-        </div>
-      </div>
+      <button class="toggle-btn" id="timer-toggle" type="button"
+              aria-pressed="false" aria-label="Toggle time limit">OFF</button>
+    </div>
+    <div class="setting-sub-row" id="timer-stepper" hidden
+         role="group" aria-labelledby="label-timer">
+      <button class="stepper-btn" id="timer-dec" type="button" aria-label="Decrease time limit">−</button>
+      <span class="stepper-value" id="val-timer">60s</span>
+      <button class="stepper-btn" id="timer-inc" type="button" aria-label="Increase time limit">+</button>
     </div>
 
     <div class="setting-row">
