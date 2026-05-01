@@ -460,6 +460,9 @@ function updateLevelMap(level) {
     if (l > level)  pip.classList.add('locked');
     if (label) label.textContent = l > level ? '···' : pip.dataset.label;
   });
+  document.querySelectorAll('#level-map .level-pip-connector').forEach((conn, i) => {
+    conn.classList.toggle('done', i + 1 < level);
+  });
 }
 
 // ── Settings panel UI ─────────────────────────────────────────

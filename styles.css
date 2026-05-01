@@ -136,9 +136,14 @@ h1 span {
 
 .level-pip-connector {
   width: 32px;
-  height: 1px;
+  height: 3px;
   background: var(--border);
+  border-radius: 2px;
   flex-shrink: 0;
+}
+
+.level-pip-connector.done {
+  background: var(--finger-middle);
 }
 
 /* ─── Stats Bar ──────────────────────────────────────────────── */
