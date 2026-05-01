@@ -650,7 +650,7 @@ h1 span {
   background: var(--finger-index);
   color: var(--bg);
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 0.9rem;
   font-weight: 700;
   letter-spacing: 0.05em;
