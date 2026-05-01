@@ -595,94 +595,6 @@ h1 span {
 #history-table tr:last-child td { border-bottom: none; }
 #history-tbody tr:first-child td { color: var(--finger-ring); font-weight: 600; }
 
-/* ─── Finger Indicator ───────────────────────────────────────── */
-#finger-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  height: 1.6rem;
-  opacity: 0;
-  transition: opacity var(--transition);
-  margin-top: -0.5rem;
-}
-#finger-indicator.active { opacity: 1; }
-
-#finger-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--text-muted);
-  flex-shrink: 0;
-  transition: background var(--transition);
-}
-#finger-dot[data-finger="pinky-left"],
-#finger-dot[data-finger="pinky-right"]  { background: var(--finger-pinky); }
-#finger-dot[data-finger="ring-left"],
-#finger-dot[data-finger="ring-right"]   { background: var(--finger-ring); }
-#finger-dot[data-finger="middle-left"],
-#finger-dot[data-finger="middle-right"] { background: var(--finger-middle); }
-#finger-dot[data-finger="index-left"],
-#finger-dot[data-finger="index-right"]  { background: var(--finger-index); }
-#finger-dot[data-finger="thumb"]        { background: var(--finger-thumb); }
-
-#finger-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
-  text-transform: uppercase;
-}
-
-/* ─── Hand Diagram ───────────────────────────────────────────── */
-#hand-diagram {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  padding: 0.2rem 0;
-  margin-top: -0.4rem;
-}
-
-.hand-svg g rect {
-  fill: var(--surface-2);
-  stroke: var(--border);
-  stroke-width: 1.5;
-  transition: fill 0.12s ease, opacity 0.12s ease;
-  opacity: 0.35;
-}
-
-.hand-svg .palm,
-.hand-svg .wrist {
-  fill: var(--surface-2);
-  stroke: var(--border);
-  stroke-width: 1.5;
-  opacity: 0.5;
-}
-
-.hand-svg text {
-  font-size: 9px;
-  font-weight: 700;
-  fill: var(--text-muted);
-  text-anchor: middle;
-  dominant-baseline: central;
-  pointer-events: none;
-  transition: fill 0.12s ease, opacity 0.12s ease;
-  opacity: 0.45;
-}
-
-.hand-svg g.finger-active rect { opacity: 1; }
-.hand-svg g.finger-active text { fill: #fff; opacity: 1; }
-
-.hand-svg g[data-finger="pinky-left"].finger-active  rect,
-.hand-svg g[data-finger="pinky-right"].finger-active rect  { fill: var(--finger-pinky);  }
-.hand-svg g[data-finger="ring-left"].finger-active   rect,
-.hand-svg g[data-finger="ring-right"].finger-active  rect  { fill: var(--finger-ring);   }
-.hand-svg g[data-finger="middle-left"].finger-active rect,
-.hand-svg g[data-finger="middle-right"].finger-active rect { fill: var(--finger-middle); }
-.hand-svg g[data-finger="index-left"].finger-active  rect,
-.hand-svg g[data-finger="index-right"].finger-active rect  { fill: var(--finger-index);  }
-.hand-svg g[data-finger="thumb"].finger-active       rect  { fill: var(--finger-thumb);  }
-
 /* ─── Advance Button ─────────────────────────────────────────── */
 #advance-btn {
   display: none;
@@ -875,6 +787,5 @@ h1 span {
   #text-display { font-size: 1.15rem; }
   .stat-value   { font-size: 1.2rem; }
   #progress-bar-bg { width: 70px; }
-  #hand-diagram { gap: 1rem; }
-  .hand-svg { width: 68px; height: 89px; }
+
 }

@@ -303,36 +303,6 @@ function renderKeyboard(level) {
   });
 }
 
-const FINGER_LABELS = {
-  'pinky-left':   'Left Pinky',
-  'ring-left':    'Left Ring',
-  'middle-left':  'Left Middle',
-  'index-left':   'Left Index',
-  'index-right':  'Right Index',
-  'middle-right': 'Right Middle',
-  'ring-right':   'Right Ring',
-  'pinky-right':  'Right Pinky',
-  'thumb':        'Thumb',
-};
-
-function updateFingerIndicator(char) {
-  const info   = char ? CHAR_TO_KEY[char] : null;
-  const finger = info && info.finger ? info.finger : null;
-  const dot    = $('finger-dot');
-  const lbl    = $('finger-label');
-  if (finger) {
-    dot.dataset.finger = finger;
-    lbl.textContent    = FINGER_LABELS[finger] || finger;
-    $('finger-indicator').classList.add('active');
-  } else {
-    dot.dataset.finger = '';
-    lbl.textContent    = '—';
-    $('finger-indicator').classList.remove('active');
-  }
-  document.querySelectorAll('#hand-diagram g[data-finger]').forEach(g => {
-    g.classList.toggle('finger-active', g.dataset.finger === finger);
-  });
-}
 
 function highlightNextKey(char) {
   const prev = document.querySelector('.key[data-state="next"]');
@@ -343,7 +313,6 @@ function highlightNextKey(char) {
   }
   const key = document.querySelector(`.key[data-char="${CSS.escape(char)}"]`);
   if (key) key.dataset.state = 'next';
-  updateFingerIndicator(char);
 }
 
 function clearNextKey() {
@@ -352,7 +321,6 @@ function clearNextKey() {
   key.dataset.state = getKeyState(
     Number(key.dataset.level), currentLevel, key.dataset.char
   );
-  updateFingerIndicator(null);
 }
 
 function flashKey(char, type) {

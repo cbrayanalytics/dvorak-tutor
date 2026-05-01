@@ -150,66 +150,6 @@
     <div id="text-inner"></div>
   </div>
 
-  <!-- Finger indicator — shows which hand/finger to use for the next key -->
-  <div id="finger-indicator" aria-hidden="true">
-    <span id="finger-dot"></span>
-    <span id="finger-label">—</span>
-  </div>
-
-  <!-- Hand diagram — highlights the finger to use for the next key -->
-  <div id="hand-diagram" aria-hidden="true">
-    <!-- Left hand: pinky(left) → index(right), thumb extends right -->
-    <svg id="hand-left" class="hand-svg" viewBox="0 0 72 94" width="95" height="124">
-      <g data-finger="pinky-left">
-        <rect x="2"  y="18" width="12" height="42" rx="7"/>
-        <text x="8"  y="39">P</text>
-      </g>
-      <g data-finger="ring-left">
-        <rect x="16" y="7"  width="13" height="53" rx="7"/>
-        <text x="22" y="33">R</text>
-      </g>
-      <g data-finger="middle-left">
-        <rect x="31" y="0"  width="15" height="60" rx="8"/>
-        <text x="38" y="30">M</text>
-      </g>
-      <g data-finger="index-left">
-        <rect x="48" y="9"  width="13" height="51" rx="7"/>
-        <text x="54" y="34">I</text>
-      </g>
-      <rect class="palm" x="2"  y="58" width="58" height="20" rx="5"/>
-      <rect class="wrist"x="8"  y="76" width="44" height="16" rx="8"/>
-      <g data-finger="thumb">
-        <rect x="50" y="68" width="20" height="13" rx="6"/>
-        <text x="60" y="74">T</text>
-      </g>
-    </svg>
-    <!-- Right hand: index(left) → pinky(right), thumb extends left -->
-    <svg id="hand-right" class="hand-svg" viewBox="0 0 72 94" width="95" height="124">
-      <g data-finger="index-right">
-        <rect x="4"  y="9"  width="13" height="51" rx="7"/>
-        <text x="10" y="34">I</text>
-      </g>
-      <g data-finger="middle-right">
-        <rect x="19" y="0"  width="15" height="60" rx="8"/>
-        <text x="26" y="30">M</text>
-      </g>
-      <g data-finger="ring-right">
-        <rect x="36" y="7"  width="13" height="53" rx="7"/>
-        <text x="42" y="33">R</text>
-      </g>
-      <g data-finger="pinky-right">
-        <rect x="51" y="18" width="12" height="42" rx="7"/>
-        <text x="57" y="39">P</text>
-      </g>
-      <rect class="palm" x="4"  y="58" width="58" height="20" rx="5"/>
-      <rect class="wrist"x="10" y="76" width="44" height="16" rx="8"/>
-      <g data-finger="thumb">
-        <rect x="2"  y="68" width="20" height="13" rx="6"/>
-        <text x="12" y="74">T</text>
-      </g>
-    </svg>
-  </div>
-
   <!-- Keyboard diagram -->
   <div id="keyboard" aria-hidden="true">
 
