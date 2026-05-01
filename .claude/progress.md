@@ -2,12 +2,75 @@
 
 **Project:** Dvorak Typing Tutor (browser-based, vanilla JS/CSS)
 **Repo:** https://github.com/cbrayanalytics/dvorak-tutor — branch `trunk`
-**Last updated:** 2026-04-28
-**Phase 7 complete.** Progress history, quotes mode, and finger indicator shipped.
+**Last updated:** 2026-04-30
+**Phase 9 in progress.** Frontend design overhaul — typography, color depth, visual hierarchy, animation polish.
 
 ---
 
 ## Task Status
+
+### Phase 9 — Frontend Design Overhaul
+
+Based on frontend-design plugin analysis. Goal: distinctive, production-grade aesthetic with clear visual hierarchy and character.
+
+#### Typography
+| # | Task | Description | Status |
+|---|------|-------------|--------|
+| T1 | **JetBrains Mono** | Load from Google Fonts; replace Segoe UI (UI) + Courier New (text display) throughout | ⬜ todo |
+| T2 | **Wordmark sizing** | h1 from 1rem → 1.6rem; "Dvorak" plain, "Tutor" orange | ⬜ todo |
+
+#### Background & Color
+| # | Task | Description | Status |
+|---|------|-------------|--------|
+| T3 | **Background depth** | Base bg → `#0d1520` (warmer navy); add radial gradient to body | ⬜ todo |
+
+#### Text Display
+| # | Task | Description | Status |
+|---|------|-------------|--------|
+| T4 | **Text display as stage** | Remove border, transparent/darker bg, inset shadow, font 1.5 → 1.75rem | ⬜ todo |
+
+#### Keyboard
+| # | Task | Description | Status |
+|---|------|-------------|--------|
+| T5 | **Keyboard elevation** | Add `box-shadow: 0 8px 32px rgba(0,0,0,0.4)` below keyboard | ⬜ todo |
+| T6 | **Key depth gradient** | Active keys: subtle top-highlight gradient for tactile feel | ⬜ todo |
+| T7 | **Locked key + pulse** | Opacity 0.13 → 0.18; pulse uses `drop-shadow` filter instead of `box-shadow` | ⬜ todo |
+
+#### Stats Bar
+| # | Task | Description | Status |
+|---|------|-------------|--------|
+| T8 | **Stats hierarchy** | BEST, TREND, LEVEL demoted to secondary size; WPM, ACC, STREAK stay primary | ⬜ todo |
+
+#### Animations & Motion
+| # | Task | Description | Status |
+|---|------|-------------|--------|
+| T9  | **Phrase fade-in** | Round start: text display content fades in over 150ms | ⬜ todo |
+| T10 | **Level advance delay** | 200ms pause after confetti fires before keyboard re-renders | ⬜ todo |
+| T11 | **WPM flash** | Brief color flash on WPM stat on each live update | ⬜ todo |
+
+#### Component Polish
+| # | Task | Description | Status |
+|---|------|-------------|--------|
+| T12 | **Pip connectors** | Increase to 3px; fill green for completed levels | ⬜ todo |
+| T13 | **Stars** | Empty star → `☆` outline; filled → `★`; not opacity/color tricks | ⬜ todo |
+| T14 | **Banner height** | Remove dead `min-height` space; animate height properly | ⬜ todo |
+| T15 | **Button radius** | Advance btn `border-radius` 8px → 10px (match everything else) | ⬜ todo |
+
+---
+
+### Phase 8 — UI/UX Redesign
+
+| # | Task | Description | Status |
+|---|------|-------------|--------|
+| 8.1 | **Compact header** | Wordmark shrinks + left-aligns; gear stays right; level map unchanged | ✅ done |
+| 8.2 | **Single-line text display (CSS)** | Fixed single-line height, `overflow: hidden`, `white-space: nowrap`; inner wrapper added | ✅ done |
+| 8.3 | **Scroll anchor logic (JS)** | Translate inner wrapper left per keypress; current char anchored ~40px from left edge | ✅ done |
+| 8.4 | **Reorder DOM** | Keyboard moves directly below text display; summary card + buttons move below keyboard | ✅ done |
+| 8.5 | **Hand diagram** | SVG left+right hand above keyboard; `updateFingerIndicator` highlights active finger on diagram | ✅ done |
+| 8.6 | **Tests for new IDs** | Add hand diagram element IDs to `index.test.js` | ✅ done |
+| 8.7 | **Layout polish** | Tighten spacing; verify narrow widths | ✅ done |
+
+---
 
 ### Phase 1 — Core App
 
@@ -32,7 +95,7 @@
 | 12 | Browser smoke test + bug fixes (panel toggle, clipping) | ✅ done |
 | 13 | Scrolling text display (fixed height, auto-scroll cursor) | ✅ done |
 
-**Total tests passing: 388/388** (84 words + 151 index + 153 app)
+**Total tests passing: 386/386** (84 words + 149 index + 153 app)
 
 ---
 
