@@ -336,6 +336,10 @@ function flashKey(char, type) {
 // ── Text display ───────────────────────────────────────────────
 
 function renderPhrase(text) {
+  const display = $('text-display');
+  display.classList.remove('phrase-fade');
+  void display.offsetWidth; // force reflow so re-adding restarts the animation
+  display.classList.add('phrase-fade');
   const inner = $('text-inner');
   inner.innerHTML = '';
   inner.style.transform = '';
