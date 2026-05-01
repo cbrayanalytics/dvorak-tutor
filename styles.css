@@ -288,12 +288,14 @@ h1 span {
 .char.correct[data-finger="index-right"]  { color: var(--finger-index);  }
 .char.correct[data-finger="thumb"]        { color: var(--finger-thumb);  }
 
-/* Background highlight on the current character — replaces blinking underline */
+@keyframes cursor-blink {
+  0%, 49.9% { border-bottom-color: var(--finger-index); }
+  50%, 100%  { border-bottom-color: transparent; }
+}
+
 .char.cursor {
-  background: rgba(251, 146, 60, 0.18);
-  border-radius: 3px;
-  outline: 1px solid rgba(251, 146, 60, 0.4);
-  outline-offset: 1px;
+  border-bottom: 2px solid var(--finger-index);
+  animation: cursor-blink 1.2s step-start infinite;
 }
 
 @keyframes char-shake {
