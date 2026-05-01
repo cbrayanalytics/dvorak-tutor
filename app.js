@@ -774,7 +774,7 @@ function advanceLevel() {
   if (currentLevel >= 5) return;
   spawnConfetti();
   playLevelUp();
-  applyLevel(currentLevel + 1);
+  setTimeout(() => applyLevel(currentLevel + 1), 200);
 }
 
 // ── Input handler ──────────────────────────────────────────────
