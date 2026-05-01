@@ -1,6 +1,6 @@
 /* ─── Custom Properties ──────────────────────────────────────── */
 :root {
-  --bg:         #0f172a;
+  --bg:         #0d1520;
   --surface:    #1e293b;
   --surface-2:  #2d3748;
   --text:       #e2e8f0;
@@ -24,6 +24,7 @@
 
 body {
   background: var(--bg);
+  background-image: radial-gradient(ellipse 80% 50% at 50% 0%, #1a2540 0%, transparent 70%);
   color: var(--text);
   font-family: 'JetBrains Mono', monospace;
   min-height: 100vh;
