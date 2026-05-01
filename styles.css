@@ -294,6 +294,7 @@ h1 span {
   flex-direction: column;
   gap: var(--key-gap);
   align-self: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .key-row {
