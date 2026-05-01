@@ -637,7 +637,9 @@ function showSummaryCard(wpm, acc, elapsedMs, isNewBest) {
 
   const rating = acc >= 90 ? 3 : acc >= 80 ? 2 : acc >= 70 ? 1 : 0;
   document.querySelectorAll('#sum-stars .star').forEach((s, i) => {
-    s.classList.toggle('star-filled', i < rating);
+    const filled = i < rating;
+    s.classList.toggle('star-filled', filled);
+    s.textContent = filled ? '★' : '☆';
   });
 
   const history = loadHistory(currentLevel);
