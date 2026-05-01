@@ -325,6 +325,11 @@ h1 span {
   gap: var(--key-gap);
 }
 
+.hand-gap {
+  width: 20px;
+  flex-shrink: 0;
+}
+
 /* Standard keyboard stagger (fraction of key-size + gap) */
 .key-row.row-upper  { padding-left: calc(var(--key-size) * 0.5  + var(--key-gap) * 0.5);  }
 .key-row.row-home   { padding-left: calc(var(--key-size) * 0.75 + var(--key-gap) * 0.75); }
