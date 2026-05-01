@@ -419,8 +419,7 @@ function updateStats() {
     void wpmEl.offsetWidth;
     wpmEl.classList.add('stat-wpm-flash');
   }
-  $('stat-acc').textContent   = totalTyped > 0 ? acc + '%' : '—';
-  $('stat-level').textContent = currentLevel;
+  $('stat-acc').textContent = totalTyped > 0 ? acc + '%' : '—';
 
   setStatColor($('stat-wpm'), !hasWpm ? null
     : wpm >= 50 ? 'stat-good'

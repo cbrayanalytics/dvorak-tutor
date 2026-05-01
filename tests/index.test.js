@@ -23,7 +23,7 @@ function countAttr(a, v) { return (html.match(new RegExp(`${a}="${v}"`, 'g')) ||
 // ── Required elements ──────────────────────────────────────────
 console.log('\nRequired element IDs');
 [
-  'app','level-map','stats','stat-wpm','stat-acc','stat-level','stat-best',
+  'app','level-map','stats','stat-wpm','stat-acc','stat-best',
   'progress-bar','text-display','banner','advance-btn','restart-btn','drill-btn',
   'round-actions','keyboard','stat-streak','stat-trend',
 ].forEach(id => assert(`#${id} exists`, hasId(id)));
