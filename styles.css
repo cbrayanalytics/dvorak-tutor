@@ -496,21 +496,57 @@ h1 span {
 }
 .stat-wpm-flash { animation: wpm-flash 250ms ease forwards; }
 
-/* ── Layout variants ─────────────────────────────────────────── */
+/* ── Corne column layout ─────────────────────────────────────── */
 
-#keyboard[data-layout="corne-3x6"] .row-number,
-#keyboard[data-layout="corne-3x5"] .row-number {
-  display: none;
+.corne-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
 }
 
-#keyboard[data-layout="corne-3x6"] .key-row,
-#keyboard[data-layout="corne-3x5"] .key-row {
-  padding-left: 0;
+.corne-half {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--key-gap);
 }
 
-#keyboard[data-layout="corne-3x5"] .key[data-char="/"],
-#keyboard[data-layout="corne-3x5"] .key[data-char="-"] {
-  display: none;
+.corne-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--key-gap);
+  margin-top: var(--col-offset, 0px);
+}
+
+.corne-thumbs {
+  display: flex;
+  gap: 20px;
+  margin-top: 6px;
+}
+
+.corne-thumb {
+  display: flex;
+  gap: var(--key-gap);
+}
+
+.corne-gap {
+  flex: 1;
+}
+
+/* Placeholder modifier keys — always dim, not trainable */
+.key-mod {
+  opacity: 0.15;
+  filter: saturate(0);
+  font-size: 0.5rem;
+  letter-spacing: 0;
+  pointer-events: none;
+}
+
+/* Keep mod keys dim regardless of data-state (renderKeyboard won't touch them) */
+.key-mod[data-state] {
+  opacity: 0.15 !important;
+  filter: saturate(0) !important;
+  background: var(--surface-2) !important;
+  border-color: transparent !important;
 }
 
 /* ─── Banner (round result) ──────────────────────────────────── */

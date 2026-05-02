@@ -517,8 +517,19 @@ loadSettings();
 console.log('\napplyKeyboardLayout');
 
 {
-  const kbEl = { dataset: {} };
-  global.document = { getElementById: id => id === 'keyboard' ? kbEl : null };
+  // Minimal DOM mock: enough for applyKeyboardLayout to set data-layout and no-op the rest
+  const noopEl = () => ({
+    className: '', dataset: {}, style: { setProperty() {} }, textContent: '',
+    appendChild() {}, firstChild: null, removeChild() {},
+    cloneNode() { return this; },
+  });
+  const kbEl = { dataset: {}, firstChild: null, removeChild() {}, appendChild() {} };
+  global.document = {
+    getElementById:        id  => id === 'keyboard' ? kbEl : null,
+    querySelectorAll:      ()  => [],
+    createElement:         ()  => noopEl(),
+    createDocumentFragment: () => ({ appendChild() {}, cloneNode() { return this; } }),
+  };
 
   applyKeyboardLayout('standard');
   assert('standard sets data-layout = standard',   kbEl.dataset.layout === 'standard');

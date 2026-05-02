@@ -224,6 +224,94 @@ function suggestTimerMins(wordCount, wpm) {
   return Math.max(1, Math.min(60, Math.ceil((wordCount / safeWpm) * 1.5)));
 }
 
+// ── Corne layout ──────────────────────────────────────────────
+
+// Character → unlock level (anything absent defaults to 5)
+const CHAR_LEVEL = {
+  a:1,o:1,e:1,u:1,h:1,t:1,n:1,s:1,
+  i:2,d:2,
+  p:3,y:3,f:3,g:3,c:3,r:3,l:3,
+  q:4,j:4,k:4,x:4,b:4,m:4,w:4,v:4,z:4,
+};
+
+// Columns ordered outer→inner for each half.
+// offset = margin-top px (0 = highest, larger = lower, simulating column stagger).
+const CORNE_COLS = [
+  { side:'left',  finger:'pinky-left',   offset:12, keys:["'", 'a', ';'] },
+  { side:'left',  finger:'ring-left',    offset: 6, keys:[',', 'o', 'q'] },
+  { side:'left',  finger:'middle-left',  offset: 0, keys:['.', 'e', 'j'] },
+  { side:'left',  finger:'index-left',   offset: 3, keys:['p', 'u', 'k'] },
+  { side:'left',  finger:'index-left',   offset: 6, keys:['y', 'i', 'x'] },
+  { side:'right', finger:'index-right',  offset: 6, keys:['f', 'd', 'b'] },
+  { side:'right', finger:'index-right',  offset: 3, keys:['g', 'h', 'm'] },
+  { side:'right', finger:'middle-right', offset: 0, keys:['c', 't', 'w'] },
+  { side:'right', finger:'ring-right',   offset: 6, keys:['r', 'n', 'v'] },
+  { side:'right', finger:'pinky-right',  offset:12, keys:['l', 's', 'z'] },
+];
+
+// Extra outer columns (shown only in 3×6 for symmetry)
+const CORNE_OUTER_LEFT  = { finger:'pinky-left',  offset:16, keys:[null, null, null] };
+const CORNE_OUTER_RIGHT = { finger:'pinky-right', offset:16, keys:['/', '-', null]   };
+
+function _makeEl(tag, cls, attrs = {}) {
+  const el = document.createElement(tag);
+  if (cls) el.className = cls;
+  Object.entries(attrs).forEach(([k, v]) => { el.dataset[k] = v; });
+  return el;
+}
+
+function _makeModKey(finger, label) {
+  const el = _makeEl('div', 'key key-mod', { finger, level: '5' });
+  el.textContent = label;
+  return el;
+}
+
+function _makeCharKey(char, finger) {
+  const el = _makeEl('div', 'key', { char, finger, level: String(CHAR_LEVEL[char] ?? 5) });
+  el.textContent = char === ' ' ? 'spc' : char;
+  return el;
+}
+
+function _makeCorneCol(col) {
+  const div = _makeEl('div', 'corne-col');
+  div.style.setProperty('--col-offset', col.offset + 'px');
+  col.keys.forEach(c => div.appendChild(c ? _makeCharKey(c, col.finger) : _makeModKey(col.finger, '·')));
+  return div;
+}
+
+function buildCorneFragment(variant) {
+  const is3x6 = variant === 'corne-3x6';
+  const frag = document.createDocumentFragment();
+
+  const body = _makeEl('div', 'corne-body');
+  const lHalf = _makeEl('div', 'corne-half');
+  if (is3x6) lHalf.appendChild(_makeCorneCol(CORNE_OUTER_LEFT));
+  CORNE_COLS.filter(c => c.side === 'left').forEach(col => lHalf.appendChild(_makeCorneCol(col)));
+  body.appendChild(lHalf);
+  body.appendChild(_makeEl('div', 'hand-gap'));
+  const rHalf = _makeEl('div', 'corne-half');
+  CORNE_COLS.filter(c => c.side === 'right').forEach(col => rHalf.appendChild(_makeCorneCol(col)));
+  if (is3x6) rHalf.appendChild(_makeCorneCol(CORNE_OUTER_RIGHT));
+  body.appendChild(rHalf);
+  frag.appendChild(body);
+
+  const thumbs = _makeEl('div', 'corne-thumbs');
+  const lThumb = _makeEl('div', 'corne-thumb');
+  ['⌫', '⌘', '⌥'].forEach(lbl => lThumb.appendChild(_makeModKey('thumb', lbl)));
+  thumbs.appendChild(lThumb);
+  thumbs.appendChild(_makeEl('div', 'corne-gap'));
+  const rThumb = _makeEl('div', 'corne-thumb');
+  rThumb.appendChild(_makeModKey('thumb', '⌥'));
+  rThumb.appendChild(_makeCharKey(' ', 'thumb'));
+  rThumb.appendChild(_makeModKey('thumb', '⏎'));
+  thumbs.appendChild(rThumb);
+  frag.appendChild(thumbs);
+
+  return frag;
+}
+
+let standardKeyboardFragment = null;
+
 // ── State ─────────────────────────────────────────────────────
 let currentLevel   = 1;
 let phrase         = '';
@@ -297,7 +385,16 @@ let CHAR_TO_KEY = {};
 
 function applyKeyboardLayout(style) {
   if (typeof document === 'undefined') return;
-  document.getElementById('keyboard').dataset.layout = style;
+  const kb = document.getElementById('keyboard');
+  kb.dataset.layout = style;
+  while (kb.firstChild) kb.removeChild(kb.firstChild);
+  if (style === 'standard') {
+    if (standardKeyboardFragment) kb.appendChild(standardKeyboardFragment.cloneNode(true));
+  } else {
+    kb.appendChild(buildCorneFragment(style));
+  }
+  CHAR_TO_KEY = buildCharMap();
+  renderKeyboard(currentLevel);
 }
 
 function renderKeyboard(level) {
@@ -858,9 +955,11 @@ function init() {
   loadSettings();
   currentLevel = settings.level;
 
-  CHAR_TO_KEY = buildCharMap();
-  applyKeyboardLayout(settings.keyboardStyle);
-  renderKeyboard(currentLevel);
+  // Save the standard keyboard as a DOM fragment before any layout swap
+  standardKeyboardFragment = document.createDocumentFragment();
+  Array.from($('keyboard').childNodes).forEach(n => standardKeyboardFragment.appendChild(n.cloneNode(true)));
+
+  applyKeyboardLayout(settings.keyboardStyle); // handles buildCharMap + renderKeyboard
   updateLevelMap(currentLevel);
   applySettingsToDisplay();
   startRound();
@@ -896,6 +995,7 @@ function init() {
   kbStyleSelect.addEventListener('change', e => {
     saveSettings({ keyboardStyle: e.target.value });
     applyKeyboardLayout(e.target.value);
+    startRound();
   });
 }
 
