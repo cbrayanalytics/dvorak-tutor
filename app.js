@@ -237,21 +237,21 @@ const CHAR_LEVEL = {
 // Columns ordered outer→inner for each half.
 // offset = margin-top px (0 = highest, larger = lower, simulating column stagger).
 const CORNE_COLS = [
-  { side:'left',  finger:'pinky-left',   offset:12, keys:["'", 'a', ';'] },
-  { side:'left',  finger:'ring-left',    offset: 6, keys:[',', 'o', 'q'] },
+  { side:'left',  finger:'pinky-left',   offset:32, keys:["'", 'a', ';'] },
+  { side:'left',  finger:'ring-left',    offset:16, keys:[',', 'o', 'q'] },
   { side:'left',  finger:'middle-left',  offset: 0, keys:['.', 'e', 'j'] },
-  { side:'left',  finger:'index-left',   offset: 3, keys:['p', 'u', 'k'] },
-  { side:'left',  finger:'index-left',   offset: 6, keys:['y', 'i', 'x'] },
-  { side:'right', finger:'index-right',  offset: 6, keys:['f', 'd', 'b'] },
-  { side:'right', finger:'index-right',  offset: 3, keys:['g', 'h', 'm'] },
+  { side:'left',  finger:'index-left',   offset: 8, keys:['p', 'u', 'k'] },
+  { side:'left',  finger:'index-left',   offset:18, keys:['y', 'i', 'x'] },
+  { side:'right', finger:'index-right',  offset:18, keys:['f', 'd', 'b'] },
+  { side:'right', finger:'index-right',  offset: 8, keys:['g', 'h', 'm'] },
   { side:'right', finger:'middle-right', offset: 0, keys:['c', 't', 'w'] },
-  { side:'right', finger:'ring-right',   offset: 6, keys:['r', 'n', 'v'] },
-  { side:'right', finger:'pinky-right',  offset:12, keys:['l', 's', 'z'] },
+  { side:'right', finger:'ring-right',   offset:16, keys:['r', 'n', 'v'] },
+  { side:'right', finger:'pinky-right',  offset:32, keys:['l', 's', 'z'] },
 ];
 
 // Extra outer columns (shown only in 3×6 for symmetry)
-const CORNE_OUTER_LEFT  = { finger:'pinky-left',  offset:16, keys:[null, null, null] };
-const CORNE_OUTER_RIGHT = { finger:'pinky-right', offset:16, keys:['/', '-', null]   };
+const CORNE_OUTER_LEFT  = { finger:'pinky-left',  offset:38, keys:[null, null, null] };
+const CORNE_OUTER_RIGHT = { finger:'pinky-right', offset:38, keys:['/', '-', null]   };
 
 function _makeEl(tag, cls, attrs = {}) {
   const el = document.createElement(tag);
@@ -298,6 +298,7 @@ function buildCorneFragment(variant) {
   const thumbs = _makeEl('div', 'corne-thumbs');
   const lThumb = _makeEl('div', 'corne-thumb');
   ['⌫', '⌘', '⌥'].forEach(lbl => lThumb.appendChild(_makeModKey('thumb', lbl)));
+  lThumb.style.visibility = 'hidden';
   thumbs.appendChild(lThumb);
   thumbs.appendChild(_makeEl('div', 'corne-gap'));
   const rThumb = _makeEl('div', 'corne-thumb');
