@@ -274,7 +274,7 @@ function _makeCharKey(char, finger) {
 function _makeCorneCol(col) {
   const div = _makeEl('div', 'corne-col');
   div.style.setProperty('--col-offset', col.offset + 'px');
-  col.keys.forEach(c => div.appendChild(c ? _makeCharKey(c, col.finger) : _makeModKey(col.finger, '·')));
+  col.keys.forEach(c => { if (c) div.appendChild(_makeCharKey(c, col.finger)); });
   return div;
 }
 
