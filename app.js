@@ -249,9 +249,8 @@ const CORNE_COLS = [
   { side:'right', finger:'pinky-right',  offset:32, keys:['l', 's', 'z'] },
 ];
 
-// Extra outer columns (shown only in 3×6 for symmetry)
-const CORNE_OUTER_LEFT  = { finger:'pinky-left',  offset:38, keys:[null, null, null] };
-const CORNE_OUTER_RIGHT = { finger:'pinky-right', offset:38, keys:['/', '-', null]   };
+// Extra outer-right column shown only in 3×6 (/ and -)
+const CORNE_OUTER_RIGHT = { finger:'pinky-right', offset:38, keys:['/', '-', null] };
 
 function _makeEl(tag, cls, attrs = {}) {
   const el = document.createElement(tag);
@@ -285,7 +284,6 @@ function buildCorneFragment(variant) {
 
   const body = _makeEl('div', 'corne-body');
   const lHalf = _makeEl('div', 'corne-half');
-  if (is3x6) lHalf.appendChild(_makeCorneCol(CORNE_OUTER_LEFT));
   CORNE_COLS.filter(c => c.side === 'left').forEach(col => lHalf.appendChild(_makeCorneCol(col)));
   body.appendChild(lHalf);
   body.appendChild(_makeEl('div', 'hand-gap'));
@@ -296,11 +294,6 @@ function buildCorneFragment(variant) {
   frag.appendChild(body);
 
   const thumbs = _makeEl('div', 'corne-thumbs');
-  const lThumb = _makeEl('div', 'corne-thumb');
-  ['⌫', '⌘', '⌥'].forEach(lbl => lThumb.appendChild(_makeModKey('thumb', lbl)));
-  lThumb.style.visibility = 'hidden';
-  thumbs.appendChild(lThumb);
-  thumbs.appendChild(_makeEl('div', 'corne-gap'));
   const rThumb = _makeEl('div', 'corne-thumb');
   rThumb.appendChild(_makeModKey('thumb', '⌥'));
   rThumb.appendChild(_makeCharKey(' ', 'thumb'));

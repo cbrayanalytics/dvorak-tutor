@@ -519,17 +519,14 @@ h1 span {
 
 .corne-thumbs {
   display: flex;
-  gap: 20px;
   margin-top: 6px;
+  /* Offset past left half (5 cols) + two gaps + hand-gap div = 60px total separation */
+  padding-left: calc(5 * var(--key-size) + 4 * var(--key-gap) + 60px);
 }
 
 .corne-thumb {
   display: flex;
   gap: var(--key-gap);
-}
-
-.corne-gap {
-  flex: 1;
 }
 
 /* Placeholder modifier keys — always dim, not trainable */
