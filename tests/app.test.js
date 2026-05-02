@@ -38,6 +38,7 @@ const {
   appendHistory,
   renderSparkline,
   calcTrend,
+  applyKeyboardLayout,
   ADVANCE_THRESHOLD,
   ROUND_WORD_COUNT,
 } = require('../app.js');
@@ -486,6 +487,50 @@ assert('audio functions silent when audioOn = false', audioOffNoCrash);
 
 localStorage.clear();
 loadSettings();
+
+// ── keyboardStyle setting ──────────────────────────────────────
+console.log('\nkeyboardStyle setting');
+
+localStorage.clear();
+loadSettings();
+assert('defaults: keyboardStyle = standard',        settings.keyboardStyle === 'standard');
+
+localStorage.clear();
+saveSettings({ keyboardStyle: 'corne-3x6' });
+loadSettings();
+assert('round-trip: corne-3x6 persists',            settings.keyboardStyle === 'corne-3x6');
+
+localStorage.clear();
+saveSettings({ keyboardStyle: 'corne-3x5' });
+loadSettings();
+assert('round-trip: corne-3x5 persists',            settings.keyboardStyle === 'corne-3x5');
+
+localStorage.clear();
+localStorage.setItem('dvorak-tutor-settings', JSON.stringify({ wordCount: 50 }));
+loadSettings();
+assert('missing keyboardStyle defaults to standard', settings.keyboardStyle === 'standard');
+
+localStorage.clear();
+loadSettings();
+
+// ── applyKeyboardLayout ────────────────────────────────────────
+console.log('\napplyKeyboardLayout');
+
+{
+  const kbEl = { dataset: {} };
+  global.document = { getElementById: id => id === 'keyboard' ? kbEl : null };
+
+  applyKeyboardLayout('standard');
+  assert('standard sets data-layout = standard',   kbEl.dataset.layout === 'standard');
+
+  applyKeyboardLayout('corne-3x6');
+  assert('corne-3x6 sets data-layout = corne-3x6', kbEl.dataset.layout === 'corne-3x6');
+
+  applyKeyboardLayout('corne-3x5');
+  assert('corne-3x5 sets data-layout = corne-3x5', kbEl.dataset.layout === 'corne-3x5');
+
+  delete global.document;
+}
 
 // ── Summary ────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(40)}`);

@@ -2,7 +2,7 @@
 
 // ── Settings ───────────────────────────────────────────────────
 const SETTINGS_KEY      = 'dvorak-tutor-settings';
-const SETTINGS_DEFAULTS = { wordCount: 100, threshold: 90, timerOn: false, timerMins: 15, level: 1, audioOn: true, mode: 'words' };
+const SETTINGS_DEFAULTS = { wordCount: 100, threshold: 90, timerOn: false, timerMins: 15, level: 1, audioOn: true, mode: 'words', keyboardStyle: 'standard' };
 
 let settings = { ...SETTINGS_DEFAULTS };
 
@@ -294,6 +294,11 @@ function buildCharMap() {
 }
 
 let CHAR_TO_KEY = {};
+
+function applyKeyboardLayout(style) {
+  if (typeof document === 'undefined') return;
+  document.getElementById('keyboard').dataset.layout = style;
+}
 
 function renderKeyboard(level) {
   document.querySelectorAll('.key[data-char]').forEach(el => {
@@ -854,6 +859,7 @@ function init() {
   currentLevel = settings.level;
 
   CHAR_TO_KEY = buildCharMap();
+  applyKeyboardLayout(settings.keyboardStyle);
   renderKeyboard(currentLevel);
   updateLevelMap(currentLevel);
   applySettingsToDisplay();
@@ -884,6 +890,13 @@ function init() {
   $('timer-toggle').addEventListener('click',  toggleTimer);
   $('audio-toggle').addEventListener('click',  toggleAudio);
   $('mode-toggle').addEventListener('click',   toggleMode);
+
+  const kbStyleSelect = $('kb-style-select');
+  kbStyleSelect.value = settings.keyboardStyle;
+  kbStyleSelect.addEventListener('change', e => {
+    saveSettings({ keyboardStyle: e.target.value });
+    applyKeyboardLayout(e.target.value);
+  });
 }
 
 if (typeof document !== 'undefined') {
@@ -916,6 +929,7 @@ if (typeof module !== 'undefined') {
     appendHistory,
     renderSparkline,
     calcTrend,
+    applyKeyboardLayout,
     get ADVANCE_THRESHOLD() { return settings.threshold; },
     get ROUND_WORD_COUNT()  { return settings.wordCount;  },
   };

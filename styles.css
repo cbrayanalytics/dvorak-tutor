@@ -496,6 +496,23 @@ h1 span {
 }
 .stat-wpm-flash { animation: wpm-flash 250ms ease forwards; }
 
+/* ── Layout variants ─────────────────────────────────────────── */
+
+#keyboard[data-layout="corne-3x6"] .row-number,
+#keyboard[data-layout="corne-3x5"] .row-number {
+  display: none;
+}
+
+#keyboard[data-layout="corne-3x6"] .key-row,
+#keyboard[data-layout="corne-3x5"] .key-row {
+  padding-left: 0;
+}
+
+#keyboard[data-layout="corne-3x5"] .key[data-char="/"],
+#keyboard[data-layout="corne-3x5"] .key[data-char="-"] {
+  display: none;
+}
+
 /* ─── Banner (round result) ──────────────────────────────────── */
 #banner {
   text-align: center;
@@ -852,6 +869,26 @@ h1 span {
   border-color: var(--finger-index);
   color: var(--bg);
 }
+
+/* ─── Settings select ────────────────────────────────────────── */
+#settings-panel select {
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0 0.5rem;
+  cursor: pointer;
+  transition: border-color var(--transition);
+  appearance: none;
+  padding-right: 1.4rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2394a3b8'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.4rem center;
+}
+#settings-panel select:hover { border-color: var(--text-muted); }
 
 /* ─── Confetti ───────────────────────────────────────────────── */
 @keyframes confetti-burst {
