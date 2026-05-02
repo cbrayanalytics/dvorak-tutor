@@ -17,7 +17,7 @@ Tests are plain Node.js files — no test framework:
 ```bash
 node tests/words.test.js   # 84 tests  — word list, level filtering, quotes
 node tests/index.test.js   # 148 tests — HTML structure and data attributes
-node tests/app.test.js     # 153 tests — game logic unit tests
+node tests/app.test.js     # 160 tests — game logic unit tests
 ```
 
 Visual CSS test: open `tests/styles.test.html` directly in a browser.
@@ -77,9 +77,25 @@ Level pips in `#level-map` are **clickable** — clicking any completed or curre
 | `level` | 1 | 1–5 | — |
 | `audioOn` | true | — | — |
 | `mode` | `'words'` | `'words'`/`'quotes'` | — |
+| `keyboardStyle` | `'standard'` | `'standard'`/`'corne-3x6'`/`'corne-3x5'` | — |
 
 Timer auto-suggests based on WPM: `ceil(wordCount / max(wpm,1) * 1.5)`.  
 Timer **waits for first keystroke** before counting down — `armTimer()` shows the time, `startTimer()` starts the interval.
+
+### Keyboard layout variants
+
+`applyKeyboardLayout(style)` swaps `#keyboard`'s children between three layouts. The standard layout is saved as a `DocumentFragment` on `init()` and restored via `cloneNode(true)`. After each swap, `buildCharMap()` and `renderKeyboard()` are called to rebuild the char→key lookup and re-apply key states.
+
+| Style | Description |
+|-------|-------------|
+| `standard` | Full 5-row staggered Dvorak keyboard |
+| `corne-3x6` | Columnar split — 5 left cols + outer-right col (`/ -`) |
+| `corne-3x5` | Columnar split — 5 cols per side, no outer col |
+
+Corne layout internals:
+- `CORNE_COLS` (10 entries) — char/finger/column-offset per column; `--col-offset` CSS var drives `margin-top` stagger (0px middle → 32px pinky)
+- `CORNE_OUTER_RIGHT` — outer-right column for 3×6 only (`/ -`); null entries are skipped (not rendered)
+- Thumb cluster: right side only (`⌥ SPC ⏎`); `.corne-thumbs` uses `padding-left: calc(5 * var(--key-size) + 4 * var(--key-gap) + 60px)` to align SPC under the index-inner area
 
 ### Round history (`localStorage` key: `dvorak-tutor-history`)
 
@@ -150,6 +166,7 @@ Stats bar order: **WPM | ACC | progress bar | BEST | STREAK | TREND | TIME** (TI
 
 | Function | Purpose |
 |----------|---------|
+| `applyKeyboardLayout(style)` | Swaps `#keyboard` children (standard fragment or Corne DOM); rebuilds `CHAR_TO_KEY` |
 | `applyLevel(n)` | Sets `currentLevel`, saves, re-renders keyboard/map, starts round |
 | `advanceLevel()` | Fires confetti, then calls `applyLevel(currentLevel + 1)` |
 | `armTimer()` | Sets `timerRemaining` + display — no interval started |
@@ -171,6 +188,8 @@ Stats bar order: **WPM | ACC | progress bar | BEST | STREAK | TREND | TIME** (TI
 **`#app` max-width is 620px** — sized to match the keyboard's intrinsic width so all sections (stats bar, text display, keyboard) share the same column.
 
 **.char.cursor** is a terminal underline (`border-bottom: 2px solid var(--finger-index)`) with a `cursor-blink` keyframe animation (1.2s, `step-start`, `infinite`) — not a box highlight.
+
+**Corne column stagger via `--col-offset`**: Each `.corne-col` gets `margin-top: var(--col-offset, 0px)`. The offset is set inline by `_makeCorneCol()` using `el.style.setProperty('--col-offset', ...)`. Middle finger = 0px (highest), pinky = 32px (lowest). The `corne-body` gap is 20px, `hand-gap` is 20px, giving 60px total inter-half separation — used in the `padding-left` calc for `.corne-thumbs`.
 
 ## Workflow Rules
 
