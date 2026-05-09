@@ -39,8 +39,12 @@ const {
   renderSparkline,
   calcTrend,
   applyKeyboardLayout,
+  getHotChars,
   ADVANCE_THRESHOLD,
   ROUND_WORD_COUNT,
+  MID_ROUND_ERROR_THRESHOLD,
+  MAX_MID_ROUND_INJECTIONS,
+  MID_ROUND_INJECT_COUNT,
 } = require('../app.js');
 
 let passed = 0;
@@ -542,6 +546,34 @@ console.log('\napplyKeyboardLayout');
 
   delete global.document;
 }
+
+// ── getHotChars ────────────────────────────────────────────────
+console.log('\ngetHotChars');
+
+assert('empty errorMap → no hot chars',
+  getHotChars({}, 3).length === 0);
+assert('all chars below threshold → empty',
+  getHotChars({ a: 2, e: 1 }, 3).length === 0);
+assert('char exactly at threshold → included',
+  getHotChars({ a: 3 }, 3).includes('a'));
+assert('char above threshold → included',
+  getHotChars({ a: 5 }, 3).includes('a'));
+assert('only chars meeting threshold returned',
+  JSON.stringify(getHotChars({ a: 3, e: 1, o: 4 }, 3).sort()) === JSON.stringify(['a', 'o']));
+assert('threshold 1 → all chars with any error',
+  getHotChars({ a: 1, b: 1 }, 1).length === 2);
+assert('char at threshold - 1 → not included',
+  getHotChars({ a: 2 }, 3).length === 0);
+
+// ── Mid-round injection constants ──────────────────────────────
+console.log('\nMid-round injection constants');
+
+assert('MID_ROUND_ERROR_THRESHOLD is a positive number',
+  typeof MID_ROUND_ERROR_THRESHOLD === 'number' && MID_ROUND_ERROR_THRESHOLD > 0);
+assert('MAX_MID_ROUND_INJECTIONS is a positive number',
+  typeof MAX_MID_ROUND_INJECTIONS === 'number' && MAX_MID_ROUND_INJECTIONS > 0);
+assert('MID_ROUND_INJECT_COUNT is a positive number',
+  typeof MID_ROUND_INJECT_COUNT === 'number' && MID_ROUND_INJECT_COUNT > 0);
 
 // ── Summary ────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(40)}`);

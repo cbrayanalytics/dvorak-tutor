@@ -159,11 +159,18 @@ function mergeWeakKeys(stored, round) {
 
 // ── Error heatmap ──────────────────────────────────────────────
 
-const HEAT_ERROR_MAX   = 3;
+const HEAT_ERROR_MAX              = 3;
+const MID_ROUND_ERROR_THRESHOLD   = 3;
+const MAX_MID_ROUND_INJECTIONS    = 2;
+const MID_ROUND_INJECT_COUNT      = 5;
 const CONFETTI_COLORS  = ['#a855f7', '#60a5fa', '#4ade80', '#fb923c', '#94a3b8'];
 
 function calcHeatIntensity(errorCount) {
   return Math.min(errorCount / HEAT_ERROR_MAX, 1);
+}
+
+function getHotChars(errMap, threshold) {
+  return Object.keys(errMap).filter(ch => errMap[ch] >= threshold);
 }
 
 function showHeatmap() {
@@ -321,6 +328,7 @@ let charEls        = []; // cached .char NodeList for current round
 let currentBest    = null; // best for currentLevel, refreshed each round
 let streak         = 0;   // consecutive rounds at or above threshold
 let drillMode      = false;
+let injectionCount = 0;
 
 // ── Pure helpers (no DOM — exported for tests) ─────────────────
 
@@ -453,6 +461,42 @@ function renderPhrase(text) {
     if (i === 0) span.classList.add('cursor');
     inner.appendChild(span);
   });
+}
+
+function injectAdaptiveWords() {
+  if (drillMode || settings.mode === 'quotes') return;
+  if (injectionCount >= MAX_MID_ROUND_INJECTIONS) return;
+
+  const hotChars = getHotChars(errorMap, MID_ROUND_ERROR_THRESHOLD);
+  if (hotChars.length === 0) return;
+
+  const weakKeys = {};
+  hotChars.forEach(ch => { weakKeys[ch] = errorMap[ch]; });
+
+  const words  = getWeightedWords(currentLevel, weakKeys, MID_ROUND_INJECT_COUNT);
+  const suffix = ' ' + words.join(' ');
+  phrase += suffix;
+
+  const inner = $('text-inner');
+  [...suffix].forEach(ch => {
+    const span = document.createElement('span');
+    const info = CHAR_TO_KEY[ch] || {};
+    if (ch === ' ') {
+      span.className   = 'char char-space pending';
+      span.textContent = ' ';
+    } else {
+      span.className   = 'char pending';
+      span.textContent = ch;
+    }
+    if (info.finger) span.dataset.finger = info.finger;
+    inner.appendChild(span);
+  });
+
+  charEls = Array.from($('text-inner').querySelectorAll('.char'));
+  injectionCount++;
+
+  $('banner').textContent = `↩ Practicing: ${hotChars.join(' ')}`;
+  $('banner').className   = 'info';
 }
 
 function updateTextScroll() {
@@ -691,6 +735,7 @@ function _initRound() {
   totalTyped     = 0;
   roundStartTime = null;
   errorMap       = {};
+  injectionCount = 0;
   currentBest    = getBest(currentLevel);
   renderPhrase(phrase);
   charEls = Array.from($('text-inner').querySelectorAll('.char'));
@@ -935,6 +980,7 @@ function handleKeydown(e) {
   if (cursor < phrase.length) {
     charEls[cursor].classList.add('cursor');
     updateTextScroll();
+    if (typed === expected && expected === ' ') injectAdaptiveWords();
     highlightNextKey(phrase[cursor]);
   } else {
     endRound();
@@ -1024,7 +1070,11 @@ if (typeof module !== 'undefined') {
     renderSparkline,
     calcTrend,
     applyKeyboardLayout,
-    get ADVANCE_THRESHOLD() { return settings.threshold; },
-    get ROUND_WORD_COUNT()  { return settings.wordCount;  },
+    getHotChars,
+    get ADVANCE_THRESHOLD()           { return settings.threshold;         },
+    get ROUND_WORD_COUNT()            { return settings.wordCount;         },
+    get MID_ROUND_ERROR_THRESHOLD()   { return MID_ROUND_ERROR_THRESHOLD;  },
+    get MAX_MID_ROUND_INJECTIONS()    { return MAX_MID_ROUND_INJECTIONS;   },
+    get MID_ROUND_INJECT_COUNT()      { return MID_ROUND_INJECT_COUNT;     },
   };
 }
