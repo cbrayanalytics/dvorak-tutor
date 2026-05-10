@@ -274,9 +274,9 @@ function suggestTimerMins(wordCount, wpm) {
   return Math.max(1, Math.min(60, Math.ceil((wordCount / safeWpm) * 1.5)));
 }
 
-// ── Corne layout ──────────────────────────────────────────────
+// ── Layout data ────────────────────────────────────────────────
 
-// Character → unlock level (anything absent defaults to 10)
+// Character → unlock level for Dvorak (absent chars default to 10)
 const CHAR_LEVEL = {
   a:1,o:1,e:1,u:1,h:1,t:1,n:1,s:1,
   i:2,d:2,
@@ -288,6 +288,25 @@ const CHAR_LEVEL = {
   v:8,k:8,
   j:9,x:9,q:9,z:9,
 };
+
+// Character → unlock level for Colemak/Colemak-DH
+const CHAR_LEVEL_COLEMAK = {
+  a:1,r:1,s:1,t:1,h:1,n:1,e:1,o:1,
+  i:2,d:2,
+  f:3,l:3,
+  u:4,p:4,
+  w:5,y:5,
+  g:6,m:6,
+  b:7,c:7,
+  v:8,k:8,
+  j:9,x:9,q:9,z:9,
+};
+
+function getLayoutFamily(style) {
+  return (style === 'colemak' || style === 'colemak-dh') ? 'colemak' : 'dvorak';
+}
+
+// ── Corne layout ──────────────────────────────────────────────
 
 // Columns ordered outer→inner for each half.
 // offset = margin-top px (0 = highest, larger = lower, simulating column stagger).
@@ -320,8 +339,9 @@ function _makeModKey(finger, label) {
   return el;
 }
 
-function _makeCharKey(char, finger) {
-  const el = _makeEl('div', 'key', { char, finger, level: String(CHAR_LEVEL[char] ?? 10) });
+function _makeCharKey(char, finger, charLevelMap) {
+  const lvlMap = charLevelMap || CHAR_LEVEL;
+  const el = _makeEl('div', 'key', { char, finger, level: String(lvlMap[char] ?? 10) });
   el.textContent = char === ' ' ? 'spc' : char;
   return el;
 }
@@ -355,6 +375,58 @@ function buildCorneFragment(variant) {
   rThumb.appendChild(_makeModKey('thumb', '⏎'));
   thumbs.appendChild(rThumb);
   frag.appendChild(thumbs);
+
+  return frag;
+}
+
+// ── Colemak / Colemak-DH standard layout ──────────────────────
+// null = hand-gap (inserted between index-left and index-right groups)
+
+const COLEMAK_ROWS = {
+  standard: {
+    upper:  [{char:'q',finger:'pinky-left'},{char:'w',finger:'ring-left'},{char:'f',finger:'middle-left'},{char:'p',finger:'index-left'},{char:'g',finger:'index-left'},null,{char:'j',finger:'index-right'},{char:'l',finger:'index-right'},{char:'u',finger:'middle-right'},{char:'y',finger:'ring-right'},{char:';',finger:'pinky-right'}],
+    home:   [{char:'a',finger:'pinky-left'},{char:'r',finger:'ring-left'},{char:'s',finger:'middle-left'},{char:'t',finger:'index-left'},{char:'d',finger:'index-left'},null,{char:'h',finger:'index-right'},{char:'n',finger:'index-right'},{char:'e',finger:'middle-right'},{char:'i',finger:'ring-right'},{char:'o',finger:'pinky-right'}],
+    bottom: [{char:'z',finger:'pinky-left'},{char:'x',finger:'ring-left'},{char:'c',finger:'middle-left'},{char:'v',finger:'index-left'},{char:'b',finger:'index-left'},null,{char:'k',finger:'index-right'},{char:'m',finger:'index-right'},{char:',',finger:'middle-right'},{char:'.',finger:'ring-right'},{char:'/',finger:'pinky-right'}],
+  },
+  dh: {
+    upper:  [{char:'q',finger:'pinky-left'},{char:'w',finger:'ring-left'},{char:'f',finger:'middle-left'},{char:'p',finger:'index-left'},{char:'b',finger:'index-left'},null,{char:'j',finger:'index-right'},{char:'l',finger:'index-right'},{char:'u',finger:'middle-right'},{char:'y',finger:'ring-right'},{char:';',finger:'pinky-right'}],
+    home:   [{char:'a',finger:'pinky-left'},{char:'r',finger:'ring-left'},{char:'s',finger:'middle-left'},{char:'t',finger:'index-left'},{char:'g',finger:'index-left'},null,{char:'m',finger:'index-right'},{char:'n',finger:'index-right'},{char:'e',finger:'middle-right'},{char:'i',finger:'ring-right'},{char:'o',finger:'pinky-right'}],
+    bottom: [{char:'z',finger:'pinky-left'},{char:'x',finger:'ring-left'},{char:'c',finger:'middle-left'},{char:'d',finger:'index-left'},{char:'v',finger:'index-left'},null,{char:'k',finger:'index-right'},{char:'h',finger:'index-right'},{char:',',finger:'middle-right'},{char:'.',finger:'ring-right'},{char:'/',finger:'pinky-right'}],
+  },
+};
+
+const COLEMAK_NUM_ROW = [
+  {char:'1',finger:'pinky-left'},{char:'2',finger:'ring-left'},{char:'3',finger:'middle-left'},{char:'4',finger:'index-left'},{char:'5',finger:'index-left'},
+  null,
+  {char:'6',finger:'index-right'},{char:'7',finger:'index-right'},{char:'8',finger:'middle-right'},{char:'9',finger:'ring-right'},{char:'0',finger:'pinky-right'},
+];
+
+function buildStandardColemakFragment(variant) {
+  const rows = variant === 'colemak-dh' ? COLEMAK_ROWS.dh : COLEMAK_ROWS.standard;
+  const frag = document.createDocumentFragment();
+
+  function buildRow(cls, keys) {
+    const row = _makeEl('div', `key-row ${cls}`);
+    keys.forEach(k => {
+      if (k === null) row.appendChild(_makeEl('div', 'hand-gap'));
+      else row.appendChild(_makeCharKey(k.char, k.finger, CHAR_LEVEL_COLEMAK));
+    });
+    return row;
+  }
+
+  frag.appendChild(buildRow('row-number', COLEMAK_NUM_ROW));
+  frag.appendChild(buildRow('row-upper',  rows.upper));
+  frag.appendChild(buildRow('row-home',   rows.home));
+  frag.appendChild(buildRow('row-bottom', rows.bottom));
+
+  const spaceRow = _makeEl('div', 'key-row row-space');
+  const spaceEl  = _makeEl('div', 'key key-space');
+  spaceEl.dataset.char   = ' ';
+  spaceEl.dataset.finger = 'thumb';
+  spaceEl.dataset.level  = '1';
+  spaceEl.textContent    = 'space';
+  spaceRow.appendChild(spaceEl);
+  frag.appendChild(spaceRow);
 
   return frag;
 }
@@ -407,7 +479,7 @@ function getKeyState(keyLevel, activeLevel, char) {
 }
 
 function buildPhrase(level, wordCount) {
-  return getRoundWords(level, wordCount).join(' ');
+  return getRoundWords(level, wordCount, getLayoutFamily(settings.keyboardStyle)).join(' ');
 }
 
 // ── DOM shortcuts ──────────────────────────────────────────────
@@ -440,6 +512,8 @@ function applyKeyboardLayout(style) {
   while (kb.firstChild) kb.removeChild(kb.firstChild);
   if (style === 'standard') {
     if (standardKeyboardFragment) kb.appendChild(standardKeyboardFragment.cloneNode(true));
+  } else if (style === 'colemak' || style === 'colemak-dh') {
+    kb.appendChild(buildStandardColemakFragment(style));
   } else {
     kb.appendChild(buildCorneFragment(style));
   }
@@ -521,7 +595,7 @@ function injectAdaptiveWords() {
   const weakKeys = {};
   hotChars.forEach(ch => { weakKeys[ch] = errorMap[ch]; });
 
-  const words  = getWeightedWords(currentLevel, weakKeys, MID_ROUND_INJECT_COUNT);
+  const words  = getWeightedWords(currentLevel, weakKeys, MID_ROUND_INJECT_COUNT, getLayoutFamily(settings.keyboardStyle));
   const suffix = ' ' + words.join(' ');
   phrase += suffix;
 
@@ -802,7 +876,7 @@ function _initRound() {
 
 function startDrillRound() {
   drillMode = true;
-  phrase    = getWeightedWords(currentLevel, loadWeakKeys(currentLevel), settings.wordCount).join(' ');
+  phrase    = getWeightedWords(currentLevel, loadWeakKeys(currentLevel), settings.wordCount, getLayoutFamily(settings.keyboardStyle)).join(' ');
   _initRound();
   $('banner').textContent = '🎯 Drilling weak keys';
   $('banner').className   = 'info';
@@ -1085,9 +1159,16 @@ function init() {
   const kbStyleSelect = $('kb-style-select');
   kbStyleSelect.value = settings.keyboardStyle;
   kbStyleSelect.addEventListener('change', e => {
-    saveSettings({ keyboardStyle: e.target.value });
-    applyKeyboardLayout(e.target.value);
-    startRound();
+    const prev = settings.keyboardStyle;
+    const next = e.target.value;
+    saveSettings({ keyboardStyle: next });
+    if (getLayoutFamily(prev) !== getLayoutFamily(next)) {
+      applyKeyboardLayout(next);
+      applyLevel(1);
+    } else {
+      applyKeyboardLayout(next);
+      startRound();
+    }
   });
 
   $('reset-btn').addEventListener('click', () => {
@@ -1131,6 +1212,8 @@ if (typeof module !== 'undefined') {
     applyKeyboardLayout,
     getHotChars,
     resetProgress,
+    CHAR_LEVEL_COLEMAK,
+    getLayoutFamily,
     loadDailyStreak,
     saveDailyStreak,
     updateDailyStreak,

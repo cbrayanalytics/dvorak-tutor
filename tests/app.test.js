@@ -44,6 +44,8 @@ const {
   loadDailyStreak,
   saveDailyStreak,
   updateDailyStreak,
+  CHAR_LEVEL_COLEMAK,
+  getLayoutFamily,
   ADVANCE_THRESHOLD,
   ROUND_WORD_COUNT,
   MID_ROUND_ERROR_THRESHOLD,
@@ -648,6 +650,30 @@ console.log('\nupdateDailyStreak');
   const fromOld = updateDailyStreak();
   assert('updateDailyStreak: old date resets streak to 1', fromOld.streak === 1);
 }
+
+// ── CHAR_LEVEL_COLEMAK ─────────────────────────────────────────
+console.log('\nCHAR_LEVEL_COLEMAK');
+
+assert('CHAR_LEVEL_COLEMAK is an object', typeof CHAR_LEVEL_COLEMAK === 'object' && CHAR_LEVEL_COLEMAK !== null);
+assert('level 1 home row: a r s t h n e o', ['a','r','s','t','h','n','e','o'].every(c => CHAR_LEVEL_COLEMAK[c] === 1));
+assert('level 2: i d', CHAR_LEVEL_COLEMAK.i === 2 && CHAR_LEVEL_COLEMAK.d === 2);
+assert('level 3: f l', CHAR_LEVEL_COLEMAK.f === 3 && CHAR_LEVEL_COLEMAK.l === 3);
+assert('level 4: u p', CHAR_LEVEL_COLEMAK.u === 4 && CHAR_LEVEL_COLEMAK.p === 4);
+assert('level 5: w y', CHAR_LEVEL_COLEMAK.w === 5 && CHAR_LEVEL_COLEMAK.y === 5);
+assert('level 6: g m', CHAR_LEVEL_COLEMAK.g === 6 && CHAR_LEVEL_COLEMAK.m === 6);
+assert('level 7: b c', CHAR_LEVEL_COLEMAK.b === 7 && CHAR_LEVEL_COLEMAK.c === 7);
+assert('level 8: v k', CHAR_LEVEL_COLEMAK.v === 8 && CHAR_LEVEL_COLEMAK.k === 8);
+assert('level 9: j x q z', ['j','x','q','z'].every(c => CHAR_LEVEL_COLEMAK[c] === 9));
+
+// ── getLayoutFamily ────────────────────────────────────────────
+console.log('\ngetLayoutFamily');
+
+assert('standard → dvorak',    getLayoutFamily('standard')   === 'dvorak');
+assert('corne-3x6 → dvorak',   getLayoutFamily('corne-3x6')  === 'dvorak');
+assert('corne-3x5 → dvorak',   getLayoutFamily('corne-3x5')  === 'dvorak');
+assert('colemak → colemak',    getLayoutFamily('colemak')    === 'colemak');
+assert('colemak-dh → colemak', getLayoutFamily('colemak-dh') === 'colemak');
+assert('unknown → dvorak',     getLayoutFamily('other')      === 'dvorak');
 
 // ── Summary ────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(40)}`);

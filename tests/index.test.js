@@ -175,6 +175,11 @@ assert('timer-toggle has aria-pressed',     html.includes('aria-pressed="false"'
 assert('settings-btn has aria-label',       html.includes('aria-label="Settings"'));
 assert('timer-toggle has aria-label',       html.includes('aria-label="Toggle time limit"'));
 
+// ── Settings panel — keyboard style options ────────────────────
+console.log('\nSettings panel — keyboard style options');
+assert('colemak option exists',    html.includes('value="colemak"'));
+assert('colemak-dh option exists', html.includes('value="colemak-dh"'));
+
 // ── Settings panel — reset button ─────────────────────────────
 console.log('\nSettings panel — reset button');
 assert('#reset-btn exists', hasId('reset-btn'));
