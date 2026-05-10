@@ -40,6 +40,7 @@ const {
   calcTrend,
   applyKeyboardLayout,
   getHotChars,
+  resetProgress,
   ADVANCE_THRESHOLD,
   ROUND_WORD_COUNT,
   MID_ROUND_ERROR_THRESHOLD,
@@ -574,6 +575,29 @@ assert('MAX_MID_ROUND_INJECTIONS is a positive number',
   typeof MAX_MID_ROUND_INJECTIONS === 'number' && MAX_MID_ROUND_INJECTIONS > 0);
 assert('MID_ROUND_INJECT_COUNT is a positive number',
   typeof MID_ROUND_INJECT_COUNT === 'number' && MID_ROUND_INJECT_COUNT > 0);
+
+// ── resetProgress ──────────────────────────────────────────────
+console.log('\nresetProgress');
+
+{
+  localStorage.clear();
+  saveBest(1, 60, 95);
+  appendHistory(1, { wpm: 60, acc: 95, ts: 1000 });
+  saveWeakKeys(1, { a: 3 });
+  saveSettings({ level: 5 });
+
+  resetProgress();
+
+  loadSettings();
+  assert('resetProgress: clears bests',
+    Object.keys(loadBests()).length === 0);
+  assert('resetProgress: clears history',
+    loadHistory(1).length === 0);
+  assert('resetProgress: clears weak keys',
+    Object.keys(loadWeakKeys(1)).length === 0);
+  assert('resetProgress: resets level to 1',
+    settings.level === 1);
+}
 
 // ── Summary ────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(40)}`);

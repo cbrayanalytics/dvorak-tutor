@@ -175,6 +175,10 @@ assert('timer-toggle has aria-pressed',     html.includes('aria-pressed="false"'
 assert('settings-btn has aria-label',       html.includes('aria-label="Settings"'));
 assert('timer-toggle has aria-label',       html.includes('aria-label="Toggle time limit"'));
 
+// ── Settings panel — reset button ─────────────────────────────
+console.log('\nSettings panel — reset button');
+assert('#reset-btn exists', hasId('reset-btn'));
+
 // ── Summary card ──────────────────────────────────────────────
 console.log('\nSummary card — required IDs');
 ['summary-card','sum-wpm','sum-acc','sum-time','sum-stars','sum-sparkline','sum-sparkline-wrap','sum-trend']

@@ -157,6 +157,13 @@ function mergeWeakKeys(stored, round) {
   return result;
 }
 
+function resetProgress() {
+  localStorage.removeItem(BESTS_KEY);
+  localStorage.removeItem(HISTORY_KEY);
+  localStorage.removeItem(WEAK_KEYS_KEY);
+  saveSettings({ level: 1 });
+}
+
 // ── Error heatmap ──────────────────────────────────────────────
 
 const HEAT_ERROR_MAX              = 3;
@@ -1043,6 +1050,13 @@ function init() {
     applyKeyboardLayout(e.target.value);
     startRound();
   });
+
+  $('reset-btn').addEventListener('click', () => {
+    if (!window.confirm('Reset all progress? This clears your history, bests, and weak-key data and returns you to Level 1.')) return;
+    resetProgress();
+    closeSettingsPanel();
+    applyLevel(1);
+  });
 }
 
 if (typeof document !== 'undefined') {
@@ -1077,6 +1091,7 @@ if (typeof module !== 'undefined') {
     calcTrend,
     applyKeyboardLayout,
     getHotChars,
+    resetProgress,
     get ADVANCE_THRESHOLD()           { return settings.threshold;         },
     get ROUND_WORD_COUNT()            { return settings.wordCount;         },
     get MID_ROUND_ERROR_THRESHOLD()   { return MID_ROUND_ERROR_THRESHOLD;  },

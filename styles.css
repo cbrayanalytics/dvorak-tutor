@@ -953,6 +953,27 @@ h1 span {
 }
 #settings-panel select:hover { border-color: var(--text-muted); }
 
+/* ─── Reset danger button ────────────────────────────────────── */
+.setting-row-danger { margin-top: 0.4rem; border-top: 1px solid var(--border); padding-top: 0.6rem; }
+
+.setting-btn-danger {
+  height: 28px;
+  padding: 0 0.85rem;
+  border-radius: 6px;
+  border: 1px solid #7f1d1d;
+  background: transparent;
+  color: #f87171;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+}
+.setting-btn-danger:hover {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: #ef4444;
+}
+
 /* ─── Confetti ───────────────────────────────────────────────── */
 @keyframes confetti-burst {
   0%   { transform: translate(0, 0) rotate(0deg);                    opacity: 1; }
