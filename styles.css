@@ -52,17 +52,51 @@ header {
   padding: 0.1rem 0;
 }
 
-h1 {
-  font-size: 1.6rem;
+/* ─── Header left block (tabs + h1) ─────────────────────────── */
+#header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+#layout-tabs {
+  display: flex;
+  gap: 1.1rem;
+  align-items: baseline;
+}
+
+.layout-tab {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 1.55rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--text);
-  margin: 0;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color var(--transition), border-color var(--transition);
+  line-height: 1;
 }
 
-h1 span {
-  color: var(--finger-index);
+.layout-tab.active {
+  color: var(--text);
+  border-bottom-color: var(--finger-index);
+}
+
+.layout-tab:not(.active):hover {
+  color: var(--text);
+}
+
+h1 {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0;
 }
 
 /* ─── Level Map (chip + segmented bar) ──────────────────────── */

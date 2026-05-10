@@ -13,7 +13,14 @@
 <div id="app">
 
   <header>
-    <h1>Dvorak <span>Tutor</span></h1>
+    <div id="header-left">
+      <nav id="layout-tabs" role="tablist" aria-label="Keyboard layout">
+        <button class="layout-tab active" data-layout="dvorak"     role="tab" aria-selected="true"  type="button">Dvorak</button>
+        <button class="layout-tab"        data-layout="colemak"    role="tab" aria-selected="false" type="button">Colemak</button>
+        <button class="layout-tab"        data-layout="colemak-dh" role="tab" aria-selected="false" type="button">Colemak-DH</button>
+      </nav>
+      <h1>Tutor</h1>
+    </div>
     <button id="settings-btn" type="button"
             aria-label="Settings"
             aria-expanded="false"
@@ -75,8 +82,6 @@
         <option value="standard">Full keyboard</option>
         <option value="corne-3x6">Corne 3×6</option>
         <option value="corne-3x5">Corne 3×5</option>
-        <option value="colemak">Colemak</option>
-        <option value="colemak-dh">Colemak-DH</option>
       </select>
     </div>
 

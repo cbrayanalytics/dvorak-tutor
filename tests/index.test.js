@@ -175,10 +175,15 @@ assert('timer-toggle has aria-pressed',     html.includes('aria-pressed="false"'
 assert('settings-btn has aria-label',       html.includes('aria-label="Settings"'));
 assert('timer-toggle has aria-label',       html.includes('aria-label="Toggle time limit"'));
 
-// ── Settings panel — keyboard style options ────────────────────
-console.log('\nSettings panel — keyboard style options');
-assert('colemak option exists',    html.includes('value="colemak"'));
-assert('colemak-dh option exists', html.includes('value="colemak-dh"'));
+// ── Layout tabs ────────────────────────────────────────────────
+console.log('\nLayout tabs');
+assert('#layout-tabs exists',            hasId('layout-tabs'));
+assert('layout-tabs has role=tablist',   html.includes('id="layout-tabs"') && html.includes('role="tablist"'));
+assert('dvorak tab exists',              html.includes('data-layout="dvorak"'));
+assert('colemak tab exists',             html.includes('data-layout="colemak"'));
+assert('colemak-dh tab exists',          html.includes('data-layout="colemak-dh"'));
+assert('colemak NOT in kb-style-select', !html.includes('value="colemak"'));
+assert('colemak-dh NOT in kb-style-select', !html.includes('value="colemak-dh"'));
 
 // ── Settings panel — reset button ─────────────────────────────
 console.log('\nSettings panel — reset button');

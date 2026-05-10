@@ -2,7 +2,7 @@
 
 // ── Settings ───────────────────────────────────────────────────
 const SETTINGS_KEY      = 'dvorak-tutor-settings';
-const SETTINGS_DEFAULTS = { wordCount: 100, threshold: 90, timerOn: false, timerMins: 15, level: 1, audioOn: true, mode: 'words', keyboardStyle: 'standard' };
+const SETTINGS_DEFAULTS = { wordCount: 100, threshold: 90, timerOn: false, timerMins: 15, level: 1, audioOn: true, mode: 'words', keyboardStyle: 'standard', layoutFamily: 'dvorak' };
 
 let settings = { ...SETTINGS_DEFAULTS };
 
@@ -14,6 +14,8 @@ function loadSettings() {
     if (stored && typeof stored === 'object') Object.assign(settings, stored);
   } catch (_) { /* malformed JSON: keep defaults */ }
   settings.level = Math.max(1, Math.min(10, settings.level));
+  const validFamilies = ['dvorak', 'colemak', 'colemak-dh'];
+  if (!validFamilies.includes(settings.layoutFamily)) settings.layoutFamily = 'dvorak';
 }
 
 function saveSettings(overrides) {
@@ -302,8 +304,8 @@ const CHAR_LEVEL_COLEMAK = {
   j:9,x:9,q:9,z:9,
 };
 
-function getLayoutFamily(style) {
-  return (style === 'colemak' || style === 'colemak-dh') ? 'colemak' : 'dvorak';
+function getLayoutFamily() {
+  return settings.layoutFamily;
 }
 
 // ── Corne layout ──────────────────────────────────────────────
@@ -346,25 +348,58 @@ function _makeCharKey(char, finger, charLevelMap) {
   return el;
 }
 
-function _makeCorneCol(col) {
+// Colemak standard Corne columns (3×5 base; outer-right added for 3×6)
+const CORNE_COLS_COLEMAK = [
+  { side:'left',  finger:'pinky-left',   offset:32, keys:['q', 'a', 'z'] },
+  { side:'left',  finger:'ring-left',    offset:16, keys:['w', 'r', 'x'] },
+  { side:'left',  finger:'middle-left',  offset: 0, keys:['f', 's', 'c'] },
+  { side:'left',  finger:'index-left',   offset: 8, keys:['p', 't', 'v'] },
+  { side:'left',  finger:'index-left',   offset:18, keys:['g', 'd', 'b'] },
+  { side:'right', finger:'index-right',  offset:18, keys:['j', 'h', 'k'] },
+  { side:'right', finger:'index-right',  offset: 8, keys:['l', 'n', 'm'] },
+  { side:'right', finger:'middle-right', offset: 0, keys:['u', 'e', ','] },
+  { side:'right', finger:'ring-right',   offset:16, keys:['y', 'i', '.'] },
+  { side:'right', finger:'pinky-right',  offset:32, keys:[';', 'o', '/'] },
+];
+
+// Colemak-DH Corne columns (G/M move to home row; D/H move to bottom row)
+const CORNE_COLS_COLEMAK_DH = [
+  { side:'left',  finger:'pinky-left',   offset:32, keys:['q', 'a', 'z'] },
+  { side:'left',  finger:'ring-left',    offset:16, keys:['w', 'r', 'x'] },
+  { side:'left',  finger:'middle-left',  offset: 0, keys:['f', 's', 'c'] },
+  { side:'left',  finger:'index-left',   offset: 8, keys:['p', 't', 'd'] },
+  { side:'left',  finger:'index-left',   offset:18, keys:['b', 'g', 'v'] },
+  { side:'right', finger:'index-right',  offset:18, keys:['j', 'm', 'k'] },
+  { side:'right', finger:'index-right',  offset: 8, keys:['l', 'n', 'h'] },
+  { side:'right', finger:'middle-right', offset: 0, keys:['u', 'e', ','] },
+  { side:'right', finger:'ring-right',   offset:16, keys:['y', 'i', '.'] },
+  { side:'right', finger:'pinky-right',  offset:32, keys:[';', 'o', '/'] },
+];
+
+function _makeCorneCol(col, charLevelMap) {
   const div = _makeEl('div', 'corne-col');
   div.style.setProperty('--col-offset', col.offset + 'px');
-  col.keys.forEach(c => { if (c) div.appendChild(_makeCharKey(c, col.finger)); });
+  col.keys.forEach(c => { if (c) div.appendChild(_makeCharKey(c, col.finger, charLevelMap)); });
   return div;
 }
 
 function buildCorneFragment(variant) {
   const is3x6 = variant === 'corne-3x6';
+  const family = getLayoutFamily();
+  const cols = family === 'colemak-dh' ? CORNE_COLS_COLEMAK_DH
+             : family === 'colemak'    ? CORNE_COLS_COLEMAK
+             : CORNE_COLS;
+  const charLvl = family === 'dvorak' ? undefined : CHAR_LEVEL_COLEMAK;
   const frag = document.createDocumentFragment();
 
   const body = _makeEl('div', 'corne-body');
   const lHalf = _makeEl('div', 'corne-half');
-  CORNE_COLS.filter(c => c.side === 'left').forEach(col => lHalf.appendChild(_makeCorneCol(col)));
+  cols.filter(c => c.side === 'left').forEach(col => lHalf.appendChild(_makeCorneCol(col, charLvl)));
   body.appendChild(lHalf);
   body.appendChild(_makeEl('div', 'hand-gap'));
   const rHalf = _makeEl('div', 'corne-half');
-  CORNE_COLS.filter(c => c.side === 'right').forEach(col => rHalf.appendChild(_makeCorneCol(col)));
-  if (is3x6) rHalf.appendChild(_makeCorneCol(CORNE_OUTER_RIGHT));
+  cols.filter(c => c.side === 'right').forEach(col => rHalf.appendChild(_makeCorneCol(col, charLvl)));
+  if (is3x6) rHalf.appendChild(_makeCorneCol(CORNE_OUTER_RIGHT, charLvl));
   body.appendChild(rHalf);
   frag.appendChild(body);
 
@@ -479,7 +514,7 @@ function getKeyState(keyLevel, activeLevel, char) {
 }
 
 function buildPhrase(level, wordCount) {
-  return getRoundWords(level, wordCount, getLayoutFamily(settings.keyboardStyle)).join(' ');
+  return getRoundWords(level, wordCount, getLayoutFamily()).join(' ');
 }
 
 // ── DOM shortcuts ──────────────────────────────────────────────
@@ -595,7 +630,7 @@ function injectAdaptiveWords() {
   const weakKeys = {};
   hotChars.forEach(ch => { weakKeys[ch] = errorMap[ch]; });
 
-  const words  = getWeightedWords(currentLevel, weakKeys, MID_ROUND_INJECT_COUNT, getLayoutFamily(settings.keyboardStyle));
+  const words  = getWeightedWords(currentLevel, weakKeys, MID_ROUND_INJECT_COUNT, getLayoutFamily());
   const suffix = ' ' + words.join(' ');
   phrase += suffix;
 
@@ -876,7 +911,7 @@ function _initRound() {
 
 function startDrillRound() {
   drillMode = true;
-  phrase    = getWeightedWords(currentLevel, loadWeakKeys(currentLevel), settings.wordCount, getLayoutFamily(settings.keyboardStyle)).join(' ');
+  phrase    = getWeightedWords(currentLevel, loadWeakKeys(currentLevel), settings.wordCount, getLayoutFamily()).join(' ');
   _initRound();
   $('banner').textContent = '🎯 Drilling weak keys';
   $('banner').className   = 'info';
@@ -1041,6 +1076,18 @@ function updateDrillBtn(weak) {
   $('drill-btn').classList.toggle('visible', Object.keys(weak).length > 0);
 }
 
+function applyLayoutFamily(family) {
+  const prev = settings.layoutFamily;
+  saveSettings({ layoutFamily: family });
+  document.querySelectorAll('#layout-tabs .layout-tab').forEach(btn => {
+    const active = btn.dataset.layout === family;
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-selected', String(active));
+  });
+  applyKeyboardLayout(settings.keyboardStyle);
+  if (prev !== family) applyLevel(1);
+}
+
 function applyLevel(n) {
   currentLevel = n;
   saveSettings({ level: currentLevel });
@@ -1159,16 +1206,21 @@ function init() {
   const kbStyleSelect = $('kb-style-select');
   kbStyleSelect.value = settings.keyboardStyle;
   kbStyleSelect.addEventListener('change', e => {
-    const prev = settings.keyboardStyle;
-    const next = e.target.value;
-    saveSettings({ keyboardStyle: next });
-    if (getLayoutFamily(prev) !== getLayoutFamily(next)) {
-      applyKeyboardLayout(next);
-      applyLevel(1);
+    saveSettings({ keyboardStyle: e.target.value });
+    applyKeyboardLayout(e.target.value);
+    startRound();
+  });
+
+  // Layout family tabs
+  document.querySelectorAll('#layout-tabs .layout-tab').forEach(btn => {
+    if (btn.dataset.layout === settings.layoutFamily) {
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
     } else {
-      applyKeyboardLayout(next);
-      startRound();
+      btn.classList.remove('active');
+      btn.setAttribute('aria-selected', 'false');
     }
+    btn.addEventListener('click', () => applyLayoutFamily(btn.dataset.layout));
   });
 
   $('reset-btn').addEventListener('click', () => {

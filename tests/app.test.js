@@ -668,12 +668,26 @@ assert('level 9: j x q z', ['j','x','q','z'].every(c => CHAR_LEVEL_COLEMAK[c] ==
 // ── getLayoutFamily ────────────────────────────────────────────
 console.log('\ngetLayoutFamily');
 
-assert('standard → dvorak',    getLayoutFamily('standard')   === 'dvorak');
-assert('corne-3x6 → dvorak',   getLayoutFamily('corne-3x6')  === 'dvorak');
-assert('corne-3x5 → dvorak',   getLayoutFamily('corne-3x5')  === 'dvorak');
-assert('colemak → colemak',    getLayoutFamily('colemak')    === 'colemak');
-assert('colemak-dh → colemak', getLayoutFamily('colemak-dh') === 'colemak');
-assert('unknown → dvorak',     getLayoutFamily('other')      === 'dvorak');
+{
+  localStorage.clear();
+  loadSettings();
+  assert('default layoutFamily is dvorak', getLayoutFamily() === 'dvorak');
+
+  saveSettings({ layoutFamily: 'colemak' });
+  loadSettings();
+  assert('after saving colemak, getLayoutFamily returns colemak', getLayoutFamily() === 'colemak');
+
+  saveSettings({ layoutFamily: 'colemak-dh' });
+  loadSettings();
+  assert('after saving colemak-dh, getLayoutFamily returns colemak-dh', getLayoutFamily() === 'colemak-dh');
+
+  saveSettings({ layoutFamily: 'invalid' });
+  loadSettings();
+  assert('invalid layoutFamily falls back to dvorak', getLayoutFamily() === 'dvorak');
+
+  localStorage.clear();
+  loadSettings();
+}
 
 // ── Summary ────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(40)}`);
