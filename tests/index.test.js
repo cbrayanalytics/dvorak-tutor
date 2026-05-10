@@ -63,16 +63,46 @@ console.log('\ndata-level — level 2 inner index keys (i d)');
   assert(`"${ch}" has data-level="2"`, regex.test(html));
 });
 
-console.log('\ndata-level — level 3 upper-row letters (p y f g c r l)');
-['p','y','f','g','c','r','l'].forEach(ch => {
+console.log('\ndata-level — level 3 keys (r l)');
+['r','l'].forEach(ch => {
   const regex = new RegExp(`data-char="${ch}"[^>]*data-level="3"|data-level="3"[^>]*data-char="${ch}"`);
   assert(`"${ch}" has data-level="3"`, regex.test(html));
 });
 
-console.log('\ndata-level — level 4 bottom-row letters (q j k x b m w v z)');
-['q','j','k','x','b','m','w','v','z'].forEach(ch => {
+console.log('\ndata-level — level 4 keys (c f)');
+['c','f'].forEach(ch => {
   const regex = new RegExp(`data-char="${ch}"[^>]*data-level="4"|data-level="4"[^>]*data-char="${ch}"`);
   assert(`"${ch}" has data-level="4"`, regex.test(html));
+});
+
+console.log('\ndata-level — level 5 keys (g p)');
+['g','p'].forEach(ch => {
+  const regex = new RegExp(`data-char="${ch}"[^>]*data-level="5"|data-level="5"[^>]*data-char="${ch}"`);
+  assert(`"${ch}" has data-level="5"`, regex.test(html));
+});
+
+console.log('\ndata-level — level 6 keys (y b)');
+['y','b'].forEach(ch => {
+  const regex = new RegExp(`data-char="${ch}"[^>]*data-level="6"|data-level="6"[^>]*data-char="${ch}"`);
+  assert(`"${ch}" has data-level="6"`, regex.test(html));
+});
+
+console.log('\ndata-level — level 7 keys (m w)');
+['m','w'].forEach(ch => {
+  const regex = new RegExp(`data-char="${ch}"[^>]*data-level="7"|data-level="7"[^>]*data-char="${ch}"`);
+  assert(`"${ch}" has data-level="7"`, regex.test(html));
+});
+
+console.log('\ndata-level — level 8 keys (v k)');
+['v','k'].forEach(ch => {
+  const regex = new RegExp(`data-char="${ch}"[^>]*data-level="8"|data-level="8"[^>]*data-char="${ch}"`);
+  assert(`"${ch}" has data-level="8"`, regex.test(html));
+});
+
+console.log('\ndata-level — level 9 keys (j x q z)');
+['j','x','q','z'].forEach(ch => {
+  const regex = new RegExp(`data-char="${ch}"[^>]*data-level="9"|data-level="9"[^>]*data-char="${ch}"`);
+  assert(`"${ch}" has data-level="9"`, regex.test(html));
 });
 
 // ── data-finger values are valid ───────────────────────────────
@@ -101,12 +131,11 @@ console.log('\nRow classes');
 
 // ── Level map pips ─────────────────────────────────────────────
 console.log('\nLevel map');
-assert('5 level pip data-level attrs', countAttr('data-level', '1') >= 1 &&
-  [1,2,3,4,5].every(l => html.includes(`data-level="${l}"`)));
+assert('10 level pip data-level attrs', [1,2,3,4,5,6,7,8,9,10].every(l => html.includes(`data-level="${l}"`)));
 assert('level-pip-connector elements present',
-  (html.match(/level-pip-connector/g) || []).length >= 4);
+  (html.match(/level-pip-connector/g) || []).length >= 9);
 assert('level pip data-label attrs present',
-  ['Novice','Learner','Builder','Adept','Master'].every(n => html.includes(`data-label="${n}"`)));
+  ['Novice','Seeker','Scout','Builder','Shaper','Climber','Forger','Adept','Expert','Master'].every(n => html.includes(`data-label="${n}"`)));
 assert('pip-label and pip-icon spans present',
   html.includes('pip-label') && html.includes('pip-icon'));
 
