@@ -1,6 +1,6 @@
 'use strict';
 
-const { WORD_LIST, LEVEL_CHARS, getLevelChars, getWordsForLevel, getRoundWords, getWeightedWords, getQuotesForLevel, getRoundQuote } = require('../words.js');
+const { WORD_LIST, LEVEL_CHARS, LEVEL_CHARS_COLEMAK, getLevelChars, getWordsForLevel, getRoundWords, getWeightedWords, getQuotesForLevel, getRoundQuote } = require('../words.js');
 
 let passed = 0;
 let failed = 0;
@@ -225,6 +225,56 @@ for (let level = 7; level <= 10; level++) {
 // Falls back gracefully at level 1 (may return empty string if no quotes exist)
 const q1 = getRoundQuote(1);
 assert('getRoundQuote level 1 does not crash', typeof q1 === 'string');
+
+// ── LEVEL_CHARS_COLEMAK ────────────────────────────────────────────────────
+console.log('\nLEVEL_CHARS_COLEMAK');
+
+assert('has entries for levels 1-10',
+  [1,2,3,4,5,6,7,8,9,10].every(l => LEVEL_CHARS_COLEMAK[l] instanceof Set));
+assert('level 1 has 8 chars (a r s t h n e o)',
+  LEVEL_CHARS_COLEMAK[1].size === 8 &&
+  [...'arsthnoe'].every(c => LEVEL_CHARS_COLEMAK[1].has(c)));
+assert('level 2 adds i and d',
+  LEVEL_CHARS_COLEMAK[2].size === 10 &&
+  LEVEL_CHARS_COLEMAK[2].has('i') && LEVEL_CHARS_COLEMAK[2].has('d'));
+assert('level 6 adds g and m',
+  LEVEL_CHARS_COLEMAK[6].size === 18 &&
+  LEVEL_CHARS_COLEMAK[6].has('g') && LEVEL_CHARS_COLEMAK[6].has('m'));
+assert('level 9 has full alphabet',
+  [...'abcdefghijklmnopqrstuvwxyz'].every(c => LEVEL_CHARS_COLEMAK[9].has(c)));
+assert('each level is a superset of the previous', [2,3,4,5,6,7,8,9,10].every(l => {
+  const prev = LEVEL_CHARS_COLEMAK[l - 1];
+  const curr = LEVEL_CHARS_COLEMAK[l];
+  return [...prev].every(c => curr.has(c));
+}));
+
+// ── getWordsForLevel — Colemak layout ─────────────────────────────────────
+console.log('\ngetWordsForLevel — colemak layout');
+
+{
+  const colemakL1 = getWordsForLevel(1, 'colemak');
+  assert('colemak level 1 returns array', Array.isArray(colemakL1));
+  assert('colemak level 1 is non-empty', colemakL1.length > 0);
+
+  const allowed1 = LEVEL_CHARS_COLEMAK[1];
+  const bad = colemakL1.find(w => w.split('').some(c => !allowed1.has(c)));
+  assert('colemak level 1: all words use only allowed chars', !bad, bad ? `offender: "${bad}"` : '');
+
+  const colemakL9 = getWordsForLevel(9, 'colemak');
+  assert('colemak level 9 returns all words', colemakL9.length === WORD_LIST.length);
+}
+
+// ── getRoundWords — Colemak layout ────────────────────────────────────────
+console.log('\ngetRoundWords — colemak layout');
+
+{
+  const round = getRoundWords(1, 10, 'colemak');
+  assert('colemak getRoundWords returns array', Array.isArray(round));
+  assert('colemak getRoundWords returns requested count', round.length === 10, `got ${round.length}`);
+  const allowed = LEVEL_CHARS_COLEMAK[1];
+  const bad = round.find(w => w.split('').some(c => !allowed.has(c)));
+  assert('colemak round words respect level filter', !bad, bad ? `offender: "${bad}"` : '');
+}
 
 // ── SUMMARY ───────────────────────────────────────────────────────────────
 console.log(`\n${'─'.repeat(40)}`);

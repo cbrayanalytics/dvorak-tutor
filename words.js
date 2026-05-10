@@ -1,6 +1,6 @@
 'use strict';
 
-// Letters unlocked at each level (cumulative)
+// Letters unlocked at each level (cumulative) — Dvorak progression
 const LEVEL_CHARS = {
   1:  new Set('aoeuhtns'),
   2:  new Set('aoeuidhtns'),
@@ -10,6 +10,22 @@ const LEVEL_CHARS = {
   6:  new Set('aoeuidhtnsrlcfgpyb'),
   7:  new Set('aoeuidhtnsrlcfgpybmw'),
   8:  new Set('aoeuidhtnsrlcfgpybmwvk'),
+  9:  new Set('abcdefghijklmnopqrstuvwxyz'),
+  10: new Set('abcdefghijklmnopqrstuvwxyz'),
+};
+
+// Letters unlocked at each level (cumulative) — Colemak/Colemak-DH progression
+// Lv 1: home row core (a r s t h n e o) | 2: +i d | 3: +f l | 4: +u p
+// Lv 5: +w y | 6: +g m | 7: +b c | 8: +v k | 9-10: full alphabet
+const LEVEL_CHARS_COLEMAK = {
+  1:  new Set('arsthnoe'),
+  2:  new Set('arsthnoe' + 'id'),
+  3:  new Set('arsthnoe' + 'id' + 'fl'),
+  4:  new Set('arsthnoe' + 'id' + 'fl' + 'up'),
+  5:  new Set('arsthnoe' + 'id' + 'fl' + 'up' + 'wy'),
+  6:  new Set('arsthnoe' + 'id' + 'fl' + 'up' + 'wy' + 'gm'),
+  7:  new Set('arsthnoe' + 'id' + 'fl' + 'up' + 'wy' + 'gm' + 'bc'),
+  8:  new Set('arsthnoe' + 'id' + 'fl' + 'up' + 'wy' + 'gm' + 'bc' + 'vk'),
   9:  new Set('abcdefghijklmnopqrstuvwxyz'),
   10: new Set('abcdefghijklmnopqrstuvwxyz'),
 };
@@ -297,8 +313,9 @@ function getLevelChars(level) {
   return LEVEL_CHARS[level] || LEVEL_CHARS[10];
 }
 
-function getWordsForLevel(level) {
-  const allowed = getLevelChars(level);
+function getWordsForLevel(level, layout) {
+  const chars = layout === 'colemak' ? LEVEL_CHARS_COLEMAK : LEVEL_CHARS;
+  const allowed = chars[level] || chars[10];
   return WORD_LIST.filter(word =>
     word.split('').every(char => allowed.has(char))
   );
@@ -314,8 +331,8 @@ function shuffle(arr) {
 }
 
 // Returns a shuffled array of `count` words for the given level
-function getRoundWords(level, count) {
-  const pool = getWordsForLevel(level);
+function getRoundWords(level, count, layout) {
+  const pool = getWordsForLevel(level, layout);
   return shuffle(pool).slice(0, Math.min(count, pool.length));
 }
 
@@ -323,8 +340,8 @@ function getRoundWords(level, count) {
 // the most-errored characters from `weakKeys` ({ char: errorCount }).
 // Each word gets 1 + min(floor(score/2), 4) copies in the candidate pool,
 // where score = sum of error counts for distinct chars in the word.
-function getWeightedWords(level, weakKeys, count) {
-  const pool = getWordsForLevel(level);
+function getWeightedWords(level, weakKeys, count, layout) {
+  const pool = getWordsForLevel(level, layout);
   const keys = weakKeys && typeof weakKeys === 'object' ? weakKeys : {};
 
   const weighted = [];
@@ -413,5 +430,5 @@ function getRoundQuote(level) {
 }
 
 if (typeof module !== 'undefined') {
-  module.exports = { WORD_LIST, LEVEL_CHARS, getLevelChars, getWordsForLevel, getRoundWords, getWeightedWords, getQuotesForLevel, getRoundQuote };
+  module.exports = { WORD_LIST, LEVEL_CHARS, LEVEL_CHARS_COLEMAK, getLevelChars, getWordsForLevel, getRoundWords, getWeightedWords, getQuotesForLevel, getRoundQuote };
 }
