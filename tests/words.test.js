@@ -35,7 +35,7 @@ assert('no words shorter than 2 characters', tooShort.length === 0,
 // ── LEVEL_CHARS ────────────────────────────────────────────────────────────
 console.log('\nLEVEL_CHARS');
 
-assert('has entries for levels 1-5', [1,2,3,4,5].every(l => LEVEL_CHARS[l] instanceof Set));
+assert('has entries for levels 1-10', [1,2,3,4,5,6,7,8,9,10].every(l => LEVEL_CHARS[l] instanceof Set));
 
 assert('Level 1 contains exactly a o e u h t n s (8 chars)',
   LEVEL_CHARS[1].size === 8 &&
@@ -45,18 +45,38 @@ assert('Level 2 adds i and d (10 chars)',
   LEVEL_CHARS[2].size === 10 &&
   LEVEL_CHARS[2].has('i') && LEVEL_CHARS[2].has('d'));
 
-assert('Level 3 adds p y f g c r l (17 chars)',
-  LEVEL_CHARS[3].size === 17 &&
-  [...'pyfgcrl'].every(c => LEVEL_CHARS[3].has(c)));
+assert('Level 3 adds r l (12 chars)',
+  LEVEL_CHARS[3].size === 12 &&
+  ['r','l'].every(c => LEVEL_CHARS[3].has(c)));
 
-assert('Level 4 adds q j k x b m w v z (26 chars)',
-  LEVEL_CHARS[4].size === 26);
+assert('Level 4 adds c f (14 chars)',
+  LEVEL_CHARS[4].size === 14 &&
+  ['c','f'].every(c => LEVEL_CHARS[4].has(c)));
 
-assert('Level 5 contains all 26 letters',
-  LEVEL_CHARS[5].size === 26 &&
-  [...'abcdefghijklmnopqrstuvwxyz'].every(c => LEVEL_CHARS[5].has(c)));
+assert('Level 5 adds g p (16 chars)',
+  LEVEL_CHARS[5].size === 16 &&
+  ['g','p'].every(c => LEVEL_CHARS[5].has(c)));
 
-assert('Levels are cumulative (each is superset of previous)', [2,3,4,5].every(l => {
+assert('Level 6 adds y b (18 chars)',
+  LEVEL_CHARS[6].size === 18 &&
+  ['y','b'].every(c => LEVEL_CHARS[6].has(c)));
+
+assert('Level 7 adds m w (20 chars)',
+  LEVEL_CHARS[7].size === 20 &&
+  ['m','w'].every(c => LEVEL_CHARS[7].has(c)));
+
+assert('Level 8 adds v k (22 chars)',
+  LEVEL_CHARS[8].size === 22 &&
+  ['v','k'].every(c => LEVEL_CHARS[8].has(c)));
+
+assert('Level 9 adds j x q z — all 26 letters',
+  LEVEL_CHARS[9].size === 26 &&
+  ['j','x','q','z'].every(c => LEVEL_CHARS[9].has(c)));
+
+assert('Level 10 contains all 26 letters',
+  [...'abcdefghijklmnopqrstuvwxyz'].every(c => LEVEL_CHARS[10].has(c)));
+
+assert('Levels are cumulative (each is superset of previous)', [2,3,4,5,6,7,8,9,10].every(l => {
   const prev = LEVEL_CHARS[l - 1];
   const curr = LEVEL_CHARS[l];
   return [...prev].every(c => curr.has(c));
@@ -66,14 +86,14 @@ assert('Levels are cumulative (each is superset of previous)', [2,3,4,5].every(l
 console.log('\ngetLevelChars');
 
 assert('returns correct Set for level 1', getLevelChars(1) === LEVEL_CHARS[1]);
-assert('returns correct Set for level 5', getLevelChars(5) === LEVEL_CHARS[5]);
-assert('falls back to level 5 for out-of-range input',
-  getLevelChars(99) === LEVEL_CHARS[5]);
+assert('returns correct Set for level 10', getLevelChars(10) === LEVEL_CHARS[10]);
+assert('falls back to level 10 for out-of-range input',
+  getLevelChars(99) === LEVEL_CHARS[10]);
 
 // ── getWordsForLevel ───────────────────────────────────────────────────────
 console.log('\ngetWordsForLevel');
 
-for (let level = 1; level <= 5; level++) {
+for (let level = 1; level <= 10; level++) {
   const words = getWordsForLevel(level);
   const allowed = getLevelChars(level);
 
@@ -91,8 +111,8 @@ assert('Level 2 has more words than Level 1',
   getWordsForLevel(2).length > getWordsForLevel(1).length);
 assert('Level 3 has more words than Level 2',
   getWordsForLevel(3).length > getWordsForLevel(2).length);
-assert('Level 5 returns all words in WORD_LIST',
-  getWordsForLevel(5).length === WORD_LIST.length);
+assert('Level 9 returns all words in WORD_LIST',
+  getWordsForLevel(9).length === WORD_LIST.length);
 
 // Spot-check known Level 1 words
 const l1 = new Set(getWordsForLevel(1));
@@ -172,7 +192,7 @@ assert('caps at pool size when count exceeds pool',
 // ── getQuotesForLevel ─────────────────────────────────────────────────────
 console.log('\ngetQuotesForLevel');
 
-for (let level = 1; level <= 5; level++) {
+for (let level = 1; level <= 10; level++) {
   const quotes = getQuotesForLevel(level);
   const allowed = getLevelChars(level);
   assert(`level ${level}: returns an array`, Array.isArray(quotes));
@@ -182,17 +202,17 @@ for (let level = 1; level <= 5; level++) {
 }
 
 // Higher levels have at least as many quotes as lower levels
-assert('level 5 has more quotes than level 1',
-  getQuotesForLevel(5).length >= getQuotesForLevel(1).length);
+assert('level 10 has more quotes than level 1',
+  getQuotesForLevel(10).length >= getQuotesForLevel(1).length);
 
-// Returns at least some quotes at level 3+
-assert('level 3 has at least 3 quotes', getQuotesForLevel(3).length >= 3);
-assert('level 5 has at least 10 quotes', getQuotesForLevel(5).length >= 10);
+// Returns at least some quotes at level 7+
+assert('level 7 has at least 3 quotes', getQuotesForLevel(7).length >= 3);
+assert('level 9 has at least 10 quotes', getQuotesForLevel(9).length >= 10);
 
 // ── getRoundQuote ─────────────────────────────────────────────────────────
 console.log('\ngetRoundQuote');
 
-for (let level = 3; level <= 5; level++) {
+for (let level = 7; level <= 10; level++) {
   const quote = getRoundQuote(level);
   assert(`level ${level}: getRoundQuote returns a string`, typeof quote === 'string');
   assert(`level ${level}: quote is non-empty`, quote.length > 0);

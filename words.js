@@ -2,11 +2,16 @@
 
 // Letters unlocked at each level (cumulative)
 const LEVEL_CHARS = {
-  1: new Set('aoeuhtns'),
-  2: new Set('aoeuidhtns'),
-  3: new Set('aoeuidhtnspyfgcrl'),
-  4: new Set('aoeuidhtnspyfgcrlqjkxbmwvz'),
-  5: new Set('abcdefghijklmnopqrstuvwxyz'),
+  1:  new Set('aoeuhtns'),
+  2:  new Set('aoeuidhtns'),
+  3:  new Set('aoeuidhtnsrl'),
+  4:  new Set('aoeuidhtnsrlcf'),
+  5:  new Set('aoeuidhtnsrlcfgp'),
+  6:  new Set('aoeuidhtnsrlcfgpyb'),
+  7:  new Set('aoeuidhtnsrlcfgpybmw'),
+  8:  new Set('aoeuidhtnsrlcfgpybmwvk'),
+  9:  new Set('abcdefghijklmnopqrstuvwxyz'),
+  10: new Set('abcdefghijklmnopqrstuvwxyz'),
 };
 
 const WORD_LIST = [
@@ -289,7 +294,7 @@ const WORD_LIST = [
 ];
 
 function getLevelChars(level) {
-  return LEVEL_CHARS[level] || LEVEL_CHARS[5];
+  return LEVEL_CHARS[level] || LEVEL_CHARS[10];
 }
 
 function getWordsForLevel(level) {
