@@ -69,7 +69,9 @@ Applied to both keyboard keys and characters in the typed-text display. Also use
 
 Each keyboard row contains a `<div class="hand-gap"></div>` (20px spacer, `flex-shrink: 0`) between the last `index-left` and first `index-right` key — visually splits the left and right hand groups.
 
-Level pips in `#level-map` are **clickable** — clicking any completed or current pip calls `applyLevel(n)` to jump to that level. Each pip has `data-label` (name), `.pip-icon` span, and `.pip-label` span (shows `···` for locked levels). 10 pips + 9 connectors total.
+`#level-map` contains two children:
+- **`#level-chip`** — pill badge showing `#chip-icon`, `#chip-name`, and `#chip-count` (`N / 10`) for the current level. Updated by `updateLevelMap()`.
+- **`#level-bar`** — 10 `.level-seg` divs (one per level) with `data-level`, `data-label`, and `data-icon` attributes. Done segments are green and clickable (calls `applyLevel(n)`); current is orange with a glow; locked are dim. Tooltips via CSS `::after` on hover.
 
 ### Settings (`localStorage` key: `dvorak-tutor-settings`)
 
@@ -174,6 +176,7 @@ Stats bar order: **WPM | ACC | progress bar | BEST | STREAK | TREND | TIME** (TI
 
 | Function | Purpose |
 |----------|---------|
+| `updateLevelMap(level)` | Updates `.level-seg` classes (done/current/locked) and syncs chip icon/name/count |
 | `applyKeyboardLayout(style)` | Swaps `#keyboard` children (standard fragment or Corne DOM); rebuilds `CHAR_TO_KEY` |
 | `applyLevel(n)` | Sets `currentLevel`, saves, re-renders keyboard/map, starts round |
 | `advanceLevel()` | Fires confetti, then calls `applyLevel(currentLevel + 1)` |

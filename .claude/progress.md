@@ -4,7 +4,7 @@
 **Repo:** https://github.com/cbrayanalytics/dvorak-tutor — branch `trunk`
 **Last updated:** 2026-05-09
 
-All phases complete through Phase 13 (10-level granular progression).
+All phases complete through Phase 14 (level-map chip + segmented bar redesign).
 
 ---
 
@@ -24,6 +24,7 @@ All phases complete through Phase 13 (10-level granular progression).
 - **Design overhaul** — JetBrains Mono, dark navy theme, key depth gradients, terminal cursor, phrase fade-in, pip connectors
 - **Keyboard layout variants** — Standard (full 5-row), Corne 3×6 (columnar + outer-right `/−`), Corne 3×5 (columnar, no outer); column stagger via `--col-offset`; thumb cluster with SPC
 - **Mid-round adaptive injection** — on word boundary, hot chars (≥3 errors) trigger splice of 5 weighted words into remaining phrase; up to 2 injections per round; injected words highlighted via `.injected` class
+- **Level-map redesign** — replaced 10-pip overflow row with chip + segmented bar: pill badge (icon + name + N/10) on left, 10 thin `.level-seg` segments on right; done=green, current=orange+glow, locked=dim; tooltip on hover; fully clickable for back-navigation
 
 ---
 
@@ -32,7 +33,7 @@ All phases complete through Phase 13 (10-level granular progression).
 | File | Tests |
 |------|-------|
 | `tests/words.test.js` | 117 |
-| `tests/index.test.js` | 148 |
+| `tests/index.test.js` | 152 |
 | `tests/app.test.js` | 195 |
 
 ---
