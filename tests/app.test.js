@@ -100,7 +100,7 @@ console.log('\ngetKeyState');
 // Level 1 — home keys active
 assert('level 1 key at level 1 → active',   getKeyState(1, 1, 'a') === 'active');
 assert('level 1 key at level 2 → active',   getKeyState(1, 2, 'a') === 'active');
-assert('level 1 key at level 5 → active',   getKeyState(1, 5, 'a') === 'active');
+assert('level 1 key at level 10 → active',  getKeyState(1, 10, 'a') === 'active');
 
 // Level 2 — locked until level 2
 assert('"i" at level 1 → home-preview',     getKeyState(2, 1, 'i') === 'home-preview');
@@ -109,17 +109,17 @@ assert('"i" at level 2 → active',           getKeyState(2, 2, 'i') === 'active
 assert('"d" at level 2 → active',           getKeyState(2, 2, 'd') === 'active');
 
 // home-preview only applies to level-2 chars at active level 1
-assert('level 3 char "p" at level 1 → locked', getKeyState(3, 1, 'p') === 'locked');
-assert('level 3 char "p" at level 2 → locked', getKeyState(3, 2, 'p') === 'locked');
-assert('level 3 char "p" at level 3 → active', getKeyState(3, 3, 'p') === 'active');
+assert('level 5 char "p" at level 1 → locked', getKeyState(5, 1, 'p') === 'locked');
+assert('level 5 char "p" at level 4 → locked', getKeyState(5, 4, 'p') === 'locked');
+assert('level 5 char "p" at level 5 → active', getKeyState(5, 5, 'p') === 'active');
 
-// Level 4 chars
-assert('level 4 char "b" at level 3 → locked', getKeyState(4, 3, 'b') === 'locked');
-assert('level 4 char "b" at level 4 → active', getKeyState(4, 4, 'b') === 'active');
+// Level 6 chars
+assert('level 6 char "b" at level 5 → locked', getKeyState(6, 5, 'b') === 'locked');
+assert('level 6 char "b" at level 6 → active', getKeyState(6, 6, 'b') === 'active');
 
-// Level 5 chars
-assert('level 5 char "1" at level 4 → locked', getKeyState(5, 4, '1') === 'locked');
-assert('level 5 char "1" at level 5 → active', getKeyState(5, 5, '1') === 'active');
+// Level 10 chars
+assert('level 10 char "1" at level 9 → locked',  getKeyState(10, 9, '1') === 'locked');
+assert('level 10 char "1" at level 10 → active', getKeyState(10, 10, '1') === 'active');
 
 // home-preview only for 'i' and 'd', not an arbitrary level-2 char
 // (there are no other level-2 chars but guard the logic explicitly)
@@ -128,7 +128,7 @@ assert('non i/d level-2 char at level 1 → locked', getKeyState(2, 1, 'x') === 
 // ── buildPhrase ────────────────────────────────────────────────
 console.log('\nbuildPhrase');
 
-for (let level = 1; level <= 5; level++) {
+for (let level = 1; level <= 10; level++) {
   const { getLevelChars } = require('../words.js');
   const allowed = getLevelChars(level);
   const phrase  = buildPhrase(level, ROUND_WORD_COUNT);
@@ -222,14 +222,14 @@ loadSettings();
 assert('round-trip: level 3 persists',    settings.level === 3);
 
 localStorage.clear();
-saveSettings({ level: 5 });
+saveSettings({ level: 10 });
 loadSettings();
-assert('round-trip: level 5 persists',    settings.level === 5);
+assert('round-trip: level 10 persists',   settings.level === 10);
 
 localStorage.clear();
-localStorage.setItem('dvorak-tutor-settings', JSON.stringify({ level: 6 }));
+localStorage.setItem('dvorak-tutor-settings', JSON.stringify({ level: 11 }));
 loadSettings();
-assert('level 6 clamps to 5',             settings.level === 5);
+assert('level 11 clamps to 10',           settings.level === 10);
 
 localStorage.clear();
 localStorage.setItem('dvorak-tutor-settings', JSON.stringify({ level: 0 }));

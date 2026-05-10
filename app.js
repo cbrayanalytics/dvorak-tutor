@@ -13,7 +13,7 @@ function loadSettings() {
     const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY));
     if (stored && typeof stored === 'object') Object.assign(settings, stored);
   } catch (_) { /* malformed JSON: keep defaults */ }
-  settings.level = Math.max(1, Math.min(5, settings.level));
+  settings.level = Math.max(1, Math.min(10, settings.level));
 }
 
 function saveSettings(overrides) {
@@ -233,12 +233,17 @@ function suggestTimerMins(wordCount, wpm) {
 
 // ── Corne layout ──────────────────────────────────────────────
 
-// Character → unlock level (anything absent defaults to 5)
+// Character → unlock level (anything absent defaults to 10)
 const CHAR_LEVEL = {
   a:1,o:1,e:1,u:1,h:1,t:1,n:1,s:1,
   i:2,d:2,
-  p:3,y:3,f:3,g:3,c:3,r:3,l:3,
-  q:4,j:4,k:4,x:4,b:4,m:4,w:4,v:4,z:4,
+  r:3,l:3,
+  c:4,f:4,
+  g:5,p:5,
+  y:6,b:6,
+  m:7,w:7,
+  v:8,k:8,
+  j:9,x:9,q:9,z:9,
 };
 
 // Columns ordered outer→inner for each half.
@@ -273,7 +278,7 @@ function _makeModKey(finger, label) {
 }
 
 function _makeCharKey(char, finger) {
-  const el = _makeEl('div', 'key', { char, finger, level: String(CHAR_LEVEL[char] ?? 5) });
+  const el = _makeEl('div', 'key', { char, finger, level: String(CHAR_LEVEL[char] ?? 10) });
   el.textContent = char === ' ' ? 'spc' : char;
   return el;
 }
@@ -864,14 +869,14 @@ function endRound() {
 
   if (acc >= settings.threshold) {
     streak++;
-    if (currentLevel < 5) {
+    if (currentLevel < 10) {
       banner.textContent = isNewBest ? 'New personal best!' : 'Round complete!';
       banner.className   = 'success';
       const btn          = $('advance-btn');
       btn.textContent    = `Advance to Level ${currentLevel + 1} →`;
       btn.classList.add('visible');
     } else {
-      banner.textContent = isNewBest ? 'New best — all 5 levels mastered!' : 'All 5 levels mastered!';
+      banner.textContent = isNewBest ? 'New best — all 10 levels mastered!' : 'All 10 levels mastered!';
       banner.className   = 'success';
     }
   } else {
@@ -924,7 +929,7 @@ function applyLevel(n) {
 }
 
 function advanceLevel() {
-  if (currentLevel >= 5) return;
+  if (currentLevel >= 10) return;
   spawnConfetti();
   playLevelUp();
   setTimeout(() => applyLevel(currentLevel + 1), 200);
