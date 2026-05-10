@@ -2,16 +2,16 @@
 
 **Project:** Dvorak Typing Tutor (browser-based, vanilla JS/CSS)
 **Repo:** https://github.com/cbrayanalytics/dvorak-tutor — branch `trunk`
-**Last updated:** 2026-05-02
+**Last updated:** 2026-05-09
 
-All phases complete through Phase 11 (keyboard layout variants).
+All phases complete through Phase 13 (10-level granular progression).
 
 ---
 
 ## Completed Features
 
 - **Core game loop** — phrase generation, keystroke handling, WPM/ACC, round lifecycle
-- **Level system** — 5 levels (Novice→Master), persistent, pip-clickable navigation
+- **Level system** — 10 levels (Novice→Master), 2–4 new keys per level, persistent, pip-clickable navigation
 - **Settings** — word count, threshold, timer, sound, mode (words/quotes), keyboard style; all persisted to localStorage
 - **Personal bests** — per-level WPM/ACC bests, cached per round
 - **Round history** — last 20 rounds per level; SVG sparkline; history panel overlay
@@ -23,6 +23,7 @@ All phases complete through Phase 11 (keyboard layout variants).
 - **Quotes mode** — 41 curated quotes, level-filtered
 - **Design overhaul** — JetBrains Mono, dark navy theme, key depth gradients, terminal cursor, phrase fade-in, pip connectors
 - **Keyboard layout variants** — Standard (full 5-row), Corne 3×6 (columnar + outer-right `/−`), Corne 3×5 (columnar, no outer); column stagger via `--col-offset`; thumb cluster with SPC
+- **Mid-round adaptive injection** — on word boundary, hot chars (≥3 errors) trigger splice of 5 weighted words into remaining phrase; up to 2 injections per round; injected words highlighted via `.injected` class
 
 ---
 
@@ -30,9 +31,9 @@ All phases complete through Phase 11 (keyboard layout variants).
 
 | File | Tests |
 |------|-------|
-| `tests/words.test.js` | 84 |
+| `tests/words.test.js` | 117 |
 | `tests/index.test.js` | 148 |
-| `tests/app.test.js` | 160 |
+| `tests/app.test.js` | 195 |
 
 ---
 

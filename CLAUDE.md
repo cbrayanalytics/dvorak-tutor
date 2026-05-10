@@ -54,17 +54,22 @@ Applied to both keyboard keys and characters in the typed-text display. Also use
 
 ### Level system
 
-| Level | Name | Letters unlocked |
-|-------|------|-----------------|
-| 1 | Novice | a o e u h t n s |
-| 2 | Learner | + i d |
-| 3 | Builder | + p y f g c r l |
-| 4 | Adept | + q j k x b m w v z |
-| 5 | Master | All + punctuation + numbers |
+| Level | Name    | Letters unlocked |
+|-------|---------|-----------------|
+| 1     | Novice  | a o e u h t n s |
+| 2     | Seeker  | + i d |
+| 3     | Scout   | + r l |
+| 4     | Builder | + c f |
+| 5     | Shaper  | + g p |
+| 6     | Climber | + y b |
+| 7     | Forger  | + m w |
+| 8     | Adept   | + v k |
+| 9     | Expert  | + j x q z |
+| 10    | Master  | All + punctuation + numbers |
 
 Each keyboard row contains a `<div class="hand-gap"></div>` (20px spacer, `flex-shrink: 0`) between the last `index-left` and first `index-right` key — visually splits the left and right hand groups.
 
-Level pips in `#level-map` are **clickable** — clicking any completed or current pip calls `applyLevel(n)` to jump to that level. Each pip has `data-label` (name), `.pip-icon` span (⌂ → ↑ ◆ ✦), and `.pip-label` span (shows `···` for locked levels).
+Level pips in `#level-map` are **clickable** — clicking any completed or current pip calls `applyLevel(n)` to jump to that level. Each pip has `data-label` (name), `.pip-icon` span, and `.pip-label` span (shows `···` for locked levels). 10 pips + 9 connectors total.
 
 ### Settings (`localStorage` key: `dvorak-tutor-settings`)
 
@@ -74,7 +79,7 @@ Level pips in `#level-map` are **clickable** — clicking any completed or curre
 | `threshold` | 90 | 50–100 | 5 |
 | `timerOn` | false | — | — |
 | `timerMins` | 15 | 1–60 | 1 |
-| `level` | 1 | 1–5 | — |
+| `level` | 1 | 1–10 | — |
 | `audioOn` | true | — | — |
 | `mode` | `'words'` | `'words'`/`'quotes'` | — |
 | `keyboardStyle` | `'standard'` | `'standard'`/`'corne-3x6'`/`'corne-3x5'` | — |
@@ -121,6 +126,8 @@ Stored as `{ 1: { char: count }, 2: ... }` — per-level error history. After ea
 
 `#drill-btn` appears post-round whenever `loadWeakKeys(currentLevel)` is non-empty. `startDrillRound()` generates the weighted phrase and sets `drillMode = true`. Enter key is drill-aware: prefers drill over restart when "Drill Weak Keys" is visible.
 
+**Mid-round adaptive injection**: on each word boundary (space typed), `injectAdaptiveWords()` checks `getHotChars(errorMap, MID_ROUND_ERROR_THRESHOLD=3)`. If hot chars exist and `injectionCount < MAX_MID_ROUND_INJECTIONS=2`, it splices `MID_ROUND_INJECT_COUNT=5` weighted words into the remaining phrase at the cursor position. Injected words are highlighted with `.injected` CSS class.
+
 ### Gamification
 
 - **Streak**: `streak` counter increments on each passing round, resets on fail. Color-coded in stats bar (orange at 3+, green at 5+).
@@ -161,6 +168,7 @@ Stats bar order: **WPM | ACC | progress bar | BEST | STREAK | TREND | TIME** (TI
 | `loadHistory(level)` / `appendHistory(level, entry)` | Per-level round history (last 20 entries) |
 | `calcTrend(history)` | Returns `'up'`/`'down'`/`'flat'` from history array |
 | `renderSparkline(wpmValues)` | SVG polyline element for WPM trend |
+| `getHotChars(errMap, threshold)` | Returns chars with error count ≥ threshold (used for mid-round injection) |
 
 ## Key DOM functions
 
