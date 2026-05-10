@@ -16,7 +16,7 @@ Tests are plain Node.js files — no test framework:
 
 ```bash
 node tests/words.test.js   # 117 tests  — word list, level filtering, quotes
-node tests/index.test.js   # 148 tests — HTML structure and data attributes
+node tests/index.test.js   # 152 tests — HTML structure and data attributes
 node tests/app.test.js     # 195 tests — game logic unit tests
 ```
 
