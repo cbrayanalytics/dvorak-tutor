@@ -129,15 +129,17 @@ console.log('\nRow classes');
   assert(`class="${cls}" present`, html.includes(cls));
 });
 
-// ── Level map pips ─────────────────────────────────────────────
+// ── Level map (segmented bar) ───────────────────────────────────
 console.log('\nLevel map');
-assert('10 level pip data-level attrs', [1,2,3,4,5,6,7,8,9,10].every(l => html.includes(`data-level="${l}"`)));
-assert('level-pip-connector elements present',
-  (html.match(/level-pip-connector/g) || []).length >= 9);
-assert('level pip data-label attrs present',
+assert('level-chip element present', hasId('level-chip'));
+assert('level-bar element present',  hasId('level-bar'));
+assert('chip-icon element present',  hasId('chip-icon'));
+assert('chip-name element present',  hasId('chip-name'));
+assert('chip-count element present', hasId('chip-count'));
+assert('10 level-seg data-level attrs', [1,2,3,4,5,6,7,8,9,10].every(l => html.includes(`data-level="${l}"`)));
+assert('level-seg data-label attrs present',
   ['Novice','Seeker','Scout','Builder','Shaper','Climber','Forger','Adept','Expert','Master'].every(n => html.includes(`data-label="${n}"`)));
-assert('pip-label and pip-icon spans present',
-  html.includes('pip-label') && html.includes('pip-icon'));
+assert('level-seg data-icon attrs present', html.includes('data-icon='));
 
 // ── Accessibility ──────────────────────────────────────────────
 console.log('\nAccessibility');

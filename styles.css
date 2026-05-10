@@ -65,86 +65,116 @@ h1 span {
   color: var(--finger-index);
 }
 
-/* ─── Level Map (pip row) ────────────────────────────────────── */
+/* ─── Level Map (chip + segmented bar) ──────────────────────── */
 #level-map {
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 0.5rem;
-  margin-top: -0.4rem;
+  gap: 0.65rem;
+  margin-top: -0.2rem;
 }
 
-.level-pip {
+/* Pill chip — shows current level icon, name, count */
+#level-chip {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  cursor: default;
-  transition: opacity var(--transition);
-  padding: 0.3rem 0.1rem;
-}
-
-.pip-icon  { font-size: 0.82rem; line-height: 1; }
-.pip-label { letter-spacing: 0.02em; }
-
-.level-pip-dot {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
+  gap: 0.4rem;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  transition: background var(--transition), border-color var(--transition),
-              width var(--transition), height var(--transition);
+  border-radius: 999px;
+  padding: 0.28rem 0.75rem;
+  font-size: 0.78rem;
+  white-space: nowrap;
   flex-shrink: 0;
+  transition: border-color var(--transition);
+}
+
+#chip-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+  color: var(--finger-index);
+}
+
+#chip-name {
+  font-weight: 600;
+  color: var(--finger-index);
+  letter-spacing: 0.03em;
+}
+
+#chip-count {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  padding-left: 0.1rem;
+}
+
+/* Segmented bar */
+#level-bar {
+  display: flex;
+  gap: 3px;
+  flex: 1;
+  align-items: center;
+  height: 24px;
+}
+
+.level-seg {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  transition: height 120ms ease, background 120ms ease, opacity 120ms ease,
+              box-shadow 120ms ease;
+  position: relative;
+  cursor: default;
+}
+
+/* Tooltip via pseudo-element */
+.level-seg::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 100ms ease;
 }
 
 /* Done — green, clickable */
-.level-pip.done {
-  cursor: pointer;
-  color: var(--finger-middle);
-}
-.level-pip.done .level-pip-dot {
+.level-seg.done {
   background: var(--finger-middle);
   border-color: var(--finger-middle);
+  cursor: pointer;
 }
-.level-pip.done:hover .pip-label {
-  text-decoration: underline;
-  text-underline-offset: 2px;
+.level-seg.done:hover {
+  height: 7px;
+}
+.level-seg.done:hover::after {
+  opacity: 1;
 }
 
-/* Current — orange, larger dot, clickable */
-.level-pip.current {
-  cursor: pointer;
-  color: var(--finger-index);
-  font-weight: 600;
-}
-.level-pip.current .level-pip-dot {
-  width: 13px;
-  height: 13px;
+/* Current — orange, taller, glow, clickable */
+.level-seg.current {
   background: var(--finger-index);
   border-color: var(--finger-index);
+  height: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--finger-index) 55%, transparent);
 }
-.level-pip.current:hover .pip-label {
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-/* Locked — dim, not interactive */
-.level-pip.locked {
-  opacity: 0.35;
+.level-seg.current:hover::after {
+  opacity: 1;
 }
 
-.level-pip-connector {
-  width: 32px;
-  height: 3px;
-  background: var(--border);
-  border-radius: 2px;
-  flex-shrink: 0;
-}
-
-.level-pip-connector.done {
-  background: var(--finger-middle);
+/* Locked — dim */
+.level-seg.locked {
+  opacity: 0.18;
 }
 
 /* ─── Stats Bar ──────────────────────────────────────────────── */

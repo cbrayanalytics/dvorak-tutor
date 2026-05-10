@@ -595,18 +595,19 @@ function updateStats() {
 }
 
 function updateLevelMap(level) {
-  document.querySelectorAll('#level-map .level-pip[data-level]').forEach(pip => {
-    const l      = Number(pip.dataset.level);
-    const label  = pip.querySelector('.pip-label');
-    pip.classList.remove('done', 'current', 'locked');
-    if (l < level)  pip.classList.add('done');
-    if (l === level) pip.classList.add('current');
-    if (l > level)  pip.classList.add('locked');
-    if (label) label.textContent = l > level ? '···' : pip.dataset.label;
+  document.querySelectorAll('#level-bar .level-seg[data-level]').forEach(seg => {
+    const l = Number(seg.dataset.level);
+    seg.classList.remove('done', 'current', 'locked');
+    if (l < level)  seg.classList.add('done');
+    if (l === level) seg.classList.add('current');
+    if (l > level)  seg.classList.add('locked');
   });
-  document.querySelectorAll('#level-map .level-pip-connector').forEach((conn, i) => {
-    conn.classList.toggle('done', i + 1 < level);
-  });
+  const cur = document.querySelector(`#level-bar .level-seg[data-level="${level}"]`);
+  if (cur) {
+    $('chip-icon').textContent = cur.dataset.icon || '';
+    $('chip-name').textContent = cur.dataset.label || '';
+  }
+  $('chip-count').textContent = `${level} / 10`;
 }
 
 // ── Settings panel UI ─────────────────────────────────────────
@@ -1009,9 +1010,9 @@ function init() {
   applySettingsToDisplay();
   startRound();
 
-  document.querySelectorAll('#level-map .level-pip[data-level]').forEach(pip => {
-    pip.addEventListener('click', () => {
-      const target = Number(pip.dataset.level);
+  document.querySelectorAll('#level-bar .level-seg[data-level]').forEach(seg => {
+    seg.addEventListener('click', () => {
+      const target = Number(seg.dataset.level);
       if (target > currentLevel) return;
       applyLevel(target);
     });
