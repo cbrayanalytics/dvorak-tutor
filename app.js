@@ -166,7 +166,7 @@ function loadDailyStreak() {
     const stored = JSON.parse(localStorage.getItem(DAILY_KEY));
     if (stored && typeof stored === 'object') return stored;
   } catch (_) {}
-  return { lastDate: '', streak: 0, todayCount: 0 };
+  return { lastDate: '', streak: 0 };
 }
 
 function saveDailyStreak(data) {
@@ -180,15 +180,13 @@ function updateDailyStreak() {
 
   const data = loadDailyStreak();
   if (data.lastDate === today) {
-    data.todayCount += 1;
+    // already counted today — no change
   } else if (data.lastDate === yesterday) {
     data.streak += 1;
     data.lastDate = today;
-    data.todayCount = 1;
   } else {
     data.streak = 1;
     data.lastDate = today;
-    data.todayCount = 1;
   }
   saveDailyStreak(data);
   return data;
@@ -198,6 +196,7 @@ function resetProgress() {
   localStorage.removeItem(BESTS_KEY);
   localStorage.removeItem(HISTORY_KEY);
   localStorage.removeItem(WEAK_KEYS_KEY);
+  localStorage.removeItem(DAILY_KEY);
   saveSettings({ level: 1 });
 }
 

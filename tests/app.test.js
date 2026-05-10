@@ -589,6 +589,8 @@ console.log('\nresetProgress');
   saveWeakKeys(1, { a: 3 });
   saveSettings({ level: 5 });
 
+  saveDailyStreak({ lastDate: '2026-05-09', streak: 5 });
+
   resetProgress();
 
   loadSettings();
@@ -600,6 +602,8 @@ console.log('\nresetProgress');
     Object.keys(loadWeakKeys(1)).length === 0);
   assert('resetProgress: resets level to 1',
     settings.level === 1);
+  assert('resetProgress: clears daily streak',
+    loadDailyStreak().streak === 0);
 }
 
 // ── Daily streak ───────────────────────────────────────────────
@@ -610,7 +614,6 @@ console.log('\nloadDailyStreak / saveDailyStreak');
   const d = loadDailyStreak();
   assert('loadDailyStreak: default lastDate is empty string', d.lastDate === '');
   assert('loadDailyStreak: default streak is 0', d.streak === 0);
-  assert('loadDailyStreak: default todayCount is 0', d.todayCount === 0);
 }
 
 console.log('\nupdateDailyStreak');
@@ -625,27 +628,25 @@ console.log('\nupdateDailyStreak');
   localStorage.clear();
   const first = updateDailyStreak();
   assert('updateDailyStreak: first call sets streak to 1', first.streak === 1);
-  assert('updateDailyStreak: first call sets todayCount to 1', first.todayCount === 1);
   assert('updateDailyStreak: first call sets lastDate to today', first.lastDate === today);
 
-  // Same day — todayCount increments, streak unchanged
+  // Same day — streak unchanged
   const second = updateDailyStreak();
-  assert('updateDailyStreak: same day increments todayCount', second.todayCount === 2);
   assert('updateDailyStreak: same day keeps streak', second.streak === 1);
+  assert('updateDailyStreak: same day keeps lastDate', second.lastDate === today);
 
   // Yesterday — streak increments
   localStorage.clear();
-  saveDailyStreak({ lastDate: yesterday, streak: 3, todayCount: 4 });
+  saveDailyStreak({ lastDate: yesterday, streak: 3 });
   const fromYesterday = updateDailyStreak();
   assert('updateDailyStreak: yesterday increments streak', fromYesterday.streak === 4);
-  assert('updateDailyStreak: yesterday resets todayCount to 1', fromYesterday.todayCount === 1);
+  assert('updateDailyStreak: yesterday updates lastDate to today', fromYesterday.lastDate === today);
 
   // Old date — streak resets
   localStorage.clear();
-  saveDailyStreak({ lastDate: '2020-01-01', streak: 10, todayCount: 2 });
+  saveDailyStreak({ lastDate: '2020-01-01', streak: 10 });
   const fromOld = updateDailyStreak();
   assert('updateDailyStreak: old date resets streak to 1', fromOld.streak === 1);
-  assert('updateDailyStreak: old date resets todayCount to 1', fromOld.todayCount === 1);
 }
 
 // ── Summary ────────────────────────────────────────────────────
