@@ -181,7 +181,7 @@ assert('#reset-btn exists', hasId('reset-btn'));
 
 // ── Summary card ──────────────────────────────────────────────
 console.log('\nSummary card — required IDs');
-['summary-card','sum-wpm','sum-acc','sum-time','sum-stars','sum-sparkline','sum-sparkline-wrap','sum-trend']
+['summary-card','sum-wpm','sum-acc','sum-time','sum-stars','sum-sparkline','sum-sparkline-wrap','sum-trend','sum-day-streak']
   .forEach(id => assert(`#${id} exists`, hasId(id)));
 
 // ── History panel ─────────────────────────────────────────────

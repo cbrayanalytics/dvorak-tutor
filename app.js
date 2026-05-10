@@ -157,6 +157,43 @@ function mergeWeakKeys(stored, round) {
   return result;
 }
 
+// ── Daily streak ───────────────────────────────────────────────
+
+const DAILY_KEY = 'dvorak-tutor-daily';
+
+function loadDailyStreak() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(DAILY_KEY));
+    if (stored && typeof stored === 'object') return stored;
+  } catch (_) {}
+  return { lastDate: '', streak: 0, todayCount: 0 };
+}
+
+function saveDailyStreak(data) {
+  localStorage.setItem(DAILY_KEY, JSON.stringify(data));
+}
+
+function updateDailyStreak() {
+  const today = new Date().toISOString().slice(0, 10);
+  const yDate = new Date(); yDate.setDate(yDate.getDate() - 1);
+  const yesterday = yDate.toISOString().slice(0, 10);
+
+  const data = loadDailyStreak();
+  if (data.lastDate === today) {
+    data.todayCount += 1;
+  } else if (data.lastDate === yesterday) {
+    data.streak += 1;
+    data.lastDate = today;
+    data.todayCount = 1;
+  } else {
+    data.streak = 1;
+    data.lastDate = today;
+    data.todayCount = 1;
+  }
+  saveDailyStreak(data);
+  return data;
+}
+
 function resetProgress() {
   localStorage.removeItem(BESTS_KEY);
   localStorage.removeItem(HISTORY_KEY);
@@ -812,6 +849,9 @@ function showSummaryCard(wpm, acc, elapsedMs, isNewBest) {
     wrapEl.classList.remove('has-data');
   }
 
+  const daily = updateDailyStreak();
+  $('sum-day-streak').textContent = daily.streak;
+
   $('summary-card').hidden = false;
 }
 
@@ -1092,6 +1132,9 @@ if (typeof module !== 'undefined') {
     applyKeyboardLayout,
     getHotChars,
     resetProgress,
+    loadDailyStreak,
+    saveDailyStreak,
+    updateDailyStreak,
     get ADVANCE_THRESHOLD()           { return settings.threshold;         },
     get ROUND_WORD_COUNT()            { return settings.wordCount;         },
     get MID_ROUND_ERROR_THRESHOLD()   { return MID_ROUND_ERROR_THRESHOLD;  },
