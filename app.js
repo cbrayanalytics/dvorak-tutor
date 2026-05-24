@@ -2,7 +2,7 @@
 
 // ── Settings ───────────────────────────────────────────────────
 const SETTINGS_KEY      = 'dvorak-tutor-settings';
-const SETTINGS_DEFAULTS = { wordCount: 100, threshold: 90, timerOn: false, timerMins: 15, level: 1, audioOn: true, mode: 'words', keyboardStyle: 'standard', layoutFamily: 'dvorak' };
+const SETTINGS_DEFAULTS = { wordCount: 100, threshold: 90, timerOn: false, timerMins: 15, level: 1, audioOn: true, mode: 'words', keyboardStyle: 'standard', layoutFamily: 'dvorak', wpmGate: true };
 
 let settings = { ...SETTINGS_DEFAULTS };
 
@@ -209,6 +209,16 @@ const MID_ROUND_ERROR_THRESHOLD   = 3;
 const MAX_MID_ROUND_INJECTIONS    = 2;
 const MID_ROUND_INJECT_COUNT      = 5;
 const CONFETTI_COLORS  = ['#a855f7', '#60a5fa', '#4ade80', '#fb923c', '#94a3b8'];
+
+// Minimum WPM required to advance at each level (index = level number).
+const WPM_FLOOR = [0, 15, 18, 22, 26, 30, 35, 40, 45, 50, 55];
+
+// Returns 'pass', 'fail', or 'wpm-gate'. Pure — no side effects.
+function getRoundResult(wpm, acc, threshold, level) {
+  if (acc < threshold) return 'fail';
+  if (wpm < (WPM_FLOOR[level] ?? 0)) return 'wpm-gate';
+  return 'pass';
+}
 
 function calcHeatIntensity(errorCount) {
   return Math.min(errorCount / HEAT_ERROR_MAX, 1);
@@ -699,6 +709,13 @@ function updateTimerVisibility() {
   if (!on) $('stat-timer').textContent = '—';
 }
 
+function updateTargetVisibility() {
+  const on = settings.wpmGate;
+  $('target-divider').hidden    = !on;
+  $('stat-target-wrap').hidden  = !on;
+  if (on) $('stat-target').textContent = WPM_FLOOR[currentLevel] ?? '—';
+}
+
 // ── Stats & level map ──────────────────────────────────────────
 
 function updateStats() {
@@ -744,6 +761,12 @@ function updateStats() {
   const pct = calcProgressPct(cursor, phrase.length, acc, settings.threshold);
   $('progress-bar').style.width = pct + '%';
   $('progress-bar').classList.toggle('progress-complete', pct >= 100);
+
+  if (settings.wpmGate) {
+    const floor    = WPM_FLOOR[currentLevel] ?? 0;
+    const targetEl = $('stat-target');
+    setStatColor(targetEl, hasWpm && wpm >= floor ? 'stat-good' : 'stat-empty');
+  }
 }
 
 function updateLevelMap(level) {
@@ -773,6 +796,10 @@ function applySettingsToDisplay() {
   timerToggle.setAttribute('aria-pressed', String(settings.timerOn));
   $('timer-stepper').hidden = !settings.timerOn;
   updateTimerVisibility();
+  updateTargetVisibility();
+  const wpmGateToggle = $('wpm-gate-toggle');
+  wpmGateToggle.textContent = settings.wpmGate ? 'ON' : 'OFF';
+  wpmGateToggle.setAttribute('aria-pressed', String(settings.wpmGate));
   const audioToggle = $('audio-toggle');
   audioToggle.textContent = settings.audioOn ? 'ON' : 'OFF';
   audioToggle.setAttribute('aria-pressed', String(settings.audioOn));
@@ -882,6 +909,15 @@ function toggleTimer() {
   } else {
     clearTimer();
   }
+}
+
+function toggleWpmGate() {
+  settings.wpmGate = !settings.wpmGate;
+  const toggle = $('wpm-gate-toggle');
+  toggle.textContent = settings.wpmGate ? 'ON' : 'OFF';
+  toggle.setAttribute('aria-pressed', String(settings.wpmGate));
+  updateTargetVisibility();
+  saveSettings();
 }
 
 // ── Round lifecycle ────────────────────────────────────────────
@@ -1023,7 +1059,19 @@ function endRound() {
 
   const banner = $('banner');
 
-  if (acc >= settings.threshold) {
+  const rawResult = getRoundResult(wpmFinal, acc, settings.threshold, currentLevel);
+  // When wpmGate is off, treat wpm-gate the same as pass (accuracy-only mode).
+  const result    = (!settings.wpmGate && rawResult === 'wpm-gate') ? 'pass' : rawResult;
+
+  const wpmTargetEl = $('wpm-target');
+  if (result === 'wpm-gate') {
+    wpmTargetEl.textContent = `need ${WPM_FLOOR[currentLevel]} WPM`;
+    wpmTargetEl.hidden      = false;
+  } else {
+    wpmTargetEl.hidden = true;
+  }
+
+  if (result === 'pass') {
     streak++;
     if (currentLevel < 10) {
       banner.textContent = isNewBest ? 'New personal best!' : 'Round complete!';
@@ -1035,6 +1083,10 @@ function endRound() {
       banner.textContent = isNewBest ? 'New best — all 10 levels mastered!' : 'All 10 levels mastered!';
       banner.className   = 'success';
     }
+  } else if (result === 'wpm-gate') {
+    streak = 0;
+    banner.textContent = `Accuracy ✓ — Need ${WPM_FLOOR[currentLevel]} WPM to advance (you typed ${wpmFinal})`;
+    banner.className   = 'warn';
   } else {
     streak = 0;
     banner.textContent = `Need ${settings.threshold}% to advance — keep going!`;
@@ -1093,6 +1145,7 @@ function applyLevel(n) {
   saveSettings({ level: currentLevel });
   renderKeyboard(currentLevel);
   updateLevelMap(currentLevel);
+  updateTargetVisibility();
   startRound();
 }
 
@@ -1199,8 +1252,9 @@ function init() {
   $('threshold-inc').addEventListener('click', () => changeThreshold(5));
   $('timer-dec').addEventListener('click',     () => changeTimerMins(-1));
   $('timer-inc').addEventListener('click',     () => changeTimerMins(1));
-  $('timer-toggle').addEventListener('click',  toggleTimer);
-  $('audio-toggle').addEventListener('click',  toggleAudio);
+  $('timer-toggle').addEventListener('click',      toggleTimer);
+  $('wpm-gate-toggle').addEventListener('click',   toggleWpmGate);
+  $('audio-toggle').addEventListener('click',      toggleAudio);
   $('mode-toggle').addEventListener('click',   toggleMode);
 
   const kbStyleSelect = $('kb-style-select');
@@ -1269,6 +1323,8 @@ if (typeof module !== 'undefined') {
     loadDailyStreak,
     saveDailyStreak,
     updateDailyStreak,
+    getRoundResult,
+    WPM_FLOOR,
     get ADVANCE_THRESHOLD()           { return settings.threshold;         },
     get ROUND_WORD_COUNT()            { return settings.wordCount;         },
     get MID_ROUND_ERROR_THRESHOLD()   { return MID_ROUND_ERROR_THRESHOLD;  },

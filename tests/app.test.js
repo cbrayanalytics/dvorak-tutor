@@ -46,6 +46,8 @@ const {
   updateDailyStreak,
   CHAR_LEVEL_COLEMAK,
   getLayoutFamily,
+  getRoundResult,
+  WPM_FLOOR,
   ADVANCE_THRESHOLD,
   ROUND_WORD_COUNT,
   MID_ROUND_ERROR_THRESHOLD,
@@ -687,6 +689,52 @@ console.log('\ngetLayoutFamily');
 
   localStorage.clear();
   loadSettings();
+}
+
+// ── getRoundResult ─────────────────────────────────────────────
+console.log('\ngetRoundResult');
+
+{
+  // WPM_FLOOR sanity
+  assert('WPM_FLOOR is an array of 11 entries', Array.isArray(WPM_FLOOR) && WPM_FLOOR.length === 11);
+  assert('WPM_FLOOR[0] is 0 (unused sentinel)', WPM_FLOOR[0] === 0);
+  assert('WPM_FLOOR[1] is 15 (level 1 floor)', WPM_FLOOR[1] === 15);
+  assert('WPM_FLOOR[10] is 55 (level 10 floor)', WPM_FLOOR[10] === 55);
+  assert('WPM_FLOOR floors increase level by level', WPM_FLOOR.slice(1).every((v, i, a) => i === 0 || v >= a[i - 1]));
+
+  // pass: acc >= threshold AND wpm >= floor
+  assert('pass: acc=90 wpm=20 threshold=90 level=1',
+    getRoundResult(20, 90, 90, 1) === 'pass');
+  assert('pass: acc=100 wpm=55 threshold=90 level=10',
+    getRoundResult(55, 100, 90, 10) === 'pass');
+  assert('pass: wpm exactly at floor',
+    getRoundResult(WPM_FLOOR[3], 95, 90, 3) === 'pass');
+  assert('pass: wpm well above floor',
+    getRoundResult(80, 95, 90, 5) === 'pass');
+
+  // fail: acc < threshold (regardless of wpm)
+  assert('fail: acc below threshold',
+    getRoundResult(50, 80, 90, 1) === 'fail');
+  assert('fail: fast wpm but poor accuracy',
+    getRoundResult(100, 50, 90, 1) === 'fail');
+  assert('fail: acc=0 wpm=999',
+    getRoundResult(999, 0, 90, 1) === 'fail');
+
+  // wpm-gate: acc >= threshold but wpm < floor
+  assert('wpm-gate: acc passes but wpm below floor level 1',
+    getRoundResult(10, 95, 90, 1) === 'wpm-gate');
+  assert('wpm-gate: wpm one below floor',
+    getRoundResult(WPM_FLOOR[5] - 1, 95, 90, 5) === 'wpm-gate');
+  assert('wpm-gate: wpm=0 acc=100',
+    getRoundResult(0, 100, 90, 2) === 'wpm-gate');
+
+  // floor=0 (level 0 sentinel) always passes on accuracy alone
+  assert('floor 0 never triggers wpm-gate',
+    getRoundResult(0, 90, 90, 0) === 'pass');
+
+  // fail takes precedence over wpm-gate
+  assert('fail beats wpm-gate when both conditions fail',
+    getRoundResult(5, 70, 90, 1) === 'fail');
 }
 
 // ── Summary ────────────────────────────────────────────────────

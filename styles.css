@@ -627,6 +627,7 @@ h1 {
 
 #banner.success { color: var(--finger-middle); font-weight: 600; }
 #banner.fail    { color: #f87171; }
+#banner.warn    { color: var(--finger-index); }
 #banner.info    { color: var(--text-muted); font-style: italic; }
 
 /* ─── Summary Card ───────────────────────────────────────────── */
@@ -661,6 +662,13 @@ h1 {
   line-height: 1.2;
 }
 .sum-value.new-best { color: var(--finger-index); }
+
+#wpm-target {
+  font-size: 0.6rem;
+  color: var(--finger-index);
+  letter-spacing: 0.05em;
+  margin-top: 0.1rem;
+}
 
 .sum-stars {
   display: flex;
