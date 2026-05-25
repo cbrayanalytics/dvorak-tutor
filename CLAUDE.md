@@ -184,6 +184,8 @@ Stats bar order: **WPM | ACC | progress bar | BEST | TARGET | STREAK | TREND | T
 | `getHotChars(errMap, threshold)` | Returns chars with error count ≥ threshold (used for mid-round injection) |
 | `getRoundResult(wpm, acc, threshold, level)` | Returns `'pass'` / `'fail'` / `'wpm-gate'` based on WPM_FLOOR and accuracy threshold |
 | `getLayoutFamily()` | Returns active layout family (`'dvorak'`/`'colemak'`/`'colemak-dh'`) from settings |
+| `WPM_FLOOR` | Exported constant array — minimum WPM per level (index = level number) |
+| `CHAR_LEVEL_COLEMAK` | Exported map `{ char → level }` for the Colemak layout |
 
 ## Key DOM functions
 
@@ -215,6 +217,8 @@ Stats bar order: **WPM | ACC | progress bar | BEST | TARGET | STREAK | TREND | T
 **`#app` max-width is 620px** — sized to match the keyboard's intrinsic width so all sections (stats bar, text display, keyboard) share the same column.
 
 **.char.cursor** is a terminal underline (`border-bottom: 2px solid var(--finger-index)`) with a `cursor-blink` keyframe animation (1.2s, `step-start`, `infinite`) — not a box highlight.
+
+**`#banner` class variants**: `success` (green), `fail` (red, triggers auto-restart after 3.5s), `warn` (orange — used for `wpm-gate`; no auto-restart), `info` (muted italic — used for mid-round messages). Setting `banner.className = ''` clears all styles.
 
 **Corne column stagger via `--col-offset`**: Each `.corne-col` gets `margin-top: var(--col-offset, 0px)`. The offset is set inline by `_makeCorneCol()` using `el.style.setProperty('--col-offset', ...)`. Middle finger = 0px (highest), pinky = 32px (lowest). The `corne-body` gap is 20px, `hand-gap` is 20px, giving 60px total inter-half separation — used in the `padding-left` calc for `.corne-thumbs`.
 
