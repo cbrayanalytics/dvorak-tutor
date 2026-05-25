@@ -804,7 +804,7 @@ function applySettingsToDisplay() {
   audioToggle.textContent = settings.audioOn ? 'ON' : 'OFF';
   audioToggle.setAttribute('aria-pressed', String(settings.audioOn));
   const modeToggle = $('mode-toggle');
-  modeToggle.textContent = settings.mode === 'quotes' ? 'Quotes' : 'Words';
+  modeToggle.textContent = settings.mode === 'quotes' ? 'Sentences' : 'Words';
   modeToggle.setAttribute('aria-pressed', String(settings.mode === 'quotes'));
 }
 
@@ -881,7 +881,7 @@ function changeTimerMins(delta) {
 function toggleMode() {
   settings.mode = settings.mode === 'quotes' ? 'words' : 'quotes';
   const toggle = $('mode-toggle');
-  toggle.textContent = settings.mode === 'quotes' ? 'Quotes' : 'Words';
+  toggle.textContent = settings.mode === 'quotes' ? 'Sentences' : 'Words';
   toggle.setAttribute('aria-pressed', String(settings.mode === 'quotes'));
   saveSettings();
   startRound();

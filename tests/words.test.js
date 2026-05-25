@@ -205,9 +205,17 @@ for (let level = 1; level <= 10; level++) {
 assert('level 10 has more quotes than level 1',
   getQuotesForLevel(10).length >= getQuotesForLevel(1).length);
 
-// Returns at least some quotes at level 7+
+// Pool size assertions
+assert('level 1 has at least 6 quotes', getQuotesForLevel(1).length >= 6,
+  `got ${getQuotesForLevel(1).length}`);
 assert('level 7 has at least 3 quotes', getQuotesForLevel(7).length >= 3);
 assert('level 9 has at least 10 quotes', getQuotesForLevel(9).length >= 10);
+assert('level 10 has at least 40 quotes', getQuotesForLevel(10).length >= 40,
+  `got ${getQuotesForLevel(10).length}`);
+
+// At least one level-10 passage is long (multi-sentence)
+assert('level 10 has at least one passage longer than 30 words',
+  getQuotesForLevel(10).some(q => q.split(' ').length > 30));
 
 // ── getRoundQuote ─────────────────────────────────────────────────────────
 console.log('\ngetRoundQuote');

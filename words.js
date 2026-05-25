@@ -11,7 +11,7 @@ const LEVEL_CHARS = {
   7:  new Set('aoeuidhtnsrlcfgpybmw'),
   8:  new Set('aoeuidhtnsrlcfgpybmwvk'),
   9:  new Set('abcdefghijklmnopqrstuvwxyz'),
-  10: new Set('abcdefghijklmnopqrstuvwxyz'),
+  10: new Set("abcdefghijklmnopqrstuvwxyz.,';:!?-"),
 };
 
 // Letters unlocked at each level (cumulative) — Colemak/Colemak-DH progression
@@ -363,56 +363,128 @@ function getWeightedWords(level, weakKeys, count, layout) {
   return result;
 }
 
-// Short quotes/phrases. Each must use only chars in the level's allowed set.
-// Level 1: aoeuhtns + space  |  Level 2: +id  |  Level 3: +pyfgcrl
-// Level 4: +qjkxbmwvz        |  Level 5: all letters + punctuation/numbers
+// Sentences/passages for Sentences mode. Each uses only chars in the level's allowed set.
+// Level 1: aoeuhtns | Level 2: +id | Level 3: +rl | Level 4: +cf | Level 5: +gp
+// Level 6: +yb | Level 7: +mw | Level 8: +vk | Level 9: full alphabet
+// Level 10: full alphabet + punctuation (.,';:!?-)
 const QUOTE_LIST = [
   // Level 1 — only a o e u h t n s
   'use the sun to heat the house',
-  'one honest tone',
-  'the sun sets east',
-  'she sent a note to us',
-  'stone the nut',
+  'she sent a note at noon',
+  'the hen sat on a hot stone',
+  'a stone house on the south sea',
+  'the heat at noon has no end',
+  'the east stones heat the sea',
+  'at noon she ate the nuts',
+
   // Level 2 — + i d
   'the tide is out at sunrise',
   'an idea is not enough on its own',
-  'the nods and the hints',
-  'a thin sound in the distance',
   'shine and do not hide',
   'this is not the end',
-  // Level 3 — + p y f g c r l
-  'the only courage that counts',
-  'life is short try again',
-  'the future belongs to those who try',
-  'practice the things you fear',
-  'go further than you thought possible',
-  'still the quiet places of the earth',
-  'clarity is the path to progress',
-  'you only fail if you stop trying',
-  'let your actions reflect your goals',
-  // Level 4 — + q j k x b m w v z
-  'a journey of a thousand miles begins with a single step',
-  'the best way to get started is to quit talking and begin doing',
-  'do what you can with what you have where you are',
-  'well begun is half done',
-  'know yourself before you judge others',
-  'work hard in silence let success make the noise',
-  'be the change you wish to see in the world',
-  'every exit is an entry somewhere else',
-  'make each day your masterwork',
-  'the expert in anything was once a beginner',
-  // Level 5 — full alphabet + punctuation
-  'it always seems impossible until it\'s done.',
-  'in the middle of difficulty lies opportunity.',
-  'you miss 100% of the shots you don\'t take.',
-  'simplicity is the ultimate sophistication.',
-  'the only way to do great work is to love what you do.',
-  'success is not final, failure is not fatal.',
-  'whether you think you can or you can\'t, you\'re right.',
-  'a smooth sea never made a skilled sailor.',
-  'do one thing every day that scares you.',
-  'the harder I work, the luckier I get.',
-  'type fast, type well, type dvorak.',
+  'the thin sound died inside the shed',
+  'do not hide an idea inside',
+  'the tide eased and the noise died',
+  'add the dish to the stone and heat it',
+
+  // Level 3 — + r l
+  'still the noise that hides the truth inside',
+  'the hard road leads to the natural order',
+  'learn to listen and the truth is not so distant',
+  'the road ahead is still under the sun',
+  'do the hard trial and rest is earned',
+  'the older the error the harder to undo',
+  'a short trial tells us the natural order',
+  'sit in the shade and let the tired soul rest',
+  'the historian noted the ordeal in detail',
+
+  // Level 4 — + c f
+  'focus on the task and the rest is certain',
+  'the final choice is often the hardest one',
+  'reach for the future not the cold of the old',
+  'a careful effort leads to certain results',
+  'life is full of second chances if the first fails',
+  'cold facts do not often reach the final conclusion',
+  'force of character is the root of all action',
+  'a fresh cold stone is the best seat in the shade',
+  'the first draft is often the one that frees the rest',
+  'call to action often fails to reach the intended result',
+
+  // Level 5 — + g p
+  'progress is not a straight line it spirals and dips',
+  'plant the seed and step aside then let it go',
+  'great ideas are often plain and grounded in fact',
+  'stop and notice the pace of life and its patterns',
+  'the goal is progress not perfection at each step',
+  'good plans address the gaps not the perfect state',
+  'push past the point of comfort and the gain is real',
+  'getting to the starting point is often the hardest part',
+  'a sharp plan is often the start of real action',
+  'open the plan and see the gaps that lead to the goal',
+
+  // Level 6 — + y b
+  'build a life and a body that is strong and bright',
+  'the best path is often the one no one has yet tried',
+  'be still and the light begins to find its place',
+  'stay focused and the days begin to bring better results',
+  'a bright idea is born in the still of the early day',
+  'the body responds best to rest and regular habit',
+  'beyond the daily grind lies the life you are trying to build',
+  'by the end of the day the effort begins to yield',
+  'boys and girls need the space to try and to build',
+  'the ability to begin is the single biggest gift you possess',
+
+  // Level 7 — + m w
+  'the mind grows stronger with each word it holds and turns',
+  'when the work matters the days begin to feel worthwhile',
+  'a well written idea is worth more than a muddled one',
+  'morning brings a fresh start and the world begins again',
+  'write with care and the words will carry their own weight',
+  'the moment you stop wanting to grow is the moment things stop',
+  'most people want more time but they spend what they have',
+  'the world made more sense when the answers were simple',
+  'memories are made in the moments we are most present',
+  'with effort and attention the mind will always find a way',
+
+  // Level 8 — + v k
+  'the voice of a kind heart is never silent in the dark',
+  'keep your values close and your work will speak for itself',
+  'ask the hard questions and the easy answers fall away',
+  'a dark sky is full of light if you know where to look',
+  'every kind act leaves a mark even if we never know it',
+  'drive forward even when the path is dark and unknown',
+  'take the risk and the world takes note of your effort',
+  'very few people are alive to the value of stillness',
+  'speak kindly and the door opens before you even ask',
+  'back to the roots is always a valid path forward',
+
+  // Level 9 — full alphabet, no punctuation
+  'the quiet joy of a job well done is its own reward',
+  'just begin and the path will reveal itself in time',
+  'question everything but judge slowly and with care',
+  'the quick fox jumps and the lazy judge barely reacts',
+  'extraordinary things begin with a single quiet step',
+  'exact answers rarely exist on the first exploration',
+  'expect the unexpected and the journey holds no fear',
+  'jazz fills the zone with a joyful and unique mix',
+  'from zero to expert requires just one extra step each day',
+  'the fox and the hound exist in a quiet jungle zone',
+
+  // Level 10 — full alphabet + punctuation; multi-sentence passages
+  "writing takes practice. every sentence you type makes the next one come easier. begin small and build from there.",
+  "the best ideas often arrive quietly. learn to recognize them before they fade. write them down at once.",
+  "you don't have to be perfect; you have to be present. show up every day and the work will compound.",
+  "clarity is not the absence of complexity. it's the result of thinking something through until it makes sense.",
+  "every expert was once a beginner. the gap between them is nothing more than time, practice, and patience.",
+  "some problems require speed; others require stillness. the skill is knowing which one the moment demands.",
+  "read slowly to understand. write quickly to create. revise carefully to improve.",
+  "don't wait for the perfect moment; it doesn't exist. the best time to start was yesterday; the second-best is now.",
+  "habit is the architecture of daily life. build your routines with care, and the hard work becomes effortless.",
+  "a good question is worth more than a quick answer. ask it slowly, and then listen even more slowly.",
+  "the quiet mind sees what the anxious mind misses. slow down, and you'll find you can move faster.",
+  "practice is not what you do once you're good. it's what you do to become good, and then to stay there.",
+  "the ability to focus on one task at a time is a rare and valuable skill. most people jump from one thing to the next, losing depth in exchange for speed. resist the urge to multitask; quality requires presence.",
+  "every skill you build today is a gift to your future self. the work feels hard in the moment because it is; that difficulty is exactly what makes it valuable. do the hard thing first, and rest comes easy.",
 ];
 
 function getQuotesForLevel(level) {
