@@ -2,9 +2,9 @@
 
 **Project:** Dvorak Typing Tutor (browser-based, vanilla JS/CSS)
 **Repo:** https://github.com/cbrayanalytics/dvorak-tutor — branch `trunk`
-**Last updated:** 2026-05-09
+**Last updated:** 2026-05-24
 
-All phases complete through Phase 14 (level-map chip + segmented bar redesign).
+All phases complete through Phase 17 (speed gate / WPM floor).
 
 ---
 
@@ -25,6 +25,8 @@ All phases complete through Phase 14 (level-map chip + segmented bar redesign).
 - **Keyboard layout variants** — Standard (full 5-row), Corne 3×6 (columnar + outer-right `/−`), Corne 3×5 (columnar, no outer); column stagger via `--col-offset`; thumb cluster with SPC
 - **Mid-round adaptive injection** — on word boundary, hot chars (≥3 errors) trigger splice of 5 weighted words into remaining phrase; up to 2 injections per round; injected words highlighted via `.injected` class
 - **Level-map redesign** — replaced 10-pip overflow row with chip + segmented bar: pill badge (icon + name + N/10) on left, 10 thin `.level-seg` segments on right; done=green, current=orange+glow, locked=dim; tooltip on hover; fully clickable for back-navigation
+- **Colemak + Colemak-DH layouts** — full 10-level character progressions; on-screen layout tabs (Dvorak / Colemak / Colemak-DH) in header; `layoutFamily` setting persisted; switching family resets to level 1
+- **Speed gate** — `WPM_FLOOR[1..10]` = [15,18,22,26,30,35,40,45,50,55]; `getRoundResult()` returns `'pass'`/`'fail'`/`'wpm-gate'`; wpm-gate blocks Advance without auto-restart; TARGET stat in stats bar; `#wpm-target` hint in summary card; toggle in settings panel
 
 ---
 
@@ -32,9 +34,9 @@ All phases complete through Phase 14 (level-map chip + segmented bar redesign).
 
 | File | Tests |
 |------|-------|
-| `tests/words.test.js` | 117 |
-| `tests/index.test.js` | 152 |
-| `tests/app.test.js` | 195 |
+| `tests/words.test.js` | 130 |
+| `tests/index.test.js` | 161 |
+| `tests/app.test.js` | 240 |
 
 ---
 
@@ -54,3 +56,5 @@ All phases complete through Phase 14 (level-map chip + segmented bar redesign).
 - **Corne column stagger** — `--col-offset` CSS var set inline per column; middle=0px, ring=16px, index-inner=8px, index-outer=18px, pinky=32px, outer=38px
 - **Corne outer-left removed** — 3×6 only adds an outer-right column (`/ -`); no outer-left null column
 - **SPC thumb positioning** — `.corne-thumbs` uses `padding-left: calc(5 * var(--key-size) + 4 * var(--key-gap) + 60px)` to align under index-inner of right half
+- **Speed gate two-result system** — `'wpm-gate'` is a third outcome between pass and fail: accuracy check happens first (fail wins), then WPM check; call site collapses wpm-gate→pass when `settings.wpmGate` is off rather than branching inside `getRoundResult`
+- **TARGET stat hidden by default when wpmGate=false** — same pattern as timer (`#stat-target-wrap` + `#target-divider` with `hidden` attribute); `updateTargetVisibility()` manages both

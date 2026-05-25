@@ -85,6 +85,8 @@ Each keyboard row contains a `<div class="hand-gap"></div>` (20px spacer, `flex-
 | `audioOn` | true | — | — |
 | `mode` | `'words'` | `'words'`/`'quotes'` | — |
 | `keyboardStyle` | `'standard'` | `'standard'`/`'corne-3x6'`/`'corne-3x5'` | — |
+| `layoutFamily` | `'dvorak'` | `'dvorak'`/`'colemak'`/`'colemak-dh'` | — |
+| `wpmGate` | `true` | — | — |
 
 Timer auto-suggests based on WPM: `ceil(wordCount / max(wpm,1) * 1.5)`.  
 Timer **waits for first keystroke** before counting down — `armTimer()` shows the time, `startTimer()` starts the interval.
@@ -130,6 +132,14 @@ Stored as `{ 1: { char: count }, 2: ... }` — per-level error history. After ea
 
 **Mid-round adaptive injection**: on each word boundary (space typed), `injectAdaptiveWords()` checks `getHotChars(errorMap, MID_ROUND_ERROR_THRESHOLD=3)`. If hot chars exist and `injectionCount < MAX_MID_ROUND_INJECTIONS=2`, it splices `MID_ROUND_INJECT_COUNT=5` weighted words into the remaining phrase at the cursor position. Injected words are highlighted with `.injected` CSS class.
 
+### Speed gate (`WPM_FLOOR`)
+
+`WPM_FLOOR = [0, 15, 18, 22, 26, 30, 35, 40, 45, 50, 55]` — minimum WPM required to advance at each level (index = level number). `getRoundResult(wpm, acc, threshold, level)` returns `'pass'`, `'fail'`, or `'wpm-gate'`. When `wpmGate` is off, `'wpm-gate'` is treated as `'pass'` at the call site.
+
+- **`wpm-gate` result**: accuracy passes but WPM is below floor — banner shows orange warning, Advance button is NOT shown, no auto-restart (unlike `'fail'`).
+- **Summary card**: `#wpm-target` hint appears below the WPM value on wpm-gate rounds (`"need N WPM"`).
+- **TARGET stat**: `#stat-target-wrap` hidden when `wpmGate` is off; updated by `updateTargetVisibility()` (called from `applyLevel`, `syncSettingsPanel`, and `toggleWpmGate`).
+
 ### Gamification
 
 - **Streak**: `streak` counter increments on each passing round, resets on fail. Color-coded in stats bar (orange at 3+, green at 5+).
@@ -138,10 +148,11 @@ Stored as `{ 1: { char: count }, 2: ... }` — per-level error history. After ea
 
 ### Stats bar behavior
 
-Stats bar order: **WPM | ACC | progress bar | BEST | STREAK | TREND | TIME** (TIME hidden unless timer is on). There is no LEVEL stat — current level is shown in the level map pips above.
+Stats bar order: **WPM | ACC | progress bar | BEST | TARGET | STREAK | TREND | TIME** (TARGET hidden when `wpmGate` is off; TIME hidden unless timer is on). There is no LEVEL stat — current level is shown in the level map pips above.
 
 - WPM and ACC color coding (`stat-good` / `stat-warn` / `stat-bad`) only activates after **5 characters typed** — prevents misleading values at round start.
 - WPM shows `—` until 5 chars typed, then updates live.
+- TARGET shows the WPM floor for the current level; turns green once WPM is met live.
 - STREAK shows `0` (dimmed) when no streak; BEST shows `—` (dimmed) when no data yet.
 - TREND shows `—` (dimmed) until enough history exists; updates live after each round end.
 
@@ -171,6 +182,8 @@ Stats bar order: **WPM | ACC | progress bar | BEST | STREAK | TREND | TIME** (TI
 | `calcTrend(history)` | Returns `'up'`/`'down'`/`'flat'` from history array |
 | `renderSparkline(wpmValues)` | SVG polyline element for WPM trend |
 | `getHotChars(errMap, threshold)` | Returns chars with error count ≥ threshold (used for mid-round injection) |
+| `getRoundResult(wpm, acc, threshold, level)` | Returns `'pass'` / `'fail'` / `'wpm-gate'` based on WPM_FLOOR and accuracy threshold |
+| `getLayoutFamily()` | Returns active layout family (`'dvorak'`/`'colemak'`/`'colemak-dh'`) from settings |
 
 ## Key DOM functions
 
@@ -190,6 +203,9 @@ Stats bar order: **WPM | ACC | progress bar | BEST | STREAK | TREND | TIME** (TI
 | `updateDrillBtn(weak)` | Shows/hides `#drill-btn` based on weak key object |
 | `showHistoryPanel()` / `closeHistoryPanel()` | Open/close round history overlay |
 | `handleKeydown(e)` | Core input handler; starts timer + roundStartTime on first key |
+| `updateTargetVisibility()` | Shows/hides `#stat-target-wrap` and `#target-divider` based on `wpmGate` setting; sets TARGET value |
+| `toggleWpmGate()` | Toggles `settings.wpmGate`, updates button label, calls `updateTargetVisibility()` |
+| `applyLayoutFamily(family)` | Switches layout family (Dvorak/Colemak/Colemak-DH); resets to level 1 on family change |
 | `init()` | Entry point — called on DOMContentLoaded |
 
 ## CSS Gotchas
