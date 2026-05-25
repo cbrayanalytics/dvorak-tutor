@@ -15,7 +15,7 @@ open index.html          # macOS — opens in default browser
 Tests are plain Node.js files — no test framework:
 
 ```bash
-node tests/words.test.js   # 130 tests  — word list, level filtering, quotes
+node tests/words.test.js   # 133 tests  — word list, level filtering, quotes
 node tests/index.test.js   # 161 tests — HTML structure and data attributes
 node tests/app.test.js     # 240 tests — game logic unit tests
 ```
